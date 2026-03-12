@@ -1,0 +1,16 @@
+node_modules
+.next
+dist
+out
+.git
+.gitignore
+Dockerfile
+docker-compose*
+.env.example
+npm-debug.log*
+pnpm-debug.log*
+.agents
+.husky
+.github
+.vscode
+.tests
