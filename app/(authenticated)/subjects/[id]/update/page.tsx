@@ -33,8 +33,8 @@ export default function UpdateSubjectPage() {
       <Page
         className="max-w-xl w-full mx-auto mt-3"
         isLoading={isLoading}
-        title="Update Customer"
-        description="Fill out the form below to update the customer's information."
+        title="Perbarui Mata Pelajaran"
+        description="Isi formulir di bawah ini untuk memperbarui informasi subjek."
       >
         {data?.data && (
           <UpdateSubjectForm

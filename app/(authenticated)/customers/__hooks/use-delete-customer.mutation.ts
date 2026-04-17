@@ -12,7 +12,7 @@ export const useDeleteCustomerMutation = () => {
       return await api.delete(`/customers/${id}`);
     },
     onSuccess: () => {
-      toast.success("Customer deleted successfully");
+      toast.success("Customer berhasil dihapus");
 
       // Invalidate the customers query to refetch the updated list
       queryClient.invalidateQueries({

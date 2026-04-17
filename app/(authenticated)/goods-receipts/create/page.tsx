@@ -49,9 +49,9 @@ export default function CreateGoodsReceiptPage() {
 
   return (
     <Page
-      title="Create Goods Receipt"
-      description="Terima barang dari Purchase Order (quantity dapat disesuaikan)"
-      className="max-w-4xl mx-auto mt-3 h-full overflow-y-auto"
+      title="Catatan Buku Masuk"
+      description="Terima barang dari Belanja Buku "
+      className="mt-3 px-4"
       style={{ height: 'calc(100vh - 100px)' }}
     >
       <div className="pb-20">

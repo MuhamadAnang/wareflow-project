@@ -1,14 +1,17 @@
 "use client";
 
 import {
-  BookOpenText,
+  Album,
+  ArrowBigDown,
+  BookType,
   BrainCircuit,
+  Building,
   LayoutDashboard,
+  Library,
   ListChecks,
   ShoppingCart,
   Truck,
   Undo,
-  User,
   Users,
 } from "lucide-react";
 import { Route as RouteNext } from "next";
@@ -29,43 +32,68 @@ export const MENU_ITEMS: MenuWithChildren[] = [
     href: "/dashboard",
     icon: <LayoutDashboard />,
   },
-  {
-    label: "Master Buku",
-    icon: <BookOpenText />,
-    children: [
-      {
-        label: "Buku Masuk",
-        href: "/bukumasuk",
-      },
-      {
-        label: "Buku Keluar",
-        href: "/bukukeluar",
-      },
-    ],
-  },
-  {
-    label: "User",
-    href: "/users",
-    icon: <User />,
-  },
+  // {
+  //   label: "Master Buku",
+  //   icon: <BookOpenText />,
+  //   children: [
+  //     {
+  //       label: "Buku Masuk",
+  //       href: "/bukumasuk",
+  //     },
+  //     {
+  //       label: "Buku Keluar",
+  //       href: "/bukukeluar",
+  //     },
+  //   ],
+  // },
+  // {
+  //   label: "User",
+  //   href: "/users",
+  //   icon: <User />,
+  // },
   {
     label: "Customer",
     href: "/customers",
     icon: <Users />,
   },
   {
-    label: "Belanja",
-    href: "/belanja",
+    label: "Supplier",
+    href: "/suppliers",
+    icon: <Building />,
+  },
+  {
+    label: "Mata Pelajaran",
+    href: "/subjects",
+    icon: <BookType />,
+  },
+  {
+    label: "Judul Buku",
+    href: "/book-titles",
+    icon: <Library />,
+  },
+  {
+    label: "Daftar Buku",
+    href: "/books",
+    icon: <Album />,
+  },
+  {
+    label: "Belanja Buku",
+    href: "/purchase-orders",
     icon: <ShoppingCart />,
   },
   {
-    label: "Pesanan",
-    href: "/pesanan",
+    label: "Buku Masuk Gudang",
+    href: "/goods-receipts",
+    icon: <ArrowBigDown />,
+  },
+  {
+    label: "Pesanan Customer",
+    href: "/customer-orders",
     icon: <ListChecks />,
   },
   {
     label: "Pengiriman",
-    href: "/pengiriman",
+    href: "/goods-out",
     icon: <Truck />,
   },
   {

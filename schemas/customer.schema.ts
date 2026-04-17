@@ -7,27 +7,27 @@ export const CreateOrUpdateCustomerSchema = z.object({
   name: z
     .string()
     .trim()
-    .nonempty("Name is required")
-    .max(255, "Name must be less than 255 characters"),
+    .nonempty("Name harus diisi")
+    .max(255, "Nama harus kurang dari 255 karakter"),
   phone: z
     .string()
     .trim()
-    .nonempty("Phone is required")
-    .max(20, "Phone must be less than 20 characters")
+    .nonempty("No HP harus diisi")
+    .max(20, "No HP harus kurang dari 20 karakter")
     .refine((value) => {
       const phoneRegex = /^0\d{9,14}$/;
       return phoneRegex.test(value);
-    }, "Phone number is not valid"),
+    }, "No HP tidak valid"),
   address: z
     .string()
     .trim()
-    .nonempty("Address is required")
-    .max(500, "Address must be less than 500 characters"),
-  school: z
+    .nonempty("Alamat harus diisi")
+    .max(500, "Alamat harus kurang dari 500 karakter"),
+  institution: z
     .string()
     .trim()
-    .nonempty("School is required")
-    .max(255, "School must be less than 255 characters"),
+    .nonempty("Institusi/Sekolah harus diisi")
+    .max(255, "Institusi/Sekolah harus kurang dari 255 karakter"),
   status: z.enum(customerStatusEnum.enumValues),
 });
 

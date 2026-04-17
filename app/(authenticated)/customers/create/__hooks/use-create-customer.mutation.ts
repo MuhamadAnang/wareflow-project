@@ -14,7 +14,7 @@ export const useCreateCustomerMutation = () => {
       return await api.post("/customers", payload);
     },
     onSuccess: () => {
-      toast.success("Customer created successfully", {
+      toast.success("Customer berhasil dibuat", {
         onAutoClose: () => {
           router.push("/customers");
         },

@@ -90,8 +90,8 @@ function UpdateForm({
   return (
     <Page
       // className=" mx-auto"
-      title="Update Purchase Order"
-      description="Edit informasi purchase order"
+      // title="Perbarui Informasi Belanja"
+      // description="Edit informasi Belanja Buku ke supplier, termasuk supplier, tanggal pesanan, catatan, dan item yang dipesan."
     >
       <CreateOrUpdatePurchaseOrderForm
         form={form}

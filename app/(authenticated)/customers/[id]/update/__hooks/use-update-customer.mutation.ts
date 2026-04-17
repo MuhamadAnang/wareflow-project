@@ -14,7 +14,7 @@ export const useUpdateCustomerMutation = (id: number) => {
       return await api.put(`/customers/${id}`, data);
     },
     onSuccess: () => {
-      toast.success("Customer updated successfully", {
+      toast.success("Customer berhasil diperbarui", {
         onAutoClose: () => {
           router.push(`/customers/${id}`);
         },

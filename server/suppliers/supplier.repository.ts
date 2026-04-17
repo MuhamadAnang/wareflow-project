@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { buildCountQuery, buildPaginatedQuery, TColumnsDefinition } from "@/lib/query-builder";
 import { TIndexSupplierQuery } from "@/schemas/supplier.schema";
 import { TNewSupplier, TUpdateSupplier } from "@/types/database";
-import { eq, isNull } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 
 export const createSupplierRepository = async (data: TNewSupplier) => {
   return await db.insert(supplierTable).values(data).returning();
@@ -34,14 +34,14 @@ export const getSuppliersCountRepository = async (queryParams: TIndexSupplierQue
 };
 
 export const getSupplierByIdRepository = async (id: number) => {
-  return await db.select().from(supplierTable).where(eq(supplierTable.id, id));
+  return await db.select().from(supplierTable).where(and(eq(supplierTable.id, id), isNull(supplierTable.deletedAt)));
 };
 
 export const updateSupplierByIdRepository = async (id: number, data: TUpdateSupplier) => {
   return await db
     .update(supplierTable)
     .set(data)
-    .where(eq(supplierTable.id, id))
+    .where(and(eq(supplierTable.id, id), isNull(supplierTable.deletedAt)))
     .returning();
 };
 
@@ -49,6 +49,6 @@ export const deleteSupplierByIdRepository = async (id: number) => {
   return await db
     .update(supplierTable)
     .set({ deletedAt: new Date() })
-    .where(eq(supplierTable.id, id))
+    .where(and(eq(supplierTable.id, id), isNull(supplierTable.deletedAt)))
     .returning();
 };

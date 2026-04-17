@@ -114,7 +114,7 @@ export default function BookTitlesPage() {
       headerAction={
         <Link href={"/book-titles/create"}>
           <Button>
-            <Plus /> Create New BookTitle
+            <Plus /> Buat Judul Buku
           </Button>
         </Link>
       }

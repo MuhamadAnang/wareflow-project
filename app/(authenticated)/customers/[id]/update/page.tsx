@@ -36,8 +36,8 @@ export default function UpdateCustomerPage() {
     <Page
       className="max-w-xl w-full mx-auto mt-3"
       isLoading={isLoading}
-      title="Update Customer"
-      description="Fill out the form below to update the customer's information."
+      title="Perbarui Data Customer"
+      description="Isi formulir di bawah ini untuk memperbarui informasi pelanggan."
     >
       {data?.data && (
         <UpdateCustomerForm
@@ -47,7 +47,7 @@ export default function UpdateCustomerPage() {
             name: data.data.name,
             phone: data.data.phone,
             address: data.data.address,
-            school: data.data.intitution,
+            institution: data.data.institution,
             status: data.data.status as (typeof customerStatusEnum.enumValues)[number],
           }}
         />

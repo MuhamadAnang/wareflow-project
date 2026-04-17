@@ -17,12 +17,12 @@ export default function PurchaseOrderDetailPage() {
   return (
     <Page
       isLoading={isLoading}
-      title="Purchase Order Detail"
-      description="Detail information about the purchase order."
+      title="Detail Belanja"
+      description="Detail informasi tentang belanja buku ke supplier."
     >
       <Card className="gap-3 shadow-none">
         <CardHeader>
-          <CardTitle>PO Information</CardTitle>
+          <CardTitle>Detail</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
@@ -36,7 +36,7 @@ export default function PurchaseOrderDetailPage() {
                 <TableCell className="w-full">{po?.supplierName}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="w-auto bg-background">Order Date</TableCell>
+                <TableCell className="w-auto bg-background">Tanggal Pesanan</TableCell>
                 <TableCell className="w-full">
                   {po?.orderDate
                     ? convertUtcToLocalTime({
@@ -47,11 +47,11 @@ export default function PurchaseOrderDetailPage() {
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="w-auto bg-background">Note</TableCell>
+                <TableCell className="w-auto bg-background">Catatan</TableCell>
                 <TableCell className="w-full">{po?.note || "-"}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="w-auto bg-background">Created At</TableCell>
+                <TableCell className="w-auto bg-background">Dibuat Pada</TableCell>
                 <TableCell className="w-full">
                   {po?.createdAt
                     ? convertUtcToLocalTime({
@@ -62,7 +62,7 @@ export default function PurchaseOrderDetailPage() {
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="w-auto bg-background">Last Updated At</TableCell>
+                <TableCell className="w-auto bg-background">Terakhir Diperbarui</TableCell>
                 <TableCell className="w-full">
                   {po?.updatedAt
                     ? convertUtcToLocalTime({
@@ -80,15 +80,15 @@ export default function PurchaseOrderDetailPage() {
       {po?.items && po.items.length > 0 && (
         <Card className="gap-3 shadow-none mt-6">
           <CardHeader>
-            <CardTitle>Order Items</CardTitle>
+            <CardTitle>Item</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
               <TableBody>
                 <TableRow>
-                  <TableCell className="bg-background font-semibold">Book Code</TableCell>
-                  <TableCell className="bg-background font-semibold">Book Title</TableCell>
-                  <TableCell className="bg-background font-semibold text-right">Quantity</TableCell>
+                  <TableCell className="bg-background font-semibold">Kode Buku </TableCell>
+                  <TableCell className="bg-background font-semibold">Judul Buku</TableCell>
+                  <TableCell className="bg-background font-semibold text-right">Jumlah</TableCell>
                 </TableRow>
                 {po.items.map((item) => (
                   <TableRow key={item.id}>

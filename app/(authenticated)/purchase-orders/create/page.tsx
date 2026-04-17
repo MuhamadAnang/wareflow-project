@@ -25,8 +25,8 @@ export default function CreatePurchaseOrderPage() {
   return (
     <Page
       // className="p-0"
-      title="Buat Purchase Order Baru"
-      description="Buat pesanan pembelian ke supplier"
+      // title="Buat Purchase Order Baru"
+      // description="Buat pesanan pembelian ke supplier"
     >
       <CreateOrUpdatePurchaseOrderForm
         form={form}

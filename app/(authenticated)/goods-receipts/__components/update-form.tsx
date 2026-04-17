@@ -110,7 +110,7 @@ export function GoodsReceiptUpdateForm({ form, books, isPending }: UpdateFormPro
                       </div>
 
                       <div className="col-span-3">
-                        <FieldLabel>Quantity *</FieldLabel>
+                        <FieldLabel>Jumlah *</FieldLabel>
                         <Input
                           type="number"
                           min={1}
@@ -154,7 +154,7 @@ export function GoodsReceiptUpdateForm({ form, books, isPending }: UpdateFormPro
           )}
         </form.Field>
         <Button type="submit" isLoading={isPending}>
-          {isPending ? "Menyimpan..." : "Update Goods Receipt"}
+          {isPending ? "Menyimpan..." : "Perbarui"}
         </Button>
       </FieldGroup>
     </form>

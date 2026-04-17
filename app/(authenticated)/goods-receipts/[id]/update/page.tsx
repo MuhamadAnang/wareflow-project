@@ -58,9 +58,9 @@ export default function UpdateGoodsReceiptPage() {
 
   return (
     <Page
-      className="max-w-4xl mx-auto mt-3"
-      title="Update Goods Receipt"
-      description="Edit informasi penerimaan barang (termasuk item)"
+      className="mt-3 px-10"
+      title="Perbarui Informasi Buku Masuk"
+      description="Edit informasi penerimaan barang"
     >
       <UpdateFormContent
         receipt={receipt}

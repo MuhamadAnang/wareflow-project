@@ -23,8 +23,8 @@ export default function CreateSupplierPage() {
   return (
     <Page
       className="max-w-3xl mx-auto mt-3"
-      title="Create Supplier"
-      description="Fill out the form below to create a new customer. Make sure to provide accurate information to ensure smooth communication and service delivery."
+      title="Buat Supplier"
+      description="Isi formulir di bawah ini untuk membuat supplier baru. Pastikan untuk memberikan informasi yang akurat untuk memastikan komunikasi dan layanan yang lancar."
     >
       <CreateOrUpdateForm form={form} isPending={isPending} />
     </Page>

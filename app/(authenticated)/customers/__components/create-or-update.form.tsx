@@ -26,6 +26,7 @@ export const CreateOrUpdateForm = ({ form, isPending }: Props) => {
     <form
       onSubmit={(e) => {
         e.preventDefault();
+        e.stopPropagation();
         form.handleSubmit(e);
       }}
     >
@@ -38,7 +39,7 @@ export const CreateOrUpdateForm = ({ form, isPending }: Props) => {
 
             return (
               <Field>
-                <FieldLabel>Name</FieldLabel>
+                <FieldLabel>Nama</FieldLabel>
                 <Input
                   id={field.name}
                   name={field.name}
@@ -61,7 +62,7 @@ export const CreateOrUpdateForm = ({ form, isPending }: Props) => {
 
             return (
               <Field>
-                <FieldLabel>Phone</FieldLabel>
+                <FieldLabel>No Handphone</FieldLabel>
                 <Input
                   id={field.name}
                   name={field.name}
@@ -80,14 +81,14 @@ export const CreateOrUpdateForm = ({ form, isPending }: Props) => {
           }}
         />
         <form.Field
-          name="school"
+          name="institution"
           // eslint-disable-next-line react/no-children-prop
           children={(field) => {
             const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 
             return (
               <Field>
-                <FieldLabel>School</FieldLabel>
+                <FieldLabel>Institusi/Sekolah</FieldLabel>
                 <Input
                   id={field.name}
                   name={field.name}
@@ -110,7 +111,7 @@ export const CreateOrUpdateForm = ({ form, isPending }: Props) => {
 
             return (
               <Field>
-                <FieldLabel>Address</FieldLabel>
+                <FieldLabel>Alamat</FieldLabel>
                 <Textarea
                   id={field.name}
                   name={field.name}
@@ -133,7 +134,7 @@ export const CreateOrUpdateForm = ({ form, isPending }: Props) => {
 
             return (
               <Field>
-                <FieldLabel>Status</FieldLabel>
+                <FieldLabel>Status Pelanggan</FieldLabel>
                 <RadioGroup
                   className="grid grid-cols-3"
                   onValueChange={(value) =>
@@ -161,7 +162,7 @@ export const CreateOrUpdateForm = ({ form, isPending }: Props) => {
             );
           }}
         ></form.Field>
-        <Button isLoading={isPending || form.state.isSubmitting}>Create Customer</Button>
+        <Button isLoading={isPending || form.state.isSubmitting}>Buat Customer</Button>
       </FieldGroup>
     </form>
   );

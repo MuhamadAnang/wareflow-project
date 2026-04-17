@@ -16,7 +16,6 @@ import { IndexCustomerQuerySchema } from "@/schemas/customer.schema";
 import { useEffect } from "react";
 import { customerStatusEnum } from "@/drizzle/schema";
 import { Badge } from "@/app/_components/ui/badge";
-import { toast } from "sonner";
 import { useDeleteCustomerMutation } from "./__hooks/use-delete-customer.mutation";
 
 export default function CustomersPage() {
@@ -42,15 +41,15 @@ export default function CustomersPage() {
   const columns: ColumnDef<TCustomer>[] = [
     {
       accessorKey: "name",
-      header: "Customer Name",
+      header: "Nama Customer",
       cell: ({ row }) => {
         const customer = row.original;
         return toTitleCase(customer.name);
       },
     },
     {
-      accessorKey: "school",
-      header: "School",
+      accessorKey: "institution",
+      header: "Institusi/Sekolah",
     },
     {
       accessorKey: "status",
@@ -61,7 +60,7 @@ export default function CustomersPage() {
     },
     {
       accessorKey: "actions",
-      header: "Actions",
+      header: "Aksi",
       cell: ({ row }) => {
         const customer = row.original;
         const id = customer.id;
@@ -108,11 +107,11 @@ export default function CustomersPage() {
   return (
     <Page
       title="Customers"
-      description="Manage your customers here. You can view, add, edit, and delete customer information as needed."
+      description="Kelola pelanggan Anda di sini. Anda dapat melihat, menambahkan, mengedit, dan menghapus informasi pelanggan sesuai kebutuhan."
       headerAction={
         <Link href={"/customers/create"}>
           <Button>
-            <Plus /> Create New Customer
+            <Plus /> Buat Customer Baru
           </Button>
         </Link>
       }
@@ -127,7 +126,7 @@ export default function CustomersPage() {
         sortOptions={sortOptions}
         isSearchable
         sortDefaultValue={filters.sort}
-        placeholderSearch="Search with name ..."
+        placeholderSearch="Cari dengan nama ..."
         filterComponents={[
           {
             type: "Select",

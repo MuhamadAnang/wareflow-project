@@ -37,7 +37,7 @@ export default function SuppliersPage() {
   const columns: ColumnDef<TSupplier>[] = [
     {
       accessorKey: "name",
-      header: "Supplier Name",
+      header: "Nama Supplier ",
       cell: ({ row }) => {
         const supplier = row.original;
         return toTitleCase(supplier.name);
@@ -45,15 +45,15 @@ export default function SuppliersPage() {
     },
     {
       accessorKey: "phone",
-      header: "Phone",
+      header: "No Handphone",
     },
     {
       accessorKey: "address",
-      header: "Address",
+      header: "Alamat",
     },
     {
       accessorKey: "actions",
-      header: "Actions",
+      header: "Aksi",
       cell: ({ row }) => {
         const supplier = row.original;
         const id = supplier.id;
@@ -89,7 +89,7 @@ export default function SuppliersPage() {
   const sortOptions: TSortOption[] = [
     {
       key: "name",
-      label: "Customer Name",
+      label: "Nama Supplier",
       options: [
         { direction: "asc", label: "A-Z" },
         { direction: "desc", label: "Z-A" },
@@ -100,11 +100,11 @@ export default function SuppliersPage() {
   return (
     <Page
     title="Suppliers"
-    description="Manage your suppliers here. You can view, add, edit, and delete supplier information as needed."
+    description="Kelola supplier Anda di sini. Anda dapat melihat, menambah, mengedit, dan menghapus informasi supplier sesuai kebutuhan."
       headerAction={
         <Link href={"/suppliers/create"}>
           <Button>
-            <Plus /> Create New Suppliers
+            <Plus /> Buat Suppliers Baru
           </Button>
         </Link>
       }
@@ -119,7 +119,7 @@ export default function SuppliersPage() {
         sortOptions={sortOptions}
         isSearchable
         sortDefaultValue={filters.sort}
-        placeholderSearch="Search with name ..."
+        placeholderSearch="Cari dengan nama ..."
       />
     </Page>
   );

@@ -8,7 +8,6 @@ import { useGetSubjectsQuery } from "./__hooks/use-get-subjects.query";
 import DataTable from "@/app/_components/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { TSubject } from "@/types/database";
-import { toTitleCase } from "@/lib/utils";
 import { useBreadcrumb } from "@/app/_contexts/breadcrumb.context";
 import { useFilters } from "@/app/_hooks/use-filters";
 import { IndexSubjectQuerySchema } from "@/schemas/subject.schema";
@@ -36,10 +35,6 @@ export default function SubjectsPage() {
     {
       accessorKey: "name",
       header: "Nama Mata Pelajaran",
-      cell: ({ row }) => {
-        const subject = row.original;
-        return toTitleCase(subject.name);
-      },
     },
     {
       accessorKey: "actions",

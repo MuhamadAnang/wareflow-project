@@ -14,7 +14,7 @@ export const useUpdateSupplierMutation = (id: number) => {
         return await api.put(`/suppliers/${id}`, data);
       },
       onSuccess: () => {
-        toast.success("Supplier updated successfully", {
+        toast.success("Supplier berhasil diperbarui", {
           onAutoClose: () => {
             router.push(`/suppliers/${id}`);
           },

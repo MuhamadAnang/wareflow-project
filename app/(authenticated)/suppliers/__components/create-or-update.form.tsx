@@ -33,7 +33,7 @@ export const CreateOrUpdateForm = ({ form, isPending }: Props) => {
 
             return (
               <Field>
-                <FieldLabel>Name</FieldLabel>
+                <FieldLabel>Nama</FieldLabel>
                 <Input
                   id={field.name}
                   name={field.name}
@@ -56,7 +56,7 @@ export const CreateOrUpdateForm = ({ form, isPending }: Props) => {
 
             return (
               <Field>
-                <FieldLabel>Phone</FieldLabel>
+                <FieldLabel>No Handphone</FieldLabel>
                 <Input
                   id={field.name}
                   name={field.name}
@@ -82,7 +82,7 @@ export const CreateOrUpdateForm = ({ form, isPending }: Props) => {
 
             return (
               <Field>
-                <FieldLabel>Address</FieldLabel>
+                <FieldLabel>Alamat</FieldLabel>
                 <Textarea
                   id={field.name}
                   name={field.name}
@@ -97,7 +97,7 @@ export const CreateOrUpdateForm = ({ form, isPending }: Props) => {
             );
           }}
         />
-        <Button isLoading={isPending || form.state.isSubmitting}>Create Customer</Button>
+        <Button isLoading={isPending || form.state.isSubmitting}>Buat Supplier</Button>
       </FieldGroup>
     </form>
   );

@@ -1,27 +1,26 @@
-// import { createSortSchema } from "@/lib/validation";
-// import { IndexQueryParams } from "@/types/query-params";
+import { createSortSchema } from "@/lib/validation";
 import z from "zod";
 
 export const CreateOrUpdateSupplierSchema = z.object({
   name: z
     .string()
     .trim()
-    .nonempty("Name is required")
-    .max(255, "Name must be less than 255 characters"),
+    .nonempty("Nama harus diisi")
+    .max(255, "Nama harus kurang dari 255 karakter"),
   phone: z
     .string()
     .trim()
-    .nonempty("Phone is required")
-    .max(20, "Phone must be less than 20 characters")
+    .nonempty("No Handphone harus diisi")
+    .max(20, "No Handphone harus kurang dari 20 karakter")
     .refine((value) => {
       const phoneRegex = /^0\d{9,14}$/;
       return phoneRegex.test(value);
-    }, "Phone number is not valid"),
+    }, "No Handphone tidak valid"),
   address: z
     .string()
     .trim()
-    .nonempty("Address is required")
-    .max(500, "Address must be less than 500 characters"),
+    .nonempty("Alamat harus diisi")
+    .max(500, "Alamat harus kurang dari 500 karakter"),
 });
 
 export type TCreateOrUpdateSupplier = z.infer<typeof CreateOrUpdateSupplierSchema>;
@@ -32,7 +31,7 @@ export const IndexSupplierQuerySchema = z.object({
   pageSize: z.coerce.number().int().min(1).max(100).default(20),
   limit: z.coerce.number().int().min(1).max(500).default(20).optional(),
   search: z.string().optional(),
-  sort: z.string().optional(),
+  sort: createSortSchema(["name"]),
 });
 
 export type TIndexSupplierQuery = z.infer<typeof IndexSupplierQuerySchema>;

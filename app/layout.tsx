@@ -9,9 +9,9 @@ import { BreadcrumbProvider } from "./_contexts/breadcrumb.context";
 ensureEnvValidated();
 
 export const metadata: Metadata = {
-  title: "Routify",
+  title: "Bookflow",
   description:
-    "Routify is a web application that allows users to create, simulate, and analyze various routing algorithms in a visual and interactive way.",
+    "Bookflow is a web application that allows users to create, simulate, and analyze various routing algorithms in a visual and interactive way.",
 };
 
 export default function RootLayout({
@@ -24,7 +24,7 @@ export default function RootLayout({
       <BreadcrumbProvider>
         <html lang="en">
           <body className={`antialiased`}>
-            <SidebarProvider defaultOpen={false}>{children}</SidebarProvider>
+            <SidebarProvider open>{children}</SidebarProvider>
             <Toaster position="top-center" theme="light" />
           </body>
         </html>

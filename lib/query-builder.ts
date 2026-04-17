@@ -27,6 +27,7 @@ type TPaginationParams<TTable extends PgTable> = {
   table: TTable;
   columns: TColumnsDefinition<TTable>;
   queryParams: TIndexQueryParams;
+  baseConditions?: SQL[];
 };
 
 type TBuildWhereParams<TTable extends PgTable> = {
@@ -98,21 +99,27 @@ export const buildCountQuery = async <TTable extends PgTable>({
   table,
   columns,
   queryParams,
+  baseConditions,
 }: Omit<TPaginationParams<TTable>, "queryParams"> & {
   queryParams: Pick<TIndexQueryParams, "search"> & Record<string, unknown>;
 }) => {
-  const whereClause = buildGenericWhereClause({
+  const queryWhereClause = buildGenericWhereClause({
     table,
     queryParams,
     columns,
   });
+
+  const whereClause = [
+    ...(baseConditions ?? []),
+    queryWhereClause,
+  ].filter(Boolean) as SQL[];
 
   const result = await db
     .select({
       count: sql<number>`count(*)`.mapWith(Number),
     })
     .from(table as PgTable)
-    .where(whereClause);
+    .where(whereClause.length ? and(...whereClause) : undefined);
 
   return result[0]?.count ?? 0;
 };
@@ -121,20 +128,26 @@ export const buildPaginatedQuery = async <TTable extends PgTable>({
   table,
   columns,
   queryParams,
+  baseConditions,
 }: TPaginationParams<TTable>) => {
   const { page, pageSize, sort } = queryParams;
   const offset = calculateOffset(page, pageSize);
 
-  const whereClause = buildGenericWhereClause({
+  const queryWhereClause = buildGenericWhereClause({
     table,
     queryParams,
     columns,
   });
 
+  const whereClause = [
+    ...(baseConditions ?? []),
+    queryWhereClause,
+  ].filter(Boolean) as SQL[];
+
   const query = db
     .select()
     .from(table as PgTable)
-    .where(whereClause)
+    .where(whereClause.length ? and(...whereClause) : undefined)
     .limit(pageSize)
     .offset(offset);
 

@@ -12,7 +12,7 @@ import { useEffect } from "react";
 import { convertUtcToLocalTime } from "@/lib/utils";
 import { useFilters } from "@/app/_hooks/use-filters";
 import { IndexPurchaseOrderQuerySchema } from "@/schemas/purchase-order.schema";
-import { TPurchaseOrder, TPurchaseOrderWithSupplier } from "@/types/database";
+import { TPurchaseOrderWithSupplier } from "@/types/database";
 import { useDeletePurchaseOrderMutation } from "./__hooks/use-delete-purchase-order.mutation";
 import { TSortOption } from "@/app/_components/data-table/sort";
 
@@ -109,12 +109,12 @@ export default function PurchaseOrdersPage() {
 
   return (
     <Page
-      title="Purchase Orders"
-      description="Daftar semua Purchase Order ke supplier"
+      title="Belanja Buku"
+      description="Daftar semua Belanja Buku ke supplier"
       headerAction={
         <Link href="/purchase-orders/create">
           <Button>
-            <Plus className="mr-2 h-4 w-4" /> Buat Purchase Order Baru
+            <Plus className="mr-2 h-4 w-4" /> Tambah Belanja Baru
           </Button>
         </Link>
       }
@@ -129,7 +129,7 @@ export default function PurchaseOrdersPage() {
         sortOptions={sortOptions}
         isSearchable
         sortDefaultValue={filters.sort}
-        placeholderSearch="Search with name ..."
+        placeholderSearch="Cari dengan nama supplier ..."
       />
     </Page>
   );

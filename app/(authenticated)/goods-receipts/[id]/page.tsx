@@ -13,7 +13,7 @@ export default function GoodsReceiptDetailPage() {
   const receipt = data?.data;
 
   return (
-    <Page isLoading={isLoading} title="Goods Receipt Detail" description="Detail penerimaan barang">
+    <Page isLoading={isLoading} title="Detail Buku Masuk" description="Detail Informasi penerimaan barang di gudang">
       <Card className="shadow-none">
         <CardHeader>
           <CardTitle>Informasi Penerimaan</CardTitle>

@@ -17,7 +17,7 @@ export default function CustomerDetailPage() {
     <Page
       isLoading={isLoading}
       title="Customer Detail"
-      description="Detailed information about the customer, including contact details, order history, and any relevant notes or interactions. Use this page to get a comprehensive view of the customer's profile and manage their information effectively."
+      description="Informasi detail tentang pelanggan, termasuk detail kontak, riwayat pesanan, dan catatan atau interaksi yang relevan. Gunakan halaman ini untuk mendapatkan gambaran komprehensif tentang profil pelanggan dan mengelola informasi mereka secara efektif."
     >
       <Card className="gap-3 shadow-none">
         <CardContent>
@@ -28,29 +28,29 @@ export default function CustomerDetailPage() {
                 <TableCell className="w-full">{data?.data.id}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="w-auto bg-background">Name</TableCell>
+                <TableCell className="w-auto bg-background">Nama</TableCell>
                 <TableCell className="w-full">{data?.data.name}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="w-auto bg-background">Phone</TableCell>
+                <TableCell className="w-auto bg-background">No Handphone</TableCell>
                 <TableCell className="w-full">{data?.data.phone}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="w-auto bg-background">Address</TableCell>
+                <TableCell className="w-auto bg-background">Alamat</TableCell>
                 <TableCell className="w-full">{data?.data.address}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="w-auto bg-background">School</TableCell>
-                <TableCell className="w-full">{data?.data.school}</TableCell>
+                <TableCell className="w-auto bg-background">Intansi/Sekolah</TableCell>
+                <TableCell className="w-full">{data?.data.institution}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="w-auto bg-background">Status</TableCell>
+                <TableCell className="w-auto bg-background">Status Pelanggan</TableCell>
                 <TableCell className="w-full">
                   <Badge>{data && toTitleCase(data?.data.status)}</Badge>
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="w-auto bg-background">Created At</TableCell>
+                <TableCell className="w-auto bg-background">Dibuat pada</TableCell>
                 <TableCell className="w-full">
                   {data ? (
                     <>
@@ -65,7 +65,7 @@ export default function CustomerDetailPage() {
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="w-auto min-w-50 bg-background">Last Updated At</TableCell>
+                <TableCell className="w-auto min-w-50 bg-background">Terakhir Diperbarui</TableCell>
                 <TableCell className="w-full">
                   {data ? (
                     <>

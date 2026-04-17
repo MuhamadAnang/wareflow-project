@@ -73,7 +73,7 @@ export default function GoodsReceiptsPage() {
     },
     {
       accessorKey: "actions",
-      header: "Actions",
+      header: "Aksi",
       cell: ({ row }) => {
         const id = row.original.id;
         return (
@@ -101,17 +101,19 @@ export default function GoodsReceiptsPage() {
       },
     },
   ];
-  return (
-    <Page title="Goods Receipt" description="Daftar penerimaan barang">
-      <div className="flex justify-end mb-6">
+   return (
+    <Page 
+      title="Buku Masuk" 
+      description="Daftar penerimaan barang"
+      headerAction={
         <Button asChild>
           <Link href="/goods-receipts/create">
             <Plus className="mr-2 h-4 w-4" />
             Tambah Goods Receipt
           </Link>
         </Button>
-      </div>
-
+      }
+    >
       <DataTable
         columns={columns}
         source={data}

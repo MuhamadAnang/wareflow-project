@@ -44,7 +44,7 @@ export function GoodsReceiptCreateForm({ form, purchaseOrders, books, isPending,
     const selectValue = field.state.value && field.state.value !== 0 ? field.state.value.toString() : "";
     return (
       <Field>
-        <FieldLabel>Purchase Order *</FieldLabel>
+        <FieldLabel>Pesanan Buku *</FieldLabel>
         <Select
           value={selectValue}
           onValueChange={(value) => {
@@ -54,7 +54,7 @@ export function GoodsReceiptCreateForm({ form, purchaseOrders, books, isPending,
           }}
         >
           <SelectTrigger aria-invalid={isInvalid}>
-            <SelectValue placeholder="Pilih Purchase Order" />
+            <SelectValue placeholder="Pilih Pesanan Buku" />
           </SelectTrigger>
           <SelectContent>
             {purchaseOrders.map((po: any) => (

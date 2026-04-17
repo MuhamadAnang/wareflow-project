@@ -16,7 +16,7 @@ export default function SupplierDetailPage() {
       <Page
         isLoading={isLoading}
         title="Supplier Detail"
-        description="Detailed information about the Supplier, including contact details, order history, and any relevant notes or interactions. Use this page to get a comprehensive view of the Supplier's profile and manage their information effectively."
+        description="Informasi detail tentang Supplier, termasuk detail kontak, riwayat pesanan, dan catatan atau interaksi yang relevan. Gunakan halaman ini untuk mendapatkan gambaran komprehensif tentang profil Supplier dan mengelola informasi mereka secara efektif."
       >
         <Card className="gap-3 shadow-none">
           <CardContent>
@@ -27,19 +27,19 @@ export default function SupplierDetailPage() {
                   <TableCell className="w-full">{data?.data.id}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell className="w-auto bg-background">Name</TableCell>
+                  <TableCell className="w-auto bg-background">Nama</TableCell>
                   <TableCell className="w-full">{data?.data.name}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell className="w-auto bg-background">Phone</TableCell>
+                  <TableCell className="w-auto bg-background">No Handphone</TableCell>
                   <TableCell className="w-full">{data?.data.phone}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell className="w-auto bg-background">Address</TableCell>
+                  <TableCell className="w-auto bg-background">Alamat</TableCell>
                   <TableCell className="w-full">{data?.data.address}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell className="w-auto bg-background">Created At</TableCell>
+                  <TableCell className="w-auto bg-background">Dibuat Pada</TableCell>
                   <TableCell className="w-full">
                     {data ? (
                       <>
@@ -54,7 +54,7 @@ export default function SupplierDetailPage() {
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell className="w-auto min-w-50 bg-background">Last Updated At</TableCell>
+                  <TableCell className="w-auto min-w-50 bg-background">Terakhir Diperbarui</TableCell>
                   <TableCell className="w-full">
                     {data ? (
                       <>

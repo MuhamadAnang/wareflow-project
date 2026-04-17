@@ -14,7 +14,7 @@ export const useCreateSupplierMutation = () => {
         return await api.post("/suppliers", payload);
       },
       onSuccess: () => {
-        toast.success("Supplier created successfully", {
+        toast.success("Supplier berhasil ditambahkan", {
           onAutoClose: () => {
             router.push("/suppliers");
           },

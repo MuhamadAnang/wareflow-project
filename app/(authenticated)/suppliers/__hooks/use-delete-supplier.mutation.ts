@@ -12,7 +12,7 @@ export const useDeleteSupplierMutation = () => {
       return await api.delete(`/suppliers/${id}`);
     },
     onSuccess: () => {
-      toast.success("Supplier deleted successfully");
+      toast.success("Supplier Berhasil dihapus");
 
       // Invalidate the suppliers query to refetch the updated list
       queryClient.invalidateQueries({

@@ -30,8 +30,8 @@ export default function UpdateCustomerPage() {
     <Page
       className="max-w-xl w-full mx-auto mt-3"
       isLoading={isLoading}
-      title="Update Supplier"
-      description="Fill out the form below to update the supplier's information."
+      title="Perbarui Supplier"
+      description="Isi formulir di bawah ini untuk memperbarui informasi pemasok supplier."
     >
       {data?.data && (
         <UpdateSupplierForm

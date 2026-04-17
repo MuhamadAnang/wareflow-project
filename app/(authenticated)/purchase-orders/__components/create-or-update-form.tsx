@@ -72,11 +72,11 @@ export const CreateOrUpdatePurchaseOrderForm = ({
             </div>
             <div>
               <h2 className="text-base font-semibold leading-tight">
-                {isEdit ? "Update Purchase Order" : "Buat Purchase Order"}
+                {isEdit ? "Perbarui data Belanja" : "Buat Belanja Baru"}
               </h2>
               <p className="text-xs text-muted-foreground mt-0.5">
                 {isEdit
-                  ? "Edit informasi purchase order"
+                  ? "Edit informasi belanja"
                   : "Pesanan pembelian ke supplier"}
               </p>
             </div>
@@ -222,8 +222,8 @@ export const CreateOrUpdatePurchaseOrderForm = ({
             {isPending
               ? "Menyimpan..."
               : isEdit
-              ? "Update Purchase Order"
-              : "Buat Purchase Order"}
+              ? "Perbarui "
+              : "Tambah Belanja"}
           </Button>
         </div>
       </aside>

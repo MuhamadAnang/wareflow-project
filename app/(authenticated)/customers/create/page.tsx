@@ -14,7 +14,7 @@ export default function CreateCustomerPage() {
       name: "",
       phone: "",
       address: "",
-      school: "",
+      institution: "",
       status: customerStatusEnum.enumValues[0],
     },
     onSubmit: async (values) => {
@@ -25,8 +25,8 @@ export default function CreateCustomerPage() {
   return (
     <Page
       className="max-w-3xl mx-auto mt-3"
-      title="Create Customer"
-      description="Fill out the form below to create a new customer. Make sure to provide accurate information to ensure smooth communication and service delivery."
+      title="Buat Customer"
+      description="Isi formulir di bawah ini untuk membuat pelanggan baru. Pastikan untuk memberikan informasi yang akurat agar komunikasi dan penyampaian layanan berjalan lancar."
     >
       <CreateOrUpdateForm form={form} isPending={isPending} />
     </Page>
