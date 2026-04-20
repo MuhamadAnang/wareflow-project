@@ -1,46 +1,46 @@
 "use client";
 
 import Page from "@/app/_components/page";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useGetBook } from "../__hooks/use-get-book.query";
-import { useUpdateBookMutation } from "./__hooks/use-update-book.mutation"; 
-import { semesterEnum } from "@/drizzle/schema";
-import { useGetBookTitlesQuery } from "../../__hooks/use-get-book-titles.query";
-import { useGetSuppliersQuery } from "../../__hooks/use-get-suppliers.query";
+import { useUpdateBookMutation } from "./__hooks/use-update-book.mutation";
+import { useGetSubjectsQuery } from "../../__hooks/use-get-subjects.query";
+import { useGetPercetakansQuery } from "../../__hooks/use-get-percetakans.query";
 import { useBookForm } from "../../__hooks/use-book-form";
 import { BookForm } from "../../__components/create-or-update.form";
 
 export default function UpdateBookPage() {
   const params = useParams();
   const bookId = Number(params.id);
-  const router = useRouter();
 
   const { data: bookData, isLoading: loadingBook } = useGetBook(bookId);
-  const { data: bookTitlesData, isLoading: loadingTitles } = useGetBookTitlesQuery();
-  const { data: suppliersData, isLoading: loadingSuppliers } = useGetSuppliersQuery();
+  const { data: subjectsData, isLoading: loadingSubjects } = useGetSubjectsQuery();
+  const { data: percetakansData, isLoading: loadingPercetakans } = useGetPercetakansQuery();
 
   const { mutateAsync: updateBook, isPending: isUpdating } = useUpdateBookMutation(bookId);
 
   const book = bookData?.data;
-  const bookTitles = bookTitlesData ?? [];
-  const suppliers = suppliersData ?? [];
+  const subjects = subjectsData ?? [];
+  const percetakans = percetakansData ?? [];
 
   const form = useBookForm({
     defaultValues: {
       code: book?.code || "",
-      bookTitleId: book?.bookTitleId || 0,
-      supplierId: book?.supplierId || 0,
-      semester: book?.semester || semesterEnum.enumValues[0],
-      pages: book?.pages ?? undefined,
-      productionYear: book?.productionYear ?? undefined,
+      subjectId: book?.subjectId || 0,
+      grade: book?.grade || 0,
+      level: book?.level || "",
+      curriculum: book?.curriculum || "",
+      semester: book?.semester || "GANJIL",
+      pages: book?.pages ?? null,
+      productionYear: book?.productionYear ?? null,
+      percetakanId: book?.percetakanId || 0,
     },
     onSubmit: async (values) => {
       await updateBook(values);
-      router.push(`/books/${bookId}`);
     },
   });
 
-  const isFormLoading = loadingBook || loadingTitles || loadingSuppliers || isUpdating;
+  const isFormLoading = loadingBook || loadingSubjects || loadingPercetakans || isUpdating;
 
   if (loadingBook || !book) {
     return (
@@ -54,14 +54,14 @@ export default function UpdateBookPage() {
     <Page
       className="max-w-3xl mx-auto mt-3"
       title="Edit Buku"
-      description="Perbarui informasi varian buku fisik ini. Pastikan data tetap akurat."
+      description="Perbarui informasi identitas buku."
       isLoading={isFormLoading}
     >
       <BookForm
         form={form}
         isPending={isUpdating}
-        bookTitles={bookTitles}
-        suppliers={suppliers}
+        subjects={subjects}
+        percetakans={percetakans}
       />
     </Page>
   );

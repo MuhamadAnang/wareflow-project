@@ -1,5 +1,3 @@
-// mirip customer.controller.ts
-
 import { handleException } from "@/common/exception/helper";
 import { parseQueryParams, validateSchema } from "@/lib/validation";
 import { CreateOrUpdateBookSchema, IndexBookQuerySchema } from "@/schemas/book.schema";
@@ -19,8 +17,10 @@ export const createBookController = async (req: NextRequest) => {
   try {
     const body = await req.json();
     validateSchema(CreateOrUpdateBookSchema, body);
+
     await createBookService(body);
-    return responseFormatter.created({ message: "Book created successfully" });
+
+    return responseFormatter.created({ message: "Buku berhasil ditambahkan" });
   } catch (error) {
     return handleException(error);
   }
@@ -29,14 +29,18 @@ export const createBookController = async (req: NextRequest) => {
 export const getBooksWithPaginationController = async (req: NextRequest) => {
   try {
     const { searchParams } = new URL(req.url);
+
     const raw = {
       page: searchParams.get("page"),
       pageSize: searchParams.get("pageSize"),
       search: searchParams.get("search") || undefined,
       sort: parseSortParams(searchParams),
-      bookTitleId: searchParams.get("bookTitleId") || undefined,
-      supplierId: searchParams.get("supplierId") || undefined,
+      subjectId: searchParams.get("subjectId") || undefined,
+      grade: searchParams.get("grade") || undefined,
+      level: searchParams.get("level") || undefined,
+      curriculum: searchParams.get("curriculum") || undefined,
       semester: searchParams.get("semester") || undefined,
+      percetakanId: searchParams.get("percetakanId") || undefined,
     };
 
     const parsed = parseQueryParams(IndexBookQuerySchema, raw);
@@ -52,7 +56,7 @@ export const getBooksWithPaginationController = async (req: NextRequest) => {
     return responseFormatter.successWithPagination<TBookListItem>({
       data,
       meta,
-      message: "Books retrieved successfully",
+      message: "Daftar buku berhasil diambil",
     });
   } catch (error) {
     return handleException(error);
@@ -64,7 +68,7 @@ export const getBookByIdController = async (id: number) => {
     const book = await getBookByIdService(id);
     return responseFormatter.successWithData<TBookListItem>({
       data: book,
-      message: "Book retrieved successfully",
+      message: "Data buku berhasil diambil",
     });
   } catch (error) {
     return handleException(error);
@@ -75,10 +79,11 @@ export const updateBookController = async (id: number, req: NextRequest) => {
   try {
     const body = await req.json();
     validateSchema(CreateOrUpdateBookSchema, body);
+
     const updated = await updateBookService(id, body);
     return responseFormatter.successWithData<TBookListItem>({
       data: updated,
-      message: "Book updated successfully",
+      message: "Buku berhasil diperbarui",
     });
   } catch (error) {
     return handleException(error);
@@ -88,7 +93,7 @@ export const updateBookController = async (id: number, req: NextRequest) => {
 export const deleteBookController = async (id: number) => {
   try {
     await deleteBookService(id);
-    return responseFormatter.success({ message: "Book deleted successfully" });
+    return responseFormatter.success({ message: "Buku berhasil dihapus" });
   } catch (error) {
     return handleException(error);
   }

@@ -4,7 +4,6 @@ import {
   purchaseOrderItemTable, 
   supplierTable, 
   bookTable, 
-  bookTitleTable, 
   subjectTable 
 } from "@/drizzle/schema";
 import { eq, desc, isNull, and, sql, ilike, asc, or } from "drizzle-orm";
@@ -135,14 +134,14 @@ export const getPurchaseOrderByIdRepository = async (id: number): Promise<TPurch
       quantity: purchaseOrderItemTable.quantity,
       bookCode: bookTable.code,
       subjectName: subjectTable.name,
-      grade: bookTitleTable.grade,
-      level: bookTitleTable.level,
-      curriculum: bookTitleTable.curriculum,
+      grade: bookTable.grade,
+      level: bookTable.level,
+      curriculum: bookTable.curriculum,
     })
     .from(purchaseOrderItemTable)
     .innerJoin(bookTable, eq(purchaseOrderItemTable.bookId, bookTable.id))
-    .innerJoin(bookTitleTable, eq(bookTable.bookTitleId, bookTitleTable.id))
-    .innerJoin(subjectTable, eq(bookTitleTable.subjectId, subjectTable.id))
+    .innerJoin(bookTable, eq(bookTable.code, bookTable.id))
+    .innerJoin(subjectTable, eq(bookTable.subjectId, subjectTable.id))
     .where(eq(purchaseOrderItemTable.purchaseOrderId, id));
 
   // Format displayTitle di JavaScript (sama persis dengan yang dipakai di Book Titles)

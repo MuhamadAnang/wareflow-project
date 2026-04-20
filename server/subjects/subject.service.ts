@@ -10,11 +10,10 @@ import {
 import { paginationResponseMapper } from "@/lib/pagination";
 import { TSubject } from "@/types/database";
 import { NotFoundException } from "@/common/exception/not-found.exception";
-import { invalidateSubjectCache } from "../book-titles/book-title.service";
 
 export const createSubjectService = async (data: TCreateOrUpdateSubject) => {
   // bisa tambah normalisasi kalau mau, misal: name.toUpperCase()
-  invalidateSubjectCache();  // <-- panggil ini
+  // invalidateSubjectCache();  // <-- panggil ini
   return await createSubjectRepository(data);
 };
 
@@ -45,7 +44,7 @@ export const updateSubjectService = async (
 ): Promise<TSubject> => {
   await getSubjectByIdService(id); // validasi exist
   const [updated] = await updateSubjectByIdRepository(id, data);
-  invalidateSubjectCache(); 
+  // invalidateSubjectCache(); 
   
   return updated;
 };
@@ -53,5 +52,5 @@ export const updateSubjectService = async (
 export const deleteSubjectService = async (id: number) => {
   await getSubjectByIdService(id);
   await deleteSubjectByIdRepository(id);
-  invalidateSubjectCache();  // <-- panggil ini
+  // invalidateSubjectCache();  // <-- panggil ini
 };

@@ -16,12 +16,13 @@ import { TCustomer } from "@/types/database";
 export const createCustomerController = async (req: NextRequest) => {
   try {
     const body = await req.json();
-
     validateSchema(CreateOrUpdateCustomerSchema, body);
-
-    await createCustomerService(body);
-
-    return responseFormatter.created({ message: "Customer created successfully" });
+    const newCustomer = await createCustomerService(body); // pastikan service mengembalikan data
+    
+    return responseFormatter.created({ 
+      data: newCustomer[0], // mengembalikan data customer
+      message: "Customer created successfully" 
+    });
   } catch (error) {
     return handleException(error);
   }

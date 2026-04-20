@@ -2,49 +2,52 @@
 
 import Page from "@/app/_components/page";
 import { useBookForm } from "../__hooks/use-book-form";
-import { useGetBookTitlesQuery } from "../__hooks/use-get-book-titles.query";
-import { useGetSuppliersQuery } from "../__hooks/use-get-suppliers.query";
+import { useGetSubjectsQuery } from "../__hooks/use-get-subjects.query";
+import { useGetPercetakansQuery } from "../__hooks/use-get-percetakans.query";
 import { semesterEnum } from "@/drizzle/schema";
 import { BookForm } from "../__components/create-or-update.form";
 import { useCreateBookMutation } from "./__hooks/use-create-book.mutation";
 
 export default function CreateBookPage() {
-  const { data: bookTitlesData, isLoading: loadingTitles } = useGetBookTitlesQuery();
-  const { data: suppliersData, isLoading: loadingSuppliers } = useGetSuppliersQuery();
+  const { data: subjectsData, isLoading: loadingSubjects } = useGetSubjectsQuery();
+  const { data: percetakansData, isLoading: loadingPercetakans } = useGetPercetakansQuery();
 
   const { mutateAsync: createBook, isPending: isCreating } = useCreateBookMutation();
 
-  const bookTitles = bookTitlesData ?? [];
-  const suppliers = suppliersData ?? [];
+  const subjects = subjectsData ?? [];
+  const percetakans = percetakansData ?? [];
 
   const form = useBookForm({
     defaultValues: {
       code: "",
-      bookTitleId: 0,
-      supplierId: 0,
-      semester: semesterEnum.enumValues[0], 
-      pages: undefined,
-      productionYear: undefined,
-    },
+      subjectId: 0,           
+      grade: 0,
+      level: "" as any,       
+      curriculum: "" as any,
+      semester: semesterEnum.enumValues[0],
+      pages: null,
+      productionYear: null,
+      percetakanId: 0,
+    } as any,
     onSubmit: async (values) => {
       await createBook(values);
     },
   });
 
-  const isFormLoading = loadingTitles || loadingSuppliers || isCreating;
+  const isFormLoading = loadingSubjects || loadingPercetakans || isCreating;
 
   return (
     <Page
       className="max-w-3xl mx-auto mt-3"
       title="Tambah Buku Baru"
-      description="Isi detail varian buku fisik di bawah ini. Pastikan kode unik dan pilih judul serta penerbit yang benar."
+      description="Isi detail identitas buku lengkap di bawah ini."
       isLoading={isFormLoading}
     >
       <BookForm
         form={form}
         isPending={isCreating}
-        bookTitles={bookTitles}
-        suppliers={suppliers}
+        subjects={subjects}
+        percetakans={percetakans}
       />
     </Page>
   );

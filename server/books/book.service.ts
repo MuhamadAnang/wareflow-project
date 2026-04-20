@@ -8,59 +8,71 @@ import {
   updateBookRepository,
 } from "./book.repository";
 import { paginationResponseMapper } from "@/lib/pagination";
-import { TBookListItem } from "@/types/database";
+import { TBookListItem, TNewBook } from "@/types/database";
+import { db } from "@/lib/db";
+import { percetakanTable, subjectTable } from "@/drizzle/schema";
+import { eq } from "drizzle-orm";
+
+const generateBookName = async (data: TCreateOrUpdateBook): Promise<string> => {
+  const [subject] = await db
+    .select({ name: subjectTable.name })
+    .from(subjectTable)
+    .where(eq(subjectTable.id, data.subjectId));
+
+  const [percetakan] = await db
+    .select({ name: percetakanTable.name })
+    .from(percetakanTable)
+    .where(eq(percetakanTable.id, data.percetakanId));
+
+  return `${subject?.name || "Unknown"} Kelas ${data.grade} ${data.level} ${data.curriculum.replace(/_/g, " ")} ${data.semester} - ${percetakan?.name || "Unknown"}`;
+};
 
 export const createBookService = async (data: TCreateOrUpdateBook) => {
-  return createBookRepository(data);
+  const name = await generateBookName(data);
+
+  const bookData = {
+    ...data,
+    name,
+    currentStock: 0,
+  };
+
+  return await createBookRepository(bookData);
 };
 
 export const getBooksWithPaginationService = async (queryParams: TIndexBookQuery) => {
-    const result = await getBooksWithPaginationRepository(queryParams);
-  
-    // result sudah punya { items, total } → langsung pakai
-    return paginationResponseMapper<TBookListItem>(result.items, {
-      currentPage: queryParams.page,
-      pageSize: queryParams.pageSize,
-      totalItems: result.total,
-    });
+  const result = await getBooksWithPaginationRepository(queryParams);
+
+  return paginationResponseMapper<TBookListItem>(result.items, {
+    currentPage: queryParams.page,
+    pageSize: queryParams.pageSize,
+    totalItems: result.total,
+  });
+};
+
+export const getBookByIdService = async (id: number): Promise<TBookListItem> => {
+  const book = await getBookByIdRepository(id);
+  if (!book) {
+    throw new NotFoundException(`Buku dengan ID ${id} tidak ditemukan`);
+  }
+  return book;
+};
+
+export const updateBookService = async (id: number, updateData: TCreateOrUpdateBook) => {
+  await getBookByIdService(id);
+
+  const name = await generateBookName(updateData);
+
+  const bookData = {
+    ...updateData,
+    name,
   };
 
-  export const getBookByIdService = async (id: number): Promise<TBookListItem> => {
-    const book = await getBookByIdRepository(id);
-  
-    if (!book) {
-      throw new NotFoundException(`Book with ID ${id} not found`);
-    }
-  
-    return book;  // book dari repository sudah TBookListItem (dengan displayTitle dll)
-  };
+  await updateBookRepository(id, bookData);
 
-  export const updateBookService = async (
-    id: number,
-    updateData: TCreateOrUpdateBook,
-  ): Promise<TBookListItem> => {
-    // Validasi exist dulu
-    await getBookByIdService(id);  // ini akan throw kalau tidak ada
-  
-    // Lakukan update
-    const [updatedPlain] = await updateBookRepository(id, updateData);
-  
-    if (!updatedPlain) {
-      throw new NotFoundException(`Book with ID ${id} not found after update`);
-    }
-  
-    // Refetch full enhanced data setelah update (penting!)
-    // karena updateRepository hanya return plain fields, bukan join
-    const updatedEnhanced = await getBookByIdRepository(id);
-  
-    if (!updatedEnhanced) {
-      throw new Error("Failed to fetch updated book data");
-    }
-  
-    return updatedEnhanced;
-  };
+  return await getBookByIdRepository(id); // return data lengkap
+};
 
 export const deleteBookService = async (id: number) => {
-  await getBookByIdService(id); 
-  return softDeleteBookRepository(id);
+  await getBookByIdService(id);
+  return await softDeleteBookRepository(id);
 };

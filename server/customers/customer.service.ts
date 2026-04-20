@@ -12,7 +12,8 @@ import { TCustomer } from "@/types/database";
 import { NotFoundException } from "@/common/exception/not-found.exception";
 
 export const createCustomerService = async (customerData: TCreateOrUpdateCustomer) => {
-  return await createCustomerRepository(customerData);
+  const result = await createCustomerRepository(customerData);
+  return result; // ini sudah mengembalikan array of customer
 };
 
 export const getCustomersWithPaginationService = async (queryParams: TIndexCustomerQuery) => {

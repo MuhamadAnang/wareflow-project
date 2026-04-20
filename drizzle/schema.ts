@@ -83,17 +83,14 @@ export const supplierTable = pgTable("suppliers", {
 });
 
 /* =========================
-   BOOK TITLES
+   PERCETAKAN
 ========================= */
 
-export const bookTitleTable = pgTable("book_titles", {
+export const percetakanTable = pgTable("percetakans", {
   id: serial("id").primaryKey(),
-  subjectId: integer("subject_id")
-    .notNull()
-    .references(() => subjectTable.id, { onDelete: "restrict" }),
-  grade: integer("grade").notNull(),
-  level: bookLevelEnum("level").notNull(),
-  curriculum: curriculumEnum("curriculum").notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  phone: varchar("phone", { length: 20 }),
+  address: varchar("address", { length: 500 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
   deletedAt: timestamp("deleted_at"),
@@ -106,15 +103,19 @@ export const bookTitleTable = pgTable("book_titles", {
 export const bookTable = pgTable("books", {
   id: serial("id").primaryKey(),
   code: varchar("code", { length: 50 }).notNull().unique(),
-  bookTitleId: integer("book_title_id")
-    .notNull()
-    .references(() => bookTitleTable.id),
-  supplierId: integer("supplier_id")
-    .notNull()
-    .references(() => supplierTable.id),
+  name: varchar("name", { length: 300 }).notNull(),
+  subjectId: integer("subject_id").notNull().references(() => subjectTable.id),
+  grade: integer("grade").notNull(),
+  level: bookLevelEnum("level").notNull(),
+  curriculum: curriculumEnum("curriculum").notNull(),
   semester: semesterEnum("semester").notNull(),
+  image: varchar("image", { length: 500 }),
   pages: integer("pages"),
   productionYear: integer("production_year"),
+  percetakanId: integer("percetakan_id")
+    .notNull()
+    .references(() => percetakanTable.id),
+  currentStock: integer("current_stock").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),

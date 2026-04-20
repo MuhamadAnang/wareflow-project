@@ -15,26 +15,21 @@ CREATE TABLE "book_prices" (
 CREATE TABLE "books" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"code" varchar(50) NOT NULL,
-	"book_title_id" integer NOT NULL,
-	"supplier_id" integer NOT NULL,
-	"semester" "semester_enum" NOT NULL,
-	"pages" integer,
-	"production_year" integer,
-	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL,
-	"deleted_at" timestamp with time zone,
-	CONSTRAINT "books_code_unique" UNIQUE("code")
-);
---> statement-breakpoint
-CREATE TABLE "book_titles" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"name" varchar(300) NOT NULL,
 	"subject_id" integer NOT NULL,
 	"grade" integer NOT NULL,
 	"level" "book_level" NOT NULL,
 	"curriculum" "curriculum" NOT NULL,
+	"semester" "semester_enum" NOT NULL,
+	"image" varchar(500),
+	"pages" integer,
+	"production_year" integer,
+	"percetakan_id" integer NOT NULL,
+	"current_stock" integer DEFAULT 0 NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
-	"deleted_at" timestamp
+	"deleted_at" timestamp with time zone,
+	CONSTRAINT "books_code_unique" UNIQUE("code")
 );
 --> statement-breakpoint
 CREATE TABLE "customer_order_items" (
@@ -126,6 +121,16 @@ CREATE TABLE "goods_receipts" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "percetakans" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" varchar(255) NOT NULL,
+	"phone" varchar(20),
+	"address" varchar(500),
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	"deleted_at" timestamp
+);
+--> statement-breakpoint
 CREATE TABLE "purchase_order_items" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"purchase_order_id" integer NOT NULL,
@@ -187,9 +192,8 @@ CREATE TABLE "suppliers" (
 );
 --> statement-breakpoint
 ALTER TABLE "book_prices" ADD CONSTRAINT "book_prices_book_id_books_id_fk" FOREIGN KEY ("book_id") REFERENCES "public"."books"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "books" ADD CONSTRAINT "books_book_title_id_book_titles_id_fk" FOREIGN KEY ("book_title_id") REFERENCES "public"."book_titles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "books" ADD CONSTRAINT "books_supplier_id_suppliers_id_fk" FOREIGN KEY ("supplier_id") REFERENCES "public"."suppliers"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "book_titles" ADD CONSTRAINT "book_titles_subject_id_subjects_id_fk" FOREIGN KEY ("subject_id") REFERENCES "public"."subjects"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "books" ADD CONSTRAINT "books_subject_id_subjects_id_fk" FOREIGN KEY ("subject_id") REFERENCES "public"."subjects"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "books" ADD CONSTRAINT "books_percetakan_id_percetakans_id_fk" FOREIGN KEY ("percetakan_id") REFERENCES "public"."percetakans"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "customer_order_items" ADD CONSTRAINT "customer_order_items_customer_order_id_customer_orders_id_fk" FOREIGN KEY ("customer_order_id") REFERENCES "public"."customer_orders"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "customer_order_items" ADD CONSTRAINT "customer_order_items_book_id_books_id_fk" FOREIGN KEY ("book_id") REFERENCES "public"."books"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "customer_orders" ADD CONSTRAINT "customer_orders_customer_id_customers_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."customers"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint

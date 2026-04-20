@@ -1,7 +1,6 @@
 import { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import {
   bookTable,
-  bookTitleTable,
   customerTable,
   goodsReceiptItemTable,
   goodsReceiptTable,
@@ -13,6 +12,7 @@ import {
   customerOrderItemTable,
   goodsOutTable,
   goodsOutItemTable,
+  percetakanTable,
 } from "@/drizzle/schema";
 
 // ==================== CUSTOMER TYPES ====================
@@ -21,6 +21,12 @@ export type TCustomer = InferSelectModel<typeof customerTable>;
 export type TNewCustomer = InferInsertModel<typeof customerTable>;
 export type TUpdateCustomer = Omit<TNewCustomer, "createdAt" | "updatedAt">;
 export type TCustomerStatus = TCustomer["status"];
+
+// ==================== PERCETAKAN TYPES ====================
+
+export type TPercetakan = InferSelectModel<typeof percetakanTable>;
+export type TNewPercetakan = InferInsertModel<typeof percetakanTable>;
+export type TUpdatePercetakan = Omit<TNewPercetakan, "createdAt" | "updatedAt">;
 
 // ==================== SUBJECT TYPES ====================
 
@@ -34,53 +40,38 @@ export type TSupplier = InferSelectModel<typeof supplierTable>;
 export type TNewSupplier = InferInsertModel<typeof supplierTable>;
 export type TUpdateSupplier = Omit<TNewSupplier, "createdAt" | "updatedAt">;
 
-// ==================== BOOK TITLE TYPES ====================
-
-export type TBookTitle = InferSelectModel<typeof bookTitleTable>;
-export type TNewBookTitle = InferInsertModel<typeof bookTitleTable>;
-export type TUpdateBookTitle = Omit<TNewBookTitle, "createdAt" | "updatedAt">;
-
-export type TBookTitleEnhanced = TBookTitle & {
-  subjectName: string;
-  displayTitle: string;
-};
-
-export type TBookTitleDetail = {
-  id: number;
-  subjectId: number;
-  grade: number;
-  level: string;
-  curriculum: string;
-  subjectName: string | null;
-  displayTitle: string;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date | null;
-};
-
-// ==================== BOOK TYPES ====================
+// ==================== BOOK TYPES (Master Identitas) ====================
 
 export type TBook = InferSelectModel<typeof bookTable>;
 export type TNewBook = InferInsertModel<typeof bookTable>;
-export type TUpdateBook = Partial<TNewBook>;
-
-export type TBookEnhanced = TBook & {
-  bookTitle: TBookTitleEnhanced;
-  supplier: { id: number; name: string };
-};
+export type TUpdateBook = Partial<Omit<TNewBook, "createdAt" | "updatedAt" | "currentStock">>;
 
 export type TBookListItem = {
   id: number;
   code: string;
-  bookTitleId: number;
-  supplierId: number;
-  semester: "GANJIL" | "GENAP" | "SETAHUN";
+  name: string;
+  subjectId: number;
+  grade: number;
+  level: string;
+  curriculum: string;
+  semester: string;
+  image: string | null;
   pages: number | null;
   productionYear: number | null;
-  deletedAt: Date | null;
+  percetakanId: number;
+  currentStock: number;
+  subjectName: string | null;        // boleh null
+  percetakanName: string | null;     // boleh null
   displayTitle: string;
-  subjectName: string | null;
-  supplierName: string | null;
+  
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+};
+export type TBookEnhanced = TBook & {
+  subjectName: string;
+  percetakanName: string;
+  displayTitle: string;
 };
 
 // ==================== PURCHASE ORDER TYPES ====================
@@ -99,15 +90,13 @@ export type TPurchaseOrderWithSupplier = TPurchaseOrder & {
 export type TPurchaseOrderDetail = TPurchaseOrderWithSupplier & {
   items: (TPurchaseOrderItem & {
     bookCode: string;
-    displayTitle: string;
+    bookName: string;
   })[];
 };
-
 export type TPurchaseOrderWithItems = TPurchaseOrder & {
   supplierName: string;
   items: TPurchaseOrderItem[];
 };
-
 // ==================== GOODS RECEIPT TYPES ====================
 
 export type TGoodsReceipt = InferSelectModel<typeof goodsReceiptTable>;
@@ -134,7 +123,7 @@ export type TGoodsReceiptWithItems = TGoodsReceipt & {
 export type TGoodsReceiptDetail = TGoodsReceiptWithItems & {
   items: (TGoodsReceiptItem & {
     bookCode: string;
-    displayTitle: string;
+    bookName: string;
   })[];
 };
 

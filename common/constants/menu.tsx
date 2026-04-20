@@ -7,7 +7,6 @@ import {
   BrainCircuit,
   Building,
   LayoutDashboard,
-  Library,
   ListChecks,
   ShoppingCart,
   Truck,
@@ -57,6 +56,11 @@ export const MENU_ITEMS: MenuWithChildren[] = [
     icon: <Users />,
   },
   {
+    label: "Percetakan",
+    href: "/percetakans",
+    icon: <Building />,
+  },
+  {
     label: "Supplier",
     href: "/suppliers",
     icon: <Building />,
@@ -65,11 +69,6 @@ export const MENU_ITEMS: MenuWithChildren[] = [
     label: "Mata Pelajaran",
     href: "/subjects",
     icon: <BookType />,
-  },
-  {
-    label: "Judul Buku",
-    href: "/book-titles",
-    icon: <Library />,
   },
   {
     label: "Daftar Buku",

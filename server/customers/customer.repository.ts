@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { buildCountQuery, buildPaginatedQuery, TColumnsDefinition } from "@/lib/query-builder";
 import { TIndexCustomerQuery } from "@/schemas/customer.schema";
 import { TNewCustomer, TUpdateCustomer } from "@/types/database";
-import { eq } from "drizzle-orm";
+import { eq, isNull } from "drizzle-orm";
 
 export const createCustomerRepository = async (customerData: TNewCustomer) => {
   return await db.insert(customerTable).values(customerData).returning();
@@ -11,7 +11,7 @@ export const createCustomerRepository = async (customerData: TNewCustomer) => {
 
 const CUSTOMER_COLUMNS: TColumnsDefinition<typeof customerTable> = {
   name: { searchable: true, sortable: true },
-  school: { searchable: true },
+  institution: { searchable: true },
   status: { filterable: true },
 };
 
@@ -20,6 +20,7 @@ export const getCustomersWithPaginationRepository = async (queryParams: TIndexCu
     table: customerTable,
     columns: CUSTOMER_COLUMNS,
     queryParams,
+    baseConditions: [isNull(customerTable.deletedAt)],
   });
 };
 
@@ -28,6 +29,7 @@ export const getCustomersCountRepository = async (queryParams: TIndexCustomerQue
     table: customerTable,
     columns: CUSTOMER_COLUMNS,
     queryParams,
+    baseConditions: [isNull(customerTable.deletedAt)],
   });
 };
 

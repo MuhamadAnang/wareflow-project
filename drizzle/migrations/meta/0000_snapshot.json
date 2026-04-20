@@ -1,5 +1,5 @@
 {
-  "id": "387e1fa3-7df9-4dcc-9144-3016aa9d9ac0",
+  "id": "7e11bfd4-3e28-426b-92c1-776860b5be15",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -80,109 +80,10 @@
           "primaryKey": false,
           "notNull": true
         },
-        "book_title_id": {
-          "name": "book_title_id",
-          "type": "integer",
+        "name": {
+          "name": "name",
+          "type": "varchar(300)",
           "primaryKey": false,
-          "notNull": true
-        },
-        "supplier_id": {
-          "name": "supplier_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "semester": {
-          "name": "semester",
-          "type": "semester_enum",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "pages": {
-          "name": "pages",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "production_year": {
-          "name": "production_year",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "deleted_at": {
-          "name": "deleted_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "books_book_title_id_book_titles_id_fk": {
-          "name": "books_book_title_id_book_titles_id_fk",
-          "tableFrom": "books",
-          "tableTo": "book_titles",
-          "columnsFrom": [
-            "book_title_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "books_supplier_id_suppliers_id_fk": {
-          "name": "books_supplier_id_suppliers_id_fk",
-          "tableFrom": "books",
-          "tableTo": "suppliers",
-          "columnsFrom": [
-            "supplier_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "books_code_unique": {
-          "name": "books_code_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "code"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.book_titles": {
-      "name": "book_titles",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
           "notNull": true
         },
         "subject_id": {
@@ -211,6 +112,44 @@
           "primaryKey": false,
           "notNull": true
         },
+        "semester": {
+          "name": "semester",
+          "type": "semester_enum",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "image": {
+          "name": "image",
+          "type": "varchar(500)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pages": {
+          "name": "pages",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "production_year": {
+          "name": "production_year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "percetakan_id": {
+          "name": "percetakan_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "current_stock": {
+          "name": "current_stock",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -227,16 +166,16 @@
         },
         "deleted_at": {
           "name": "deleted_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": false
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "book_titles_subject_id_subjects_id_fk": {
-          "name": "book_titles_subject_id_subjects_id_fk",
-          "tableFrom": "book_titles",
+        "books_subject_id_subjects_id_fk": {
+          "name": "books_subject_id_subjects_id_fk",
+          "tableFrom": "books",
           "tableTo": "subjects",
           "columnsFrom": [
             "subject_id"
@@ -244,12 +183,33 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "restrict",
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "books_percetakan_id_percetakans_id_fk": {
+          "name": "books_percetakan_id_percetakans_id_fk",
+          "tableFrom": "books",
+          "tableTo": "percetakans",
+          "columnsFrom": [
+            "percetakan_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "books_code_unique": {
+          "name": "books_code_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "code"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -930,6 +890,63 @@
           "onUpdate": "no action"
         }
       },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.percetakans": {
+      "name": "percetakans",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "phone": {
+          "name": "phone",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "address": {
+          "name": "address",
+          "type": "varchar(500)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
