@@ -11,6 +11,7 @@ import {
   ShoppingCart,
   Truck,
   Undo,
+  Undo2,
   Users,
 } from "lucide-react";
 import { Route as RouteNext } from "next";
@@ -95,11 +96,14 @@ export const MENU_ITEMS: MenuWithChildren[] = [
     href: "/goods-out",
     icon: <Truck />,
   },
-  {
-    label: "Retur",
-    href: "/retur",
-    icon: <Undo />,
-  },
+{
+  label: "Retur",
+  icon: <Undo2 />,
+  children: [
+    { label: "Retur Customer", href: "/returns/customer" },
+    { label: "Retur Supplier", href: "/returns/supplier" },
+  ],
+},
   {
     label: "Prioritas Pengiriman",
     href: "/prioritas",

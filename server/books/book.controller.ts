@@ -15,16 +15,45 @@ import { TBookListItem } from "@/types/database";
 
 export const createBookController = async (req: NextRequest) => {
   try {
-    const body = await req.json();
+    const formData = await req.formData();
+    const body: any = {};
+
+    console.log("✅ FormData diterima, jumlah field:", formData.entries().length);
+
+    for (const [key, value] of formData.entries()) {
+      console.log(`Field: ${key} → tipe: ${value instanceof File ? "FILE" : typeof value}`);
+      
+      if (value instanceof File) {
+        body[key] = value;
+      } else {
+        body[key] = value === "null" || value === "" ? null : value;
+      }
+    }
+
+    // Convert ke number
+    if (body.subjectId) body.subjectId = Number(body.subjectId);
+    if (body.grade) body.grade = Number(body.grade);
+    if (body.percetakanId) body.percetakanId = Number(body.percetakanId);
+    if (body.pages) body.pages = body.pages ? Number(body.pages) : null;
+    if (body.productionYear) body.productionYear = body.productionYear ? Number(body.productionYear) : null;
+
+    console.log("Body setelah parsing:", {
+      code: body.code,
+      hasImage: body.image instanceof File,
+      imageName: body.image?.name,
+    });
+
     validateSchema(CreateOrUpdateBookSchema, body);
 
     await createBookService(body);
 
-    return responseFormatter.created({ message: "Buku berhasil ditambahkan" });
-  } catch (error) {
+    return responseFormatter.created({ message: "Buku berhasil dibuat" });
+  } catch (error: any) {
+    console.error("❌ Create Book Error:", error);
     return handleException(error);
   }
 };
+
 
 export const getBooksWithPaginationController = async (req: NextRequest) => {
   try {
@@ -77,15 +106,42 @@ export const getBookByIdController = async (id: number) => {
 
 export const updateBookController = async (id: number, req: NextRequest) => {
   try {
-    const body = await req.json();
-    validateSchema(CreateOrUpdateBookSchema, body);
+    const body: any = {};
+    const contentType = req.headers.get("content-type") || "";
 
+    if (contentType.includes("multipart/form-data") || contentType.includes("application/x-www-form-urlencoded")) {
+      const formData = await req.formData();
+      console.log("🔄 Update FormData diterima");
+
+      for (const [key, value] of formData.entries()) {
+        if (value instanceof File) {
+          body[key] = value;
+        } else {
+          body[key] = value === "null" || value === "" ? null : value;
+        }
+      }
+    } else {
+      // Fallback ke JSON
+      const json = await req.json();
+      Object.assign(body, json);
+    }
+
+    // Convert ke number
+    if (body.subjectId) body.subjectId = Number(body.subjectId);
+    if (body.grade) body.grade = Number(body.grade);
+    if (body.percetakanId) body.percetakanId = Number(body.percetakanId);
+    if (body.pages) body.pages = body.pages ? Number(body.pages) : null;
+    if (body.productionYear) body.productionYear = body.productionYear ? Number(body.productionYear) : null;
+
+    validateSchema(CreateOrUpdateBookSchema, body);
     const updated = await updateBookService(id, body);
-    return responseFormatter.successWithData<TBookListItem>({
+
+    return responseFormatter.successWithData({
       data: updated,
       message: "Buku berhasil diperbarui",
     });
-  } catch (error) {
+  } catch (error: any) {
+    console.error("❌ Update Book Error:", error);
     return handleException(error);
   }
 };

@@ -92,6 +92,7 @@ export async function getBookByIdRepository(id: number) {
     .select({
       ...bookColumns,
       subjectName: subjectTable.name,
+ 
       percetakanName: percetakanTable.name,
       displayTitle: displayTitleExpr,
     })

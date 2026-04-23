@@ -48,6 +48,9 @@ export default function CreateBookPage() {
         isPending={isCreating}
         subjects={subjects}
         percetakans={percetakans}
+        onSubjectCreated={(newId) => {
+    form.setFieldValue("subjectId", newId);   // otomatis pilih subject yang baru dibuat
+  }}
       />
     </Page>
   );

@@ -10,16 +10,32 @@ export const useCreateBookMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (payload: TCreateOrUpdateBook) => {
-      return await api.post("/books", payload);
+    mutationFn: async (payload: any) => {
+      const formData = new FormData();
+
+      Object.entries(payload).forEach(([key, value]) => {
+        if (value === null || value === undefined) return;
+        
+        if (value instanceof File) {
+          formData.append(key, value);
+        } else {
+          formData.append(key, String(value));
+        }
+      });
+
+      return await api.post("/books", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", // Axios akan handle otomatis
+        },
+      });
     },
     onSuccess: () => {
-      toast.success("Buku berhasil dibuat", { duration: 3000 });
+      toast.success("Buku berhasil dibuat");
       router.push("/books");
       queryClient.invalidateQueries({ queryKey: ["books"] });
     },
-    onError: (err) => {
-      toast.error(err.message || "Gagal membuat buku");
+    onError: (err: any) => {
+      toast.error(err.response?.data?.message || "Gagal membuat buku");
     },
   });
 };

@@ -9,6 +9,7 @@ import { useGetPercetakansQuery } from "../../__hooks/use-get-percetakans.query"
 import { useBookForm } from "../../__hooks/use-book-form";
 import { BookForm } from "../../__components/create-or-update.form";
 
+
 export default function UpdateBookPage() {
   const params = useParams();
   const bookId = Number(params.id);
@@ -34,8 +35,10 @@ export default function UpdateBookPage() {
       pages: book?.pages ?? null,
       productionYear: book?.productionYear ?? null,
       percetakanId: book?.percetakanId || 0,
+      image: book?.image || "",
     },
     onSubmit: async (values) => {
+      console.log("Values nich : ", values)
       await updateBook(values);
     },
   });
@@ -58,10 +61,14 @@ export default function UpdateBookPage() {
       isLoading={isFormLoading}
     >
       <BookForm
+        key={book.id}          // ← ini yang penting, force re-mount saat data siap
         form={form}
         isPending={isUpdating}
         subjects={subjects}
         percetakans={percetakans}
+        onSubjectCreated={(newId) => {
+          form.setFieldValue("subjectId", newId);
+        }}
       />
     </Page>
   );

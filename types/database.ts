@@ -13,6 +13,10 @@ import {
   goodsOutTable,
   goodsOutItemTable,
   percetakanTable,
+  customerReturnTable,
+  customerReturnItemTable,
+  supplierReturnTable,
+  supplierReturnItemTable,
 } from "@/drizzle/schema";
 
 // ==================== CUSTOMER TYPES ====================
@@ -120,10 +124,12 @@ export type TGoodsReceiptWithItems = TGoodsReceipt & {
   supplierName?: string;
 };
 
-export type TGoodsReceiptDetail = TGoodsReceiptWithItems & {
+// ✅ Fix TGoodsReceiptDetail di types/database.ts
+export type TGoodsReceiptDetail = TGoodsReceipt & {
+  supplierName: string | null;
   items: (TGoodsReceiptItem & {
     bookCode: string;
-    bookName: string;
+    bookName: string;  // ✅ konsisten dengan PO
   })[];
 };
 
@@ -139,7 +145,6 @@ export type TNewCustomerOrderItem = InferInsertModel<typeof customerOrderItemTab
 export type TCustomerOrderWithCustomer = TCustomerOrder & {
   customerName: string;
 };
-
 export type TCustomerOrderDetail = TCustomerOrder & {
   customer: {
     id: number;
@@ -149,18 +154,8 @@ export type TCustomerOrderDetail = TCustomerOrder & {
     institution: string;
   };
   items: (TCustomerOrderItem & {
-    book: {
-      id: number;
-      code: string;
-      bookTitle: {
-        id: number;
-        grade: number;
-        level: string;
-        curriculum: string;
-        subject: { name: string } | null;
-      };
-      supplier: { id: number; name: string } | null;
-    };
+    bookCode: string;
+    bookName: string;
     shippedQuantity?: number;
     remainingQuantity?: number;
   })[];
@@ -209,16 +204,77 @@ export type TGoodsOutDetail = TGoodsOut & {
     };
   };
   items: (TGoodsOutItem & {
+    bookCode: string;
+    bookName: string;
+  })[];
+};
+
+// ==================== CUSTOMER RETURN TYPES ====================
+
+export type TCustomerReturn = InferSelectModel<typeof customerReturnTable>;
+export type TNewCustomerReturn = InferInsertModel<typeof customerReturnTable>;
+
+export type TCustomerReturnItem = InferSelectModel<typeof customerReturnItemTable>;
+export type TNewCustomerReturnItem = InferInsertModel<typeof customerReturnItemTable>;
+
+export type TCustomerReturnListItem = {
+  id: number;
+  customerName: string;
+  returnDate: Date;
+  reason: string | null;
+  totalItems: number;
+  totalQuantity: number;
+  createdAt: Date;
+};
+
+export type TCustomerReturnDetail = TCustomerReturn & {
+  customer: {
+    id: number;
+    name: string;
+    phone: string;
+    address: string;
+    institution: string;
+  };
+  items: (TCustomerReturnItem & {
     book: {
       id: number;
       code: string;
-      bookTitle: {
-        id: number;
-        grade: number;
-        level: string;
-        curriculum: string;
-        subject: { name: string } | null;
-      };
+      name: string;
+    };
+  })[];
+};
+
+// ==================== SUPPLIER RETURN TYPES ====================
+
+export type TSupplierReturn = InferSelectModel<typeof supplierReturnTable>;
+export type TNewSupplierReturn = InferInsertModel<typeof supplierReturnTable>;
+
+export type TSupplierReturnItem = InferSelectModel<typeof supplierReturnItemTable>;
+export type TNewSupplierReturnItem = InferInsertModel<typeof supplierReturnItemTable>;
+
+export type TSupplierReturnListItem = {
+  id: number;
+  supplierName: string;
+  returnDate: Date;
+  reason: string | null;
+  totalItems: number;
+  totalQuantity: number;
+  createdAt: Date;
+};
+
+export type TSupplierReturnDetail = TSupplierReturn & {
+  supplier: {
+    id: number;
+    name: string;
+    phone: string;
+    address: string | null;
+  };
+  items: (TSupplierReturnItem & {
+    book: {
+      id: number;
+      code: string;
+      name: string;
+      currentStock: number;
     };
   })[];
 };

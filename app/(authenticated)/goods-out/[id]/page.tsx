@@ -5,7 +5,6 @@ import { useParams } from "next/navigation";
 import { useGetGoodsOutDetail } from "../__hooks/use-get-goods-out-detail.query";
 import { Table, TableBody, TableCell, TableRow } from "@/app/_components/ui/table";
 import { Card, CardContent } from "@/app/_components/ui/card";
-import { Badge } from "@/app/_components/ui/badge";
 import { Package, Calendar, User, FileText } from "lucide-react";
 
 export default function GoodsOutDetailPage() {
@@ -62,10 +61,10 @@ export default function GoodsOutDetailPage() {
                   <TableCell className="text-right">Quantity</TableCell>
                 </TableRow>
                 {goodsOut?.items?.map((item) => {
-                  const title = `${item.book.bookTitle.subject?.name || ""} Kelas ${item.book.bookTitle.grade} ${item.book.bookTitle.level}`;
+                  const title = `${item.bookName || ""} `;
                   return (
                     <TableRow key={item.id}>
-                      <TableCell>{item.book.code}</TableCell>
+                      <TableCell>{item.bookCode}</TableCell>
                       <TableCell>{title}</TableCell>
                       <TableCell className="text-right">{item.quantity}</TableCell>
                     </TableRow>

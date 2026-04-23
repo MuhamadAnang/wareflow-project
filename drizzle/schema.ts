@@ -226,6 +226,7 @@ export const customerOrderTable = pgTable("customer_orders", {
     .notNull()
     .references(() => customerTable.id),
   orderDate: date("order_date").notNull(),
+  deadline: date("deadline"), 
   status: customerOrderStatusEnum("status").notNull().default("DRAFT"),
   note: varchar("note", { length: 500 }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

@@ -137,11 +137,11 @@ export const getPurchaseOrderByIdRepository = async (id: number): Promise<TPurch
       grade: bookTable.grade,
       level: bookTable.level,
       curriculum: bookTable.curriculum,
+      semester: bookTable.semester,     
     })
     .from(purchaseOrderItemTable)
-    .innerJoin(bookTable, eq(purchaseOrderItemTable.bookId, bookTable.id))
-    .innerJoin(bookTable, eq(bookTable.code, bookTable.id))
-    .innerJoin(subjectTable, eq(bookTable.subjectId, subjectTable.id))
+    .innerJoin(bookTable, eq(purchaseOrderItemTable.bookId, bookTable.id)) // ✅ satu join saja
+    .innerJoin(subjectTable, eq(bookTable.subjectId, subjectTable.id))     // ✅ langsung dari bookTable
     .where(eq(purchaseOrderItemTable.purchaseOrderId, id));
 
   // Format displayTitle di JavaScript (sama persis dengan yang dipakai di Book Titles)

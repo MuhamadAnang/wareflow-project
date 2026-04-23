@@ -21,7 +21,7 @@ COPY . .
 
 RUN pnpm build
 
-FROM base as runner
+FROM base as runner 
 
 ENV NODE_ENV=production
 

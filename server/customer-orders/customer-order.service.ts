@@ -81,10 +81,10 @@ export const getCustomerOrderByIdService = async (id: number): Promise<TCustomer
   
   // Tambahkan shippedQuantity ke setiap item
   const itemsWithShipped = order.items.map((item) => ({
-    ...item,
-    shippedQuantity: shippedMap.get(item.book.id) || 0,
-    remainingQuantity: item.quantity - (shippedMap.get(item.book.id) || 0),
-  }));
+  ...item,
+  shippedQuantity: shippedMap.get(item.bookId) || 0,
+  remainingQuantity: item.quantity - (shippedMap.get(item.bookId) || 0),
+}));
   
   return {
     ...order,

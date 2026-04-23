@@ -16,6 +16,7 @@ export const useBookForm = ({ defaultValues, onSubmit }: Params) => {
       level: "",
       curriculum: "",
       semester: "GANJIL",
+      image: "",
       pages: null,
       productionYear: null,
       percetakanId: 0,

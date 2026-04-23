@@ -17,8 +17,7 @@ export const CreateOrUpdateBookSchema = z.object({
   level: z.enum(bookLevelEnum.enumValues, { message: "Level tidak valid" }),
   curriculum: z.enum(curriculumEnum.enumValues, { message: "Kurikulum tidak valid" }),
   semester: z.enum(semesterEnum.enumValues, { message: "Semester tidak valid" }),
-  image: z.string().url("URL gambar tidak valid").optional().nullable()
-    .or(z.literal("")),
+    image: z.any().optional(),
   pages: z.number().int().positive().min(1).max(2000).optional().nullable(),
   productionYear: z.number().int()
     .min(1900, "Tahun terbit minimal 1900")

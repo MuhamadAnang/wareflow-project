@@ -13,7 +13,7 @@ import {
 } from "@/app/_components/ui/table";
 import { Card, CardContent } from "@/app/_components/ui/card";
 import { Badge } from "@/app/_components/ui/badge";
-import { convertUtcToLocalTime, toTitleCase } from "@/lib/utils";
+import { convertUtcToLocalTime } from "@/lib/utils";
 import Link from "next/link";
 import { Button } from "@/app/_components/ui/button";
 import { Pencil, Plus } from "lucide-react";
@@ -66,8 +66,18 @@ export default function BookDetailPage() {
                 <TableCell className="font-medium">{book?.name}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="font-medium bg-muted/50">Mata Pelajaran</TableCell>
-                <TableCell>{book?.subjectName}</TableCell>
+                <TableCell className="font-medium bg-muted/50">Gambar Cover</TableCell>
+                <TableCell>
+                  {book?.image && (
+                    <div className="flex justify-center my-6">
+                      <img
+                        src={book.image}
+                        alt={book.name}
+                        className="max-h-80 rounded-lg shadow-md object-contain"
+                      />
+                    </div>
+                  )}
+                </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell className="font-medium bg-muted/50">Kelas & Level</TableCell>
@@ -94,7 +104,7 @@ export default function BookDetailPage() {
               <TableRow>
                 <TableCell className="font-medium bg-muted/50">Stok Saat Ini</TableCell>
                 <TableCell className="text-2xl font-bold text-green-600">
-                  {totalStock} eksemplar
+                  {book?.currentStock ?? 0} eksemplar
                 </TableCell>
               </TableRow>
             </TableBody>

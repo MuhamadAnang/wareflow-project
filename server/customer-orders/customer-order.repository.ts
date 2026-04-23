@@ -51,37 +51,34 @@ export const getCustomerOrderByIdRepository = async (id: number) => {
   const items = await db
     .select({
       id: customerOrderItemTable.id,
+      customerOrderId: customerOrderItemTable.customerOrderId,
+      bookId: customerOrderItemTable.bookId,
       quantity: customerOrderItemTable.quantity,
       price: customerOrderItemTable.price,
-      book: {
-        id: bookTable.id,
-        code: bookTable.code,
-        bookTitle: {
-          id: bookTitleTable.id,
-          grade: bookTitleTable.grade,
-          level: bookTitleTable.level,
-          curriculum: bookTitleTable.curriculum,
-          subject: {
-            name: subjectTable.name,
-          },
-        },
-        supplier: {
-          id: supplierTable.id,
-          name: supplierTable.name,
-        },
-      },
+      bookCode: bookTable.code,
+      subjectName: subjectTable.name,
+      grade: bookTable.grade,
+      level: bookTable.level,
+      curriculum: bookTable.curriculum,
+      semester: bookTable.semester,
     })
     .from(customerOrderItemTable)
     .innerJoin(bookTable, eq(customerOrderItemTable.bookId, bookTable.id))
-    .innerJoin(bookTitleTable, eq(bookTable.bookTitleId, bookTitleTable.id))
-    .leftJoin(subjectTable, eq(bookTitleTable.subjectId, subjectTable.id))
-    .leftJoin(supplierTable, eq(bookTable.supplierId, supplierTable.id))
+    .innerJoin(subjectTable, eq(bookTable.subjectId, subjectTable.id))  // ✅ langsung dari bookTable
     .where(eq(customerOrderItemTable.customerOrderId, order.id));
 
   return {
     ...order,
     customer,
-    items,
+    items: items.map((item) => ({
+      id: item.id,
+      customerOrderId: item.customerOrderId,
+      bookId: item.bookId,
+      quantity: item.quantity,
+      price: item.price,
+      bookCode: item.bookCode,
+      bookName: `${item.subjectName} Kelas ${item.grade} ${item.level} ${item.curriculum.replace(/_/g, " ")} ${item.semester}`,
+    })),
   };
 };
 
@@ -112,7 +109,7 @@ export const getCustomerOrdersWithPaginationRepository = async (
   if (customerId) {
     baseQuery = baseQuery.where(eq(customerOrderTable.customerId, customerId));
   }
-  
+
   // Handle status yang bisa berupa string CSV
   if (status) {
     if (typeof status === 'string' && status.includes(',')) {
@@ -122,7 +119,7 @@ export const getCustomerOrdersWithPaginationRepository = async (
       baseQuery = baseQuery.where(eq(customerOrderTable.status, status as any));
     }
   }
-  
+
   if (startDate) {
     baseQuery = baseQuery.where(sql`${customerOrderTable.orderDate} >= ${startDate}`);
   }
@@ -164,7 +161,7 @@ export const getCustomerOrdersCountRepository = async (queryParams: TIndexCustom
     .innerJoin(customerTable, eq(customerOrderTable.customerId, customerTable.id));
 
   if (customerId) baseQuery = baseQuery.where(eq(customerOrderTable.customerId, customerId));
-  
+
   if (status) {
     if (typeof status === 'string' && status.includes(',')) {
       const statuses = status.split(',');
@@ -173,7 +170,7 @@ export const getCustomerOrdersCountRepository = async (queryParams: TIndexCustom
       baseQuery = baseQuery.where(eq(customerOrderTable.status, status as any));
     }
   }
-  
+
   if (startDate) baseQuery = baseQuery.where(sql`${customerOrderTable.orderDate} >= ${startDate}`);
   if (endDate) baseQuery = baseQuery.where(sql`${customerOrderTable.orderDate} <= ${endDate}`);
   if (search) baseQuery = baseQuery.where(sql`${customerTable.name} ILIKE ${`%${search}%`}`);
@@ -186,13 +183,13 @@ export const updateCustomerOrderStatusRepository = async (id: number, status: st
   try {
     const result = await db
       .update(customerOrderTable)
-      .set({ 
-        status: status as any, 
-        updatedAt: new Date() 
+      .set({
+        status: status as any,
+        updatedAt: new Date()
       })
       .where(eq(customerOrderTable.id, id))
       .returning();
-    
+
     console.log("Update status result:", result);
     return result;
   } catch (error) {
@@ -202,12 +199,19 @@ export const updateCustomerOrderStatusRepository = async (id: number, status: st
 };
 
 export const deleteCustomerOrderRepository = async (id: number) => {
-  // Karena tidak ada soft delete, kita lakukan hard delete atau ubah status jadi CANCELLED?
-  // Untuk sementara, kita lakukan hard delete.
-  return await db
-    .delete(customerOrderTable)
-    .where(eq(customerOrderTable.id, id))
-    .returning();
+  return await db.transaction(async (tx) => {
+    await tx
+      .delete(customerOrderItemTable)
+      .where(eq(customerOrderItemTable.customerOrderId, id));
+
+    const [deleted] = await tx
+      .delete(customerOrderTable)
+      .where(eq(customerOrderTable.id, id))
+      .returning();
+
+    if (!deleted) throw new Error(`Order ${id} tidak ditemukan`);
+    return [deleted];
+  });
 };
 
 export const getCustomerOrderStatusRepository = async (id: number) => {

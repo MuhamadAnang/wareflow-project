@@ -5,15 +5,26 @@ import {
   getGoodsReceiptsWithPaginationRepository,
   getGoodsReceiptByIdRepository,
   deleteGoodsReceiptByIdRepository,
-  updateGoodsReceiptByIdRepository,
   updateGoodsReceiptHeaderRepository,
   replaceGoodsReceiptItemsRepository,
 } from "./goods-receipt.repository";
 import { paginationResponseMapper } from "@/lib/pagination";
 import { TGoodsReceiptDetail, TGoodsReceiptWithItems } from "@/types/database";
+import { processStockMovement } from "@/server/stock-movements/stock-movement.service";
 
 export const createGoodsReceiptService = async (data: TCreateGoodsReceipt) => {
-  return await createGoodsReceiptRepository(data);
+  return await createGoodsReceiptRepository(data, async (tx, receipt, items) => {
+    for (const item of items) {
+      await processStockMovement({
+        bookId: item.bookId,
+        type: "IN_PURCHASE",
+        quantity: item.quantity,
+        referenceType: "goods_receipt",
+        referenceId: receipt.id,
+        note: `Penerimaan dari PO #${data.purchaseOrderId}`,
+      }, tx); // 👈 PASS TX
+    }
+  });
 };
 
 export const getGoodsReceiptsWithPaginationService = async (queryParams: TIndexGoodsReceiptQuery) => {
@@ -25,7 +36,6 @@ export const getGoodsReceiptsWithPaginationService = async (queryParams: TIndexG
   });
 };
 
-// Tambahkan fungsi-fungsi berikut
 export const getGoodsReceiptByIdService = async (id: number): Promise<TGoodsReceiptDetail> => {
   const receipt = await getGoodsReceiptByIdRepository(id);
   if (!receipt) throw new NotFoundException(`Goods Receipt dengan ID ${id} tidak ditemukan`);
@@ -38,23 +48,19 @@ export const deleteGoodsReceiptService = async (id: number) => {
 };
 
 export const updateGoodsReceiptService = async (id: number, data: TUpdateGoodsReceipt) => {
-  // Cek apakah receipt ada
   await getGoodsReceiptByIdService(id);
 
-  // Update header
   const updateHeader = {
     receivedDate: new Date(data.receivedDate),
     note: data.note || null,
   };
   await updateGoodsReceiptHeaderRepository(id, updateHeader);
 
-  // Update items
   const items = data.items.map(item => ({
     bookId: item.bookId,
     quantity: item.quantity,
   }));
   await replaceGoodsReceiptItemsRepository(id, items);
 
-  // Kembalikan data terbaru
   return await getGoodsReceiptByIdService(id);
 };

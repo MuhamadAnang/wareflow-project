@@ -12,15 +12,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/app/_components/ui/radio-group";
 import { semesterEnum, bookLevelEnum, curriculumEnum } from "@/drizzle/schema";
 import { useBookForm } from "../__hooks/use-book-form";
+import { useState } from "react";
+import { Plus } from "lucide-react";
+import { CreateSubjectModal } from "./create-subject-modal";
 
 interface Props {
   form: ReturnType<typeof useBookForm>;
   isPending?: boolean;
   subjects: { id: number; name: string }[];
   percetakans: { id: number; name: string }[];
+  onSubjectCreated?: (newSubjectId: number) => void;
 }
 
-export const BookForm = ({ form, isPending, subjects, percetakans }: Props) => {
+export const BookForm = ({ form, isPending, subjects, percetakans, onSubjectCreated }: Props) => {
+  const [showSubjectModal, setShowSubjectModal] = useState(false);
   return (
     <form onSubmit={(e) => { e.preventDefault(); form.handleSubmit(e); }}>
       <FieldGroup>
@@ -45,21 +50,32 @@ export const BookForm = ({ form, isPending, subjects, percetakans }: Props) => {
           {(field) => (
             <Field>
               <FieldLabel>Mata Pelajaran *</FieldLabel>
-              <Select
-                value={field.state.value?.toString()}
-                onValueChange={(val) => field.handleChange(Number(val))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih mata pelajaran" />
-                </SelectTrigger>
-                <SelectContent>
-                  {subjects.map((s) => (
-                    <SelectItem key={s.id} value={s.id.toString()}>
-                      {s.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex gap-2">
+                <Select
+                  value={field.state.value?.toString() || ""}
+                  onValueChange={(val) => field.handleChange(Number(val))}
+                >
+                  <SelectTrigger className="flex-1">
+                    <SelectValue placeholder="Pilih mata pelajaran" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {subjects.map((s) => (
+                      <SelectItem key={s.id} value={s.id.toString()}>
+                        {s.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setShowSubjectModal(true)}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
               <FieldError errors={field.state.meta.errors} />
             </Field>
           )}
@@ -214,11 +230,65 @@ export const BookForm = ({ form, isPending, subjects, percetakans }: Props) => {
             </Field>
           )}
         </form.Field>
+        {/* Upload Gambar */}
+        <form.Field name="image">
+          {(field) => {
+            // Preview state harus di luar Field callback
+            // Tapi karena ini di dalam Field, kita pakai cara alternatif yang aman
+            const currentValue = field.state.value;
 
+            return (
+              <Field>
+                <FieldLabel>Gambar Cover Buku</FieldLabel>
+
+                {/* Preview */}
+                {currentValue && !(currentValue instanceof File && !currentValue.size) && (
+                  <div className="mb-4">
+                    <img
+                      src={
+                        currentValue instanceof File
+                          ? URL.createObjectURL(currentValue)
+                          : typeof currentValue === "string" && currentValue !== ""
+                            ? currentValue
+                            : undefined
+                      }
+                      alt="Preview Cover"
+                      className="w-40 h-52 object-cover rounded-lg border shadow-sm"
+                    />
+                  </div>
+                )}
+
+                <Input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+
+                    field.handleChange(file);   // Kirim File object ke form
+                  }}
+                />
+
+                <p className="text-xs text-muted-foreground mt-1">
+                  JPG, PNG, WebP • Maksimal 2MB
+                </p>
+                <FieldError errors={field.state.meta.errors} />
+              </Field>
+            );
+          }}
+        </form.Field>
         <Button type="submit" disabled={isPending || form.state.isSubmitting}>
           {isPending ? "Menyimpan..." : "Simpan Buku"}
         </Button>
       </FieldGroup>
+      <CreateSubjectModal
+        open={showSubjectModal}
+        onClose={() => setShowSubjectModal(false)}
+        onSuccess={(newId) => {
+          onSubjectCreated?.(newId);
+          setShowSubjectModal(false);
+        }}
+      />
     </form>
   );
 };

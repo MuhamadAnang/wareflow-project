@@ -11,6 +11,7 @@ export const CustomerOrderItemSchema = z.object({
 export const CreateCustomerOrderFormSchema = z.object({
   customerId: z.number().int().positive({ message: "Pilih customer terlebih dahulu" }),
   orderDate: z.string().min(1, "Tanggal order harus diisi"),
+  deadline: z.coerce.date().optional().nullable(),  // ← TAMBAHKAN
   note: z.string().max(500).optional().nullable(),
   items: z
     .array(CustomerOrderItemSchema)

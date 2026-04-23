@@ -1,4 +1,3 @@
-// app/(authenticated)/goods-out/__components/create-goods-out.form.tsx
 "use client";
 
 import { Button } from "@/app/_components/ui/button";
@@ -28,7 +27,7 @@ interface Props {
 interface ShipmentItem {
   bookId: number;
   bookCode: string;
-  bookTitle: string;
+  bookName: string;
   orderedQuantity: number;
   shippedQuantity: number;
   toShip: number;
@@ -50,24 +49,33 @@ export const CreateGoodsOutForm = ({ onSubmit, isPending }: Props) => {
   useEffect(() => {
     if (orderDetail?.data) {
       const order = orderDetail.data;
+      
+      // Validasi: pastikan order.items ada dan merupakan array
+      if (!order.items || !Array.isArray(order.items)) {
+        console.warn("Order items is not an array:", order.items);
+        setItems([]);
+        return;
+      }
+      
+      // Struktur baru: bookCode dan bookName sudah langsung di item
       const mappedItems: ShipmentItem[] = order.items.map((item) => ({
-        bookId: item.book.id,
-        bookCode: item.book.code,
-        bookTitle: `${item.book.bookTitle.subject?.name || ""} Kelas ${item.book.bookTitle.grade} ${item.book.bookTitle.level}`,
+        bookId: item.bookId,
+        bookCode: item.bookCode || "Unknown Code",
+        bookName: item.bookName || "Unknown Title",
         orderedQuantity: item.quantity,
-        shippedQuantity: item.shippedQuantity || 0,
-        toShip: item.remainingQuantity || item.quantity,
+        shippedQuantity: (item as any).shippedQuantity || 0,
+        toShip: (item as any).remainingQuantity || item.quantity,
       }));
+      
       setItems(mappedItems);
     }
   }, [orderDetail]);
 
   const handleOrderChange = (orderId: string) => {
     setSelectedOrderId(parseInt(orderId));
-    setItems([]); // Reset items saat order berganti
+    setItems([]);
   };
 
-  // ✅ Fungsi yang sebelumnya hilang
   const updateToShip = (bookId: number, value: number) => {
     setItems((prev) =>
       prev.map((item) =>
@@ -101,11 +109,11 @@ export const CreateGoodsOutForm = ({ onSubmit, isPending }: Props) => {
           quantity: item.toShip,
         })),
       });
-      // ✅ Tidak perlu manual refetch — invalidateQueries di mutation sudah handle ini
       // Reset form
       setSelectedOrderId(undefined);
       setItems([]);
       setNote("");
+      setShippedDate(new Date().toISOString().split("T")[0]);
       toast.success("Pengiriman berhasil dibuat");
     } catch (error) {
       console.error("Submit error:", error);
@@ -129,7 +137,7 @@ export const CreateGoodsOutForm = ({ onSubmit, isPending }: Props) => {
               <SelectValue placeholder="Pilih order yang akan dikirim" />
             </SelectTrigger>
             <SelectContent>
-              {ordersData?.data.map((order) => (
+              {ordersData?.data?.map((order) => (
                 <SelectItem key={order.id} value={order.id.toString()}>
                   Order #{order.id} - {order.customerName} (
                   {new Date(order.orderDate).toLocaleDateString("id-ID")})
@@ -167,36 +175,37 @@ export const CreateGoodsOutForm = ({ onSubmit, isPending }: Props) => {
               <div className="text-center py-8">Loading items...</div>
             ) : (
               <div className="space-y-3">
-                {items.map((item) => (
-                  <Card key={item.bookId}>
-                    <CardContent className="p-4">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <p className="font-medium">{item.bookCode}</p>
-                          <p className="text-sm text-muted-foreground">{item.bookTitle}</p>
-                          <p className="text-sm mt-1">
-                            Pesanan: {item.orderedQuantity} | Sudah dikirim:{" "}
-                            {item.shippedQuantity} | Sisa:{" "}
-                            {item.orderedQuantity - item.shippedQuantity}
-                          </p>
+                {items.length > 0 ? (
+                  items.map((item) => (
+                    <Card key={item.bookId}>
+                      <CardContent className="p-4">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <p className="font-medium">{item.bookCode}</p>
+                            <p className="text-sm text-muted-foreground">{item.bookName}</p>
+                            <p className="text-sm mt-1">
+                              Pesanan: {item.orderedQuantity} | Sudah dikirim:{" "}
+                              {item.shippedQuantity} | Sisa:{" "}
+                              {item.orderedQuantity - item.shippedQuantity}
+                            </p>
+                          </div>
+                          <div className="w-32">
+                            <Label className="text-sm">Jumlah Kirim</Label>
+                            <Input
+                              type="number"
+                              min={0}
+                              max={item.orderedQuantity - item.shippedQuantity}
+                              value={item.toShip}
+                              onChange={(e) =>
+                                updateToShip(item.bookId, parseInt(e.target.value) || 0)
+                              }
+                            />
+                          </div>
                         </div>
-                        <div className="w-32">
-                          <Label className="text-sm">Jumlah Kirim</Label>
-                          <Input
-                            type="number"
-                            min={0}
-                            max={item.orderedQuantity - item.shippedQuantity}
-                            value={item.toShip}
-                            onChange={(e) =>
-                              updateToShip(item.bookId, parseInt(e.target.value) || 0)
-                            }
-                          />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-                {items.length === 0 && (
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : (
                   <div className="text-center text-muted-foreground py-8 border rounded-md">
                     Tidak ada item dalam order ini
                   </div>
