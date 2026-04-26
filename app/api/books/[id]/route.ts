@@ -1,21 +1,45 @@
+import { handleAuthenticatedRequest } from "@/lib/request";
 import {
-    deleteBookController,
-    getBookByIdController,
-    updateBookController,
-  } from "@/server/books/book.controller";
-  import { NextRequest } from "next/server";
-  
-  export const GET = async (_: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
-    const { id } = await params;
-    return getBookByIdController(Number(id));
-  };
-  
-  export const PUT = async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
-    const { id } = await params;
-    return updateBookController(Number(id), req);
-  };
-  
-  export const DELETE = async (_: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
-    const { id } = await params;
-    return deleteBookController(Number(id));
-  };
+  deleteBookController,
+  getBookByIdController,
+  updateBookController,
+} from "@/server/books/book.controller";
+import { NextRequest } from "next/server";
+
+type Params = { params: Promise<{ id: string }> };
+
+const parseId = (id: string) => {
+  const num = Number(id);
+  if (isNaN(num)) throw new Error("Invalid ID");
+  return num;
+};
+
+export const GET = async (req: NextRequest, { params }: Params) => {
+  return handleAuthenticatedRequest({
+    request: req,
+    callback: async () => {
+      const { id } = await params;
+      return getBookByIdController(parseId(id));
+    },
+  });
+};
+
+export const PUT = async (req: NextRequest, { params }: Params) => {
+  return handleAuthenticatedRequest({
+    request: req,
+    callback: async () => {
+      const { id } = await params;
+      return updateBookController(parseId(id), req);
+    },
+  });
+};
+
+export const DELETE = async (req: NextRequest, { params }: Params) => {
+  return handleAuthenticatedRequest({
+    request: req,
+    callback: async () => {
+      const { id } = await params;
+      return deleteBookController(parseId(id));
+    },
+  });
+};

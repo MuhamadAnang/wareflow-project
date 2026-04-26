@@ -1,21 +1,45 @@
+import { handleAuthenticatedRequest } from "@/lib/request";
 import {
-    deletePurchaseOrderController,
-    getPurchaseOrderByIdController,
-    updatePurchaseOrderController,
-  } from "@/server/purchase-orders/purchase-order.controller";
-  import { NextRequest } from "next/server";
-  
-  export const GET = async (_: NextRequest, context: { params: Promise<{ id: number }> }) => {
-    const { id } = await context.params;
-    return await getPurchaseOrderByIdController(id);
-  };
-  
-  export const PUT = async (req: NextRequest, context: { params: Promise<{ id: number }> }) => {
-    const { id } = await context.params;
-    return await updatePurchaseOrderController(id, req);
-  };
-  
-  export const DELETE = async (_: NextRequest, context: { params: Promise<{ id: number }> }) => {
-    const { id } = await context.params;
-    return await deletePurchaseOrderController(id);
-  };
+  deletePurchaseOrderController,
+  getPurchaseOrderByIdController,
+  updatePurchaseOrderController,
+} from "@/server/purchase-orders/purchase-order.controller";
+import { NextRequest } from "next/server";
+
+type Params = { params: Promise<{ id: string }> };
+
+const parseId = (id: string) => {
+  const num = Number(id);
+  if (isNaN(num)) throw new Error("Invalid ID");
+  return num;
+};
+
+export const GET = async (req: NextRequest, { params }: Params) => {
+  return handleAuthenticatedRequest({
+    request: req,
+    callback: async () => {
+      const { id } = await params;
+      return getPurchaseOrderByIdController(parseId(id));
+    },
+  });
+};
+
+export const PUT = async (req: NextRequest, { params }: Params) => {
+  return handleAuthenticatedRequest({
+    request: req,
+    callback: async () => {
+      const { id } = await params;
+      return updatePurchaseOrderController(parseId(id), req);
+    },
+  });
+};
+
+export const DELETE = async (req: NextRequest, { params }: Params) => {
+  return handleAuthenticatedRequest({
+    request: req,
+    callback: async () => {
+      const { id } = await params;
+      return deletePurchaseOrderController(parseId(id));
+    },
+  });
+};

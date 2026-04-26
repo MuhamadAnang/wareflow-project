@@ -92,6 +92,23 @@ export const CreateOrderForm = ({ form, isPending }: Props) => {
             );
           }}
         </form.Field>
+        
+        <form.Field name="deadline">
+          {(field) => (
+            <Field>
+              <FieldLabel>Deadline (Opsional)</FieldLabel>
+              <Input
+                type="date"
+                value={field.state.value || ""}
+                onChange={(e) => field.handleChange(e.target.value || null)}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Kosongkan jika tidak ada deadline khusus
+              </p>
+              <FieldError errors={field.state.meta.errors} />
+            </Field>
+          )}
+        </form.Field>
 
         <form.Field name="items">
           {(itemsField) => {

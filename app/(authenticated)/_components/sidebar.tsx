@@ -6,6 +6,7 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -13,15 +14,14 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarTrigger,
 } from "@/app/_components/ui/sidebar";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/app/_components/ui/collapsible";
-import { MENU_ITEMS, MenuItem, MenuWithChildren } from "@/common/constants/menu";
-import { ChevronDown, X } from "lucide-react";
+import { MENU_GROUPS, MenuItem, MenuWithChildren } from "@/common/constants/menu";
+import { ChevronDown,  } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
@@ -44,23 +44,31 @@ export default function AuthenticatedSidebar() {
         <Logo />
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {MENU_ITEMS.map((item, index) =>
-                item.children && item.children.length > 0 ? (
-                  <CollapsibleMenuItem key={index} item={item} isActive={isMenuActive} />
-                ) : (
-                  <SingleMenuItem
-                    key={index}
-                    item={item}
-                    isActive={isMenuActive(item.href ?? "")}
-                  />
-                ),
-              )}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {MENU_GROUPS.map((group, idx) => (
+  <SidebarGroup key={idx}>
+    <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+
+    <SidebarGroupContent>
+      <SidebarMenu>
+        {group.items.map((item, index) =>
+          item.children && item.children.length > 0 ? (
+            <CollapsibleMenuItem
+              key={index}
+              item={item}
+              isActive={isMenuActive}
+            />
+          ) : (
+            <SingleMenuItem
+              key={index}
+              item={item}
+              isActive={isMenuActive(item.href ?? "")}
+            />
+          )
+        )}
+      </SidebarMenu>
+    </SidebarGroupContent>
+  </SidebarGroup>
+))}
       </SidebarContent>
     </Sidebar>
   );

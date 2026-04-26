@@ -1,3 +1,4 @@
+import { handleAuthenticatedRequest } from "@/lib/request";
 import {
   createCustomerController,
   getCustomersWithPaginationController,
@@ -5,9 +6,15 @@ import {
 import { NextRequest } from "next/server";
 
 export const POST = async (req: NextRequest) => {
-  return await createCustomerController(req);
+  return handleAuthenticatedRequest({
+    request: req,
+    callback: () => createCustomerController(req),
+  });
 };
 
 export const GET = async (req: NextRequest) => {
-  return await getCustomersWithPaginationController(req);
+  return handleAuthenticatedRequest({
+    request: req,
+    callback: () => getCustomersWithPaginationController(req),
+  });
 };

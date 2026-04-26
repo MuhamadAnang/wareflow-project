@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "./_components/ui/sonner";
 import { QueryProvider } from "@/lib/tanstack";
-import { SidebarProvider } from "./_components/ui/sidebar";
 import { ensureEnvValidated } from "@/lib/validate-env";
 import { BreadcrumbProvider } from "./_contexts/breadcrumb.context";
+import { ClerkProvider } from "@clerk/nextjs";
 
 ensureEnvValidated();
 
@@ -21,14 +21,16 @@ export default function RootLayout({
 }>) {
   return (
     <QueryProvider>
-      <BreadcrumbProvider>
-        <html lang="en">
-          <body className={`antialiased`}>
-            <SidebarProvider open>{children}</SidebarProvider>
-            <Toaster position="top-center" theme="light" />
-          </body>
-        </html>
-      </BreadcrumbProvider>
-    </QueryProvider>
+      <ClerkProvider afterSignOutUrl={"/sign-in"} >
+        <BreadcrumbProvider>
+          <html lang="en">
+            <body className={`antialiased`}>
+              <Toaster position="top-center" theme="light" />
+              {children}
+            </body>
+          </html>
+        </BreadcrumbProvider>
+      </ClerkProvider>
+    </QueryProvider >
   );
 }

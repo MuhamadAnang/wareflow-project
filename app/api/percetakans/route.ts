@@ -1,3 +1,4 @@
+import { handleAuthenticatedRequest } from "@/lib/request";
 import {
   createPercetakanController,
   getPercetakansWithPaginationController,
@@ -5,9 +6,15 @@ import {
 import { NextRequest } from "next/server";
 
 export const POST = async (req: NextRequest) => {
-  return await createPercetakanController(req);
+  return await handleAuthenticatedRequest({
+    request: req,
+    callback: () => createPercetakanController(req),
+  });
 };
 
 export const GET = async (req: NextRequest) => {
-  return await getPercetakansWithPaginationController(req);
+  return await handleAuthenticatedRequest({
+    request: req,
+    callback: () => getPercetakansWithPaginationController(req),
+  });
 };

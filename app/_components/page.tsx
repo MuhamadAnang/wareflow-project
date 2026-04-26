@@ -18,10 +18,14 @@ export default function Page({
   description,
   children,
   isLoading,
+  className,
   ...props
 }: PropsWithChildren<Props>) {
   return (
-    <div className="w-full h-full flex flex-col gap-4 p-4" {...props}>
+    <div 
+      className={`w-full flex-1 flex flex-col gap-4 p-4 overflow-auto ${className || ""}`} 
+      {...props}
+    >
       {isLoading ? (
         <Empty>
           <EmptyContent>
@@ -30,14 +34,16 @@ export default function Page({
         </Empty>
       ) : (
         <>
-          <header className="flex justify-between items-center mb-2">
+          <header className="flex justify-between items-center mb-2 flex-shrink-0">
             <div>
               {title && <Title level={2}>{title}</Title>}
               {description && <Paragraph>{description}</Paragraph>}
             </div>
             {headerAction && headerAction}
           </header>
-          {children}
+          <div className="flex-1">
+            {children}
+          </div>
         </>
       )}
     </div>

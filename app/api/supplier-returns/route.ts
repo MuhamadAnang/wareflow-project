@@ -1,3 +1,4 @@
+import { handleAuthenticatedRequest } from "@/lib/request";
 import {
   createSupplierReturnController,
   getSupplierReturnListController,
@@ -5,9 +6,15 @@ import {
 import { NextRequest } from "next/server";
 
 export const POST = async (req: NextRequest) => {
-  return await createSupplierReturnController(req);
+  return await handleAuthenticatedRequest({
+    request: req,
+    callback: () => createSupplierReturnController(req),
+  });
 };
 
 export const GET = async (req: NextRequest) => {
-  return await getSupplierReturnListController(req);
+  return await handleAuthenticatedRequest({
+    request: req,
+    callback: () => getSupplierReturnListController(req),
+  });
 };

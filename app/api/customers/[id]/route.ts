@@ -1,3 +1,4 @@
+import { handleAuthenticatedRequest } from "@/lib/request";
 import {
   deleteCustomerController,
   getCustomerByIdController,
@@ -5,20 +6,40 @@ import {
 } from "@/server/customers/customer.controller";
 import { NextRequest } from "next/server";
 
-export const GET = async (_: NextRequest, context: { params: Promise<{ id: number }> }) => {
-  const { id } = await context.params;
+type Params = { params: Promise<{ id: string }> };
 
-  return await getCustomerByIdController(id);
+const parseId = (id: string) => {
+  const num = Number(id);
+  if (isNaN(num)) throw new Error("Invalid ID");
+  return num;
 };
 
-export const PUT = async (req: NextRequest, context: { params: Promise<{ id: number }> }) => {
-  const { id } = await context.params;
-
-  return await updateCustomerController(id, req);
+export const GET = async (req: NextRequest, { params }: Params) => {
+  return handleAuthenticatedRequest({
+    request: req,
+    callback: async () => {
+      const { id } = await params;
+      return getCustomerByIdController(parseId(id));
+    },
+  });
 };
 
-export const DELETE = async (_: NextRequest, context: { params: Promise<{ id: number }> }) => {
-  const { id } = await context.params;
+export const PUT = async (req: NextRequest, { params }: Params) => {
+  return handleAuthenticatedRequest({
+    request: req,
+    callback: async () => {
+      const { id } = await params;
+      return updateCustomerController(parseId(id), req);
+    },
+  });
+};
 
-  return await deleteCustomerController(id);
+export const DELETE = async (req: NextRequest, { params }: Params) => {
+  return handleAuthenticatedRequest({
+    request: req,
+    callback: async () => {
+      const { id } = await params;
+      return deleteCustomerController(parseId(id));
+    },
+  });
 };

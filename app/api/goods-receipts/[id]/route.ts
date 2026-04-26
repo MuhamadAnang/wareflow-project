@@ -1,21 +1,45 @@
-import { NextRequest } from "next/server";
+import { handleAuthenticatedRequest } from "@/lib/request";
 import {
   getGoodsReceiptByIdController,
   updateGoodsReceiptController,
   deleteGoodsReceiptController,
 } from "@/server/goods-receipts/goods-receipt.controller";
+import { NextRequest } from "next/server";
 
-export const GET = async (_: NextRequest, context: { params: Promise<{ id: string }> }) => {
-  const { id } = await context.params;
-  return await getGoodsReceiptByIdController(Number(id));
+type Params = { params: Promise<{ id: string }> };
+
+const parseId = (id: string) => {
+  const num = Number(id);
+  if (isNaN(num)) throw new Error("Invalid ID");
+  return num;
 };
 
-export const PUT = async (req: NextRequest, context: { params: Promise<{ id: string }> }) => {
-  const { id } = await context.params;
-  return await updateGoodsReceiptController(Number(id), req);
+export const GET = async (req: NextRequest, { params }: Params) => {
+  return handleAuthenticatedRequest({
+    request: req,
+    callback: async () => {
+      const { id } = await params;
+      return getGoodsReceiptByIdController(parseId(id));
+    },
+  });
 };
 
-export const DELETE = async (_: NextRequest, context: { params: Promise<{ id: string }> }) => {
-  const { id } = await context.params;
-  return await deleteGoodsReceiptController(Number(id));
+export const PUT = async (req: NextRequest, { params }: Params) => {
+  return handleAuthenticatedRequest({
+    request: req,
+    callback: async () => {
+      const { id } = await params;
+      return updateGoodsReceiptController(parseId(id), req);
+    },
+  });
+};
+
+export const DELETE = async (req: NextRequest, { params }: Params) => {
+  return handleAuthenticatedRequest({
+    request: req,
+    callback: async () => {
+      const { id } = await params;
+      return deleteGoodsReceiptController(parseId(id));
+    },
+  });
 };

@@ -1,6 +1,8 @@
+"use server";
+
 import { TMiddlewareResponse } from "@/lib/request";
 import { NextRequest, NextResponse } from "next/server";
-import { getAuth } from "@clerk/nextjs/server";
+import { clerkService } from "@/server/clerk/clerk.service";
 
 export type TAuthMiddlewareData = {
   clerkUserId: string;
@@ -11,14 +13,16 @@ export const authMiddleware = async (
   req: NextRequest,
 ): Promise<TMiddlewareResponse<TAuthMiddlewareData>> => {
   try {
-    const {isAuthenticated, sessionId, userId } = getAuth(req);
+    const authData = await clerkService.authenticateRequest(req);
 
-    if (!isAuthenticated) {
+    if (!authData) {
       return {
         pass: false,
         response: NextResponse.json({ message: "Unauthorized" }, { status: 401 }),
       };
     }
+
+    const { sessionId, userId } = authData;
 
     if (!userId) {
       return {

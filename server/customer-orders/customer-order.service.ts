@@ -1,7 +1,7 @@
 import { NotFoundException } from "@/common/exception/not-found.exception";
 import { paginationResponseMapper } from "@/lib/pagination";
 import { TCreateCustomerOrder, TIndexCustomerOrderQuery } from "@/schemas/customer-order.schema";
-import { TCustomerOrder, TCustomerOrderDetail, TCustomerOrderListItem } from "@/types/database";
+import { TCustomerOrder, TCustomerOrderDetail, TCustomerOrderListItem, TNewCustomerOrder } from "@/types/database";
 import {
   createCustomerOrderRepository,
   deleteCustomerOrderRepository,
@@ -9,7 +9,6 @@ import {
   getCustomerOrdersCountRepository,
   getCustomerOrdersWithPaginationRepository,
   updateCustomerOrderStatusRepository,
-  getCustomerOrderStatusRepository,
 } from "./customer-order.repository";
 import { getGoodsOutByOrderIdRepository } from "../goods-out/goods-out.repository";
 import { db } from "@/lib/db";
@@ -17,11 +16,12 @@ import { customerOrderItemTable, customerOrderTable, customerTable } from "@/dri
 import { eq, sql } from "drizzle-orm";
 
 export const createCustomerOrderService = async (data: TCreateCustomerOrder) => {
-  const { customerId, orderDate, note, items } = data;
+  const { customerId, orderDate, deadline, note, items } = data;  // ← tambah deadline
 
   const orderData: TNewCustomerOrder = {
     customerId,
     orderDate: orderDate as any,
+    deadline: deadline || null,
     note: note || null,
     status: "DRAFT" as const,
   };
@@ -29,7 +29,7 @@ export const createCustomerOrderService = async (data: TCreateCustomerOrder) => 
   const orderItems = items.map((item) => ({
     bookId: item.bookId,
     quantity: item.quantity,
-    price: item.price.toString(), // numeric field but stored as string in Drizzle
+    price: item.price.toString(),
   }));
 
   const order = await createCustomerOrderRepository(orderData, orderItems);

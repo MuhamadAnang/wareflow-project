@@ -1,3 +1,4 @@
+import { handleAuthenticatedRequest } from "@/lib/request";
 import {
     createSupplierController,
     getSuppliersWithPaginationController,
@@ -5,9 +6,15 @@ import {
   import { NextRequest } from "next/server";
   
   export const POST = async (req: NextRequest) => {
-    return await createSupplierController(req);
+    return await handleAuthenticatedRequest({
+      request: req,
+      callback: () => createSupplierController(req),
+    });
   };
-  
+
   export const GET = async (req: NextRequest) => {
-    return await getSuppliersWithPaginationController(req);
+    return await handleAuthenticatedRequest({
+      request: req,
+      callback: () => getSuppliersWithPaginationController(req),
+    });
   };

@@ -1,9 +1,9 @@
-import { customerOrderTable, customerOrderItemTable, customerTable, bookTitleTable, subjectTable, supplierTable, bookTable } from "@/drizzle/schema";
+import { customerOrderTable, customerOrderItemTable, customerTable, bookTable } from "@/drizzle/schema";
 import { db } from "@/lib/db";
-import { buildCountQuery, buildPaginatedQuery, TColumnsDefinition } from "@/lib/query-builder";
+import {  TColumnsDefinition } from "@/lib/query-builder";
 import { TIndexCustomerOrderQuery } from "@/schemas/customer-order.schema";
 import { TNewCustomerOrder, TNewCustomerOrderItem } from "@/types/database";
-import { and, eq, isNull, sql } from "drizzle-orm";
+import {  eq, sql } from "drizzle-orm";
 
 // ==================== HEADER ====================
 
@@ -24,7 +24,6 @@ export const createCustomerOrderRepository = async (
 };
 
 export const getCustomerOrderByIdRepository = async (id: number) => {
-  // 1. Ambil order header beserta customer
   const orderWithCustomer = await db
     .select({
       order: customerOrderTable,
@@ -41,13 +40,10 @@ export const getCustomerOrderByIdRepository = async (id: number) => {
     .where(eq(customerOrderTable.id, id))
     .limit(1);
 
-  if (!orderWithCustomer.length) {
-    return null;
-  }
+  if (!orderWithCustomer.length) return null;
 
   const { order, customer } = orderWithCustomer[0];
 
-  // 2. Ambil items dengan informasi buku
   const items = await db
     .select({
       id: customerOrderItemTable.id,
@@ -56,29 +52,16 @@ export const getCustomerOrderByIdRepository = async (id: number) => {
       quantity: customerOrderItemTable.quantity,
       price: customerOrderItemTable.price,
       bookCode: bookTable.code,
-      subjectName: subjectTable.name,
-      grade: bookTable.grade,
-      level: bookTable.level,
-      curriculum: bookTable.curriculum,
-      semester: bookTable.semester,
+      bookName: bookTable.name,
     })
     .from(customerOrderItemTable)
     .innerJoin(bookTable, eq(customerOrderItemTable.bookId, bookTable.id))
-    .innerJoin(subjectTable, eq(bookTable.subjectId, subjectTable.id))  // ✅ langsung dari bookTable
     .where(eq(customerOrderItemTable.customerOrderId, order.id));
 
   return {
     ...order,
     customer,
-    items: items.map((item) => ({
-      id: item.id,
-      customerOrderId: item.customerOrderId,
-      bookId: item.bookId,
-      quantity: item.quantity,
-      price: item.price,
-      bookCode: item.bookCode,
-      bookName: `${item.subjectName} Kelas ${item.grade} ${item.level} ${item.curriculum.replace(/_/g, " ")} ${item.semester}`,
-    })),
+    items,
   };
 };
 

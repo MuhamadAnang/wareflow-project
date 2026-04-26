@@ -3,7 +3,7 @@ export {};
 declare global {
   interface CustomJwtSessionClaims {
     metadata: {
-      isOnboarded?: boolean;
+      isAllowed?: boolean;
     };
   }
 }

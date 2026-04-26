@@ -1,3 +1,4 @@
+import { handleAuthenticatedRequest } from "@/lib/request";
 import {
   deleteSubjectController,
   getSubjectByIdController,
@@ -5,25 +6,40 @@ import {
 } from "@/server/subjects/subject.controller";
 import { NextRequest } from "next/server";
 
-export const GET = async (_: NextRequest, context: { params: Promise<{ id: string }> }) => {
-  const params = await context.params;
-  const id = parseInt(params.id, 10);
+type Params = { params: Promise<{ id: string }> };
 
-  if (isNaN(id)) {
-    return new Response(JSON.stringify({ error: "Invalid ID" }), { status: 400 });
-  }
-
-  return await getSubjectByIdController(id);
+const parseId = (id: string) => {
+  const num = Number(id);
+  if (isNaN(num)) throw new Error("Invalid ID");
+  return num;
 };
 
-export const PUT = async (req: NextRequest, context: { params: Promise<{ id: number }> }) => {
-  const { id } = await context.params;
-
-  return await updateSubjectController(id, req);
+export const GET = async (req: NextRequest, { params }: Params) => {
+  return handleAuthenticatedRequest({
+    request: req,
+    callback: async () => {
+      const { id } = await params;
+      return getSubjectByIdController(parseId(id));
+    },
+  });
 };
 
-export const DELETE = async (_: NextRequest, context: { params: Promise<{ id: number }> }) => {
-  const { id } = await context.params;
+export const PUT = async (req: NextRequest, { params }: Params) => {
+  return handleAuthenticatedRequest({
+    request: req,
+    callback: async () => {
+      const { id } = await params;
+      return updateSubjectController(parseId(id), req);
+    },
+  });
+};
 
-  return await deleteSubjectController(id);
+export const DELETE = async (req: NextRequest, { params }: Params) => {
+  return handleAuthenticatedRequest({
+    request: req,
+    callback: async () => {
+      const { id } = await params;
+      return deleteSubjectController(parseId(id));
+    },
+  });
 };
