@@ -3,7 +3,25 @@ import { db } from "@/lib/db";
 import { buildCountQuery, buildPaginatedQuery, TColumnsDefinition } from "@/lib/query-builder";
 import { TIndexSubjectQuery } from "@/schemas/subject.schema";
 import { TNewSubject, TUpdateSubject } from "@/types/database";
-import { eq, isNull } from "drizzle-orm";
+import { and, eq, ilike, isNull, not } from "drizzle-orm";
+
+export const getSubjectByNameRepository = async (name: string, excludeId?: number) => {
+  const conditions = [
+    ilike(subjectTable.name, name.trim()),
+    isNull(subjectTable.deletedAt),
+  ];
+
+  if (excludeId) {
+    conditions.push(not(eq(subjectTable.id, excludeId)));
+  }
+
+  const [existing] = await db
+    .select({ id: subjectTable.id, name: subjectTable.name })
+    .from(subjectTable)
+    .where(and(...conditions));
+
+  return existing ?? null;
+};
 
 export const createSubjectRepository = async (data: TNewSubject) => {
   return await db.insert(subjectTable).values(data).returning();

@@ -43,7 +43,7 @@ export default function GoodsOutPage() {
     {
       accessorKey: "address",
       header: "Alamat Customer",
-      cell: ({ row }) => row.original.address || "-",
+      cell: ({ row }) => row.original.customerAddress || "-",
     },
     {
       accessorKey: "shippedDate",

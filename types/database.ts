@@ -184,6 +184,7 @@ export type TGoodsOutListItem = {
   id: number;
   customerOrderId: number;
   customerName: string;
+  customerAddress: string | null;
   shippedDate: Date;
   note: string | null;
   totalItems: number;

@@ -2,6 +2,7 @@ import { responseFormatter } from "@/lib/response-formatter";
 import { NotFoundException } from "./not-found.exception";
 import { ValidationException } from "./validation.exception";
 import { BadRequestException } from "./bad-request.exception";
+import { ConflictException } from "./conflict.exception";
 
 export const handleException = (error: unknown) => {
   console.log("Error:", error);
@@ -15,6 +16,8 @@ export const handleException = (error: unknown) => {
     });
   } else if (error instanceof BadRequestException) {
     return responseFormatter.badRequest({ message: error.message });
+  } else if (error instanceof ConflictException) {
+    return responseFormatter.conflict(error.message);
   }
 
   return responseFormatter.error({ message: "An unexpected error occurred" });

@@ -4,7 +4,7 @@ import Page from "@/app/_components/page";
 import { useGetPriorityDistribution } from "./__hooks/use-get-priority.query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/_components/ui/card";
 import { PriorityTable } from "./__components/priority-table";
-import { Package, Trophy, TrendingUp, Calendar, Info, AlertTriangle, Handshake } from "lucide-react";
+import { Package, Trophy, TrendingUp, Calendar, Info } from "lucide-react";
 import { useBreadcrumb } from "@/app/_contexts/breadcrumb.context";
 import { useEffect } from "react";
 import { Button } from "@/app/_components/ui/button";
@@ -33,7 +33,7 @@ export default function PriorityDistributionPage() {
       }
     >
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -88,9 +88,9 @@ export default function PriorityDistributionPage() {
         </Card>
       </div>
 
-      {/* Priority Table */}
+      {/* Priority Table Card */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-2">
           <CardTitle>Daftar Prioritas Pengiriman</CardTitle>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Info className="h-3 w-3" />
@@ -108,7 +108,7 @@ export default function PriorityDistributionPage() {
           <CardTitle>Informasi Bobot Kriteria (Hasil AHP)</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <Package className="h-4 w-4 text-blue-500" />
@@ -129,7 +129,7 @@ export default function PriorityDistributionPage() {
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Handshake className="h-4 w-4 text-green-500" />
+                <Trophy className="h-4 w-4 text-green-500" />
                 <p className="font-semibold">C3 - Status Kontrak</p>
               </div>
               <p className="text-2xl font-bold text-green-600">12%</p>
@@ -137,7 +137,7 @@ export default function PriorityDistributionPage() {
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-red-500" />
+                <TrendingUp className="h-4 w-4 text-red-500" />
                 <p className="font-semibold">C4 - Riwayat Retur</p>
               </div>
               <p className="text-2xl font-bold text-red-600">6%</p>

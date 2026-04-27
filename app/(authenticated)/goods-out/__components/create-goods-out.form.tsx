@@ -163,7 +163,7 @@ export const CreateGoodsOutForm = ({ onSubmit, isPending }: Props) => {
           <Textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="Catatan pengiriman (opsional)"
+            placeholder="Catatan pengiriman (contoh: di terima oleh Mas Abid dengan lengkap)"
           />
         </div>
 

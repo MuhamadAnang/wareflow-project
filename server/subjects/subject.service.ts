@@ -3,6 +3,7 @@ import {
   createSubjectRepository,
   deleteSubjectByIdRepository,
   getSubjectByIdRepository,
+  getSubjectByNameRepository,
   getSubjectsCountRepository,
   getSubjectsWithPaginationRepository,
   updateSubjectByIdRepository,
@@ -10,10 +11,13 @@ import {
 import { paginationResponseMapper } from "@/lib/pagination";
 import { TSubject } from "@/types/database";
 import { NotFoundException } from "@/common/exception/not-found.exception";
+import { ConflictException } from "@/common/exception/conflict.exception";
 
 export const createSubjectService = async (data: TCreateOrUpdateSubject) => {
-  // bisa tambah normalisasi kalau mau, misal: name.toUpperCase()
-  // invalidateSubjectCache();  // <-- panggil ini
+  const existing = await getSubjectByNameRepository(data.name);
+  if (existing) {
+    throw new ConflictException(`Mata pelajaran "${data.name}" sudah ada`);
+  }
   return await createSubjectRepository(data);
 };
 
@@ -42,10 +46,15 @@ export const updateSubjectService = async (
   id: number,
   data: TCreateOrUpdateSubject,
 ): Promise<TSubject> => {
-  await getSubjectByIdService(id); // validasi exist
+  await getSubjectByIdService(id);
+
+  // Cek duplikat nama, tapi exclude subject yang sedang diupdate
+  const existing = await getSubjectByNameRepository(data.name, id);
+  if (existing) {
+    throw new ConflictException(`Mata pelajaran "${data.name}" sudah ada`);
+  }
+
   const [updated] = await updateSubjectByIdRepository(id, data);
-  // invalidateSubjectCache(); 
-  
   return updated;
 };
 

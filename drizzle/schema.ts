@@ -1,3 +1,5 @@
+import { sql } from "drizzle-orm";
+import { uniqueIndex } from "drizzle-orm/gel-core";
 import {
   pgEnum,
   pgTable,
@@ -66,7 +68,11 @@ export const subjectTable = pgTable("subjects", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 100 }).notNull(),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
-});
+}, (table) => ({
+  // Opsi 2: Unique constraint case-insensitive (rekomendasi)
+  uniqueNameCaseInsensitive: uniqueIndex("unique_name_case_insensitive_idx")
+    .on(sql`LOWER(${table.name})`),
+}));
 
 /* =========================
    SUPPLIERS
@@ -226,7 +232,7 @@ export const customerOrderTable = pgTable("customer_orders", {
     .notNull()
     .references(() => customerTable.id),
   orderDate: date("order_date").notNull(),
-  deadline: date("deadline"), 
+  deadline: date("deadline"),
   status: customerOrderStatusEnum("status").notNull().default("DRAFT"),
   note: varchar("note", { length: 500 }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
