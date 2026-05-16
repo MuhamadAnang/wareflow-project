@@ -17,31 +17,48 @@ import {
    ENUMS
 ========================= */
 
+// drizzle/schema.ts (bagian enum)
 export const customerStatusEnum = pgEnum("customer_status_enum", [
-  "CONTRACT",
-  "NON-CONTRACT",
-  "MOU",
+  "CONTRACT",      // Kontrak resmi (bobot 5)
+  "NON-CONTRACT",  // Langganan tetap non kontrak (bobot 3)
+  "MOU",           // Nota kesepahaman (bobot 1, setara REGULER)
 ]);
 
-export const semesterEnum = pgEnum("semester_enum", ["GANJIL", "GENAP", "SETAHUN"]);
+export const semesterEnum = pgEnum("semester_enum", [
+  "GANJIL", 
+  "GENAP", 
+  "SETAHUN"
+]);
 
-export const bookLevelEnum = pgEnum("book_level", ["SD", "SMP", "SMA", "SMK", "SMA/SMK"]);
-export const curriculumEnum = pgEnum("curriculum", ["KURIKULUM_MERDEKA", "K13", "KTSP", "LAINNYA"]);
+export const bookLevelEnum = pgEnum("book_level", [
+  "SD", 
+  "SMP", 
+  "SMA", 
+  "SMK", 
+  "SMA/SMK"
+]);
+
+export const curriculumEnum = pgEnum("curriculum", [
+  "KURIKULUM_MERDEKA", 
+  "K13", 
+  "KTSP", 
+  "LAINNYA"
+]);
 
 export const customerOrderStatusEnum = pgEnum("customer_order_status_enum", [
-  "DRAFT",
-  "CONFIRMED",
-  "PARTIALLY_SHIPPED",
-  "SHIPPED",
-  "CANCELLED",
+  "DRAFT",              // Draft, belum final
+  "CONFIRMED",          // Dikonfirmasi, siap diproses
+  "PARTIALLY_SHIPPED",  // Sebagian sudah dikirim
+  "SHIPPED",            // Sudah dikirim semua
+  "CANCELLED",          // Dibatalkan
 ]);
 
 export const stockMovementTypeEnum = pgEnum("stock_movement_type_enum", [
-  "IN_PURCHASE",
-  "OUT_SALES",
-  "RETURN_CUSTOMER",
-  "RETURN_SUPPLIER",
-  "ADJUSTMENT",
+  "IN_PURCHASE",       // Barang masuk dari pembelian
+  "OUT_SALES",         // Barang keluar untuk penjualan
+  "RETURN_CUSTOMER",   // Retur dari pelanggan
+  "RETURN_SUPPLIER",   // Retur ke supplier
+  "ADJUSTMENT",        // Penyesuaian stok
 ]);
 
 /* =========================

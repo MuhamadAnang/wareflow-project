@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import {
   customerOrderTable,
   customerOrderItemTable,
@@ -18,9 +18,16 @@ interface OrderPriorityInput {
   urgency: number;
   contractStatus: number;
   returnRate: number;
-  orderItems: any[];
-  deadline: Date | null;
-  orderDate: Date;
+  orderItems: {
+    id: number;
+    bookId: number;
+    quantity: number;
+    price: string;
+    bookCode: string;
+    bookName: string;
+  }[];
+  deadline: string | null;
+  orderDate: string;
 }
 
 /**
@@ -59,19 +66,19 @@ async function calculateStockFulfillment(orderId: number): Promise<number> {
 
 /**
  * Hitung urgensi (C2) - Benefit
- * Berdasarkan deadline (jika ada) atau default 50
+ * Berdasarkan deadline (jika ada) atau default 10
  */
 async function calculateUrgency(order: {
   id: number;
-  deadline: Date | null;
-  orderDate: Date;
+  deadline: string | Date | null;
+  orderDate: string | Date;
 }): Promise<number> {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
   // Tidak ada deadline -> nilai default sedang
   if (!order.deadline) {
-    return 50;
+    return 10;
   }
   
   const deadline = new Date(order.deadline);
@@ -164,7 +171,12 @@ async function calculateReturnRate(customerId: number): Promise<number> {
  * Ambil semua order yang perlu diprioritaskan
  * Status: CONFIRMED atau PARTIALLY_SHIPPED
  */
-export async function getPendingOrdersForPriority(): Promise<OrderPriorityInput[]> {
+export async function getPendingOrdersForPriority(orderIds?: number[]): Promise<OrderPriorityInput[]> {
+  const statusCondition = sql`${customerOrderTable.status} IN ('CONFIRMED', 'PARTIALLY_SHIPPED')`;
+  const whereCondition = orderIds?.length
+    ? and(statusCondition, inArray(customerOrderTable.id, orderIds))
+    : statusCondition;
+
   const orders = await db
     .select({
       id: customerOrderTable.id,
@@ -176,9 +188,7 @@ export async function getPendingOrdersForPriority(): Promise<OrderPriorityInput[
     })
     .from(customerOrderTable)
     .innerJoin(customerTable, eq(customerOrderTable.customerId, customerTable.id))
-    .where(
-      sql`${customerOrderTable.status} IN ('CONFIRMED', 'PARTIALLY_SHIPPED')`
-    )
+    .where(whereCondition)
     .orderBy(customerOrderTable.createdAt);
 
   const result: OrderPriorityInput[] = [];
@@ -225,8 +235,8 @@ export async function getPendingOrdersForPriority(): Promise<OrderPriorityInput[
 /**
  * Hitung prioritas distribusi untuk semua pending orders
  */
-export async function calculateDistributionPriority() {
-  const pendingOrders = await getPendingOrdersForPriority();
+export async function calculateDistributionPriority(orderIds?: number[]) {
+  const pendingOrders = await getPendingOrdersForPriority(orderIds);
   
   if (pendingOrders.length === 0) {
     return [];

@@ -17,6 +17,76 @@ import { useEffect } from "react";
 import { customerOrderStatusEnum } from "@/drizzle/schema";
 import { Badge } from "@/app/_components/ui/badge";
 import { useDeleteCustomerOrderMutation } from "./__hooks/use-delete-customer-order.mutation";
+import { useUpdateOrderStatusMutation } from "./__hooks/use-update-order-status.mutation";
+
+const statusTransitions: Record<string, string[]> = {
+  DRAFT: ["CONFIRMED", "CANCELLED"],
+  CONFIRMED: ["PARTIALLY_SHIPPED", "SHIPPED", "CANCELLED"],
+  PARTIALLY_SHIPPED: ["SHIPPED", "CANCELLED"],
+  SHIPPED: [],
+  CANCELLED: [],
+};
+
+function CustomerOrderActionsCell({
+  order,
+  onDelete,
+  onStatusChange,
+  isUpdating,
+  isDeleting,
+}: {
+  order: TCustomerOrderListItem;
+  onDelete: (id: number) => Promise<void>;
+  onStatusChange: (id: number, status: string) => Promise<void>;
+  isUpdating: boolean;
+  isDeleting: boolean;
+}) {
+  const availableActions = statusTransitions[order.status] || [];
+  const canConfirm = availableActions.includes("CONFIRMED");
+  const canCancel = availableActions.includes("CANCELLED");
+
+  return (
+    <div className="flex gap-2">
+      <Link href={`/customer-orders/${order.id}`}>
+        <Button variant="outline" size="icon" disabled={isDeleting}>
+          <Eye className="h-4 w-4" />
+        </Button>
+      </Link>
+
+
+      <Button
+        variant="outline"
+        size="icon"
+        onClick={() => onDelete(order.id)}
+        disabled={isDeleting}
+      >
+        <Trash className="h-4 w-4 text-red-500" />
+      </Button>
+      {canConfirm && (
+        <Button
+        className="bg-primary text-white"
+          variant="outline"
+          size="sm"
+          onClick={() => onStatusChange(order.id, "CONFIRMED")}
+          disabled={isUpdating}
+        >
+          Confirm
+        </Button>
+      )}
+
+      {canCancel && (
+        <Button
+        className="bg-red-600 text-white"
+          variant="outline"
+          size="sm"
+          onClick={() => onStatusChange(order.id, "CANCELLED")}
+          disabled={isUpdating}
+        >
+          Cancel
+        </Button>
+      )}
+    </div>
+  );
+}
 
 export default function CustomerOrdersPage() {
   const { setBreadcrumbs } = useBreadcrumb();
@@ -28,7 +98,16 @@ export default function CustomerOrdersPage() {
     sort: filters.sort,
     status: filters.status,
   });
-  const { mutateAsync, isPending } = useDeleteCustomerOrderMutation();
+  const { mutateAsync: deleteOrder, isPending: isDeleting } = useDeleteCustomerOrderMutation();
+  const { mutateAsync: updateStatus, isLoading: isUpdatingStatus } = useUpdateOrderStatusMutation();
+
+  const handleDelete = async (id: number) => {
+    await deleteOrder(id);
+  };
+
+  const handleStatusChange = async (id: number, status: string) => {
+    await updateStatus({ id, status });
+  };
 
   useEffect(() => {
     setBreadcrumbs([{ label: "Customer Orders" }]);
@@ -55,21 +134,13 @@ export default function CustomerOrdersPage() {
       accessorKey: "actions",
       header: "Actions",
       cell: ({ row }) => (
-        <div className="flex gap-2">
-          <Link href={`/customer-orders/${row.original.id}`}>
-            <Button variant="outline" size="icon" disabled={isPending}>
-              <Eye className="h-4 w-4" />
-            </Button>
-          </Link>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => mutateAsync(row.original.id)}
-            disabled={isPending}
-          >
-            <Trash className="h-4 w-4 text-red-500" />
-          </Button>
-        </div>
+        <CustomerOrderActionsCell
+          order={row.original}
+          onDelete={handleDelete}
+          onStatusChange={handleStatusChange}
+          isUpdating={isUpdatingStatus}
+          isDeleting={isDeleting}
+        />
       ),
     },
   ];

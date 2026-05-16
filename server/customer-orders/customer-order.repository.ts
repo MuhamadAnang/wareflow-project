@@ -1,9 +1,10 @@
-import { customerOrderTable, customerOrderItemTable, customerTable, bookTable } from "@/drizzle/schema";
+import { bookTable, customerOrderItemTable, customerOrderStatusEnum, customerOrderTable, customerTable } from "@/drizzle/schema";
 import { db } from "@/lib/db";
-import {  TColumnsDefinition } from "@/lib/query-builder";
 import { TIndexCustomerOrderQuery } from "@/schemas/customer-order.schema";
 import { TNewCustomerOrder, TNewCustomerOrderItem } from "@/types/database";
 import {  eq, sql } from "drizzle-orm";
+
+type CustomerOrderStatus = (typeof customerOrderStatusEnum.enumValues)[number];
 
 // ==================== HEADER ====================
 
@@ -53,6 +54,7 @@ export const getCustomerOrderByIdRepository = async (id: number) => {
       price: customerOrderItemTable.price,
       bookCode: bookTable.code,
       bookName: bookTable.name,
+      currentStock: bookTable.currentStock,
     })
     .from(customerOrderItemTable)
     .innerJoin(bookTable, eq(customerOrderItemTable.bookId, bookTable.id))
@@ -63,11 +65,6 @@ export const getCustomerOrderByIdRepository = async (id: number) => {
     customer,
     items,
   };
-};
-
-const CUSTOMER_ORDER_COLUMNS: TColumnsDefinition<typeof customerOrderTable> = {
-  orderDate: { sortable: true },
-  status: { filterable: true },
 };
 
 export const getCustomerOrdersWithPaginationRepository = async (
@@ -99,7 +96,7 @@ export const getCustomerOrdersWithPaginationRepository = async (
       const statuses = status.split(',');
       baseQuery = baseQuery.where(sql`${customerOrderTable.status} IN (${statuses.join(',')})`);
     } else {
-      baseQuery = baseQuery.where(eq(customerOrderTable.status, status as any));
+      baseQuery = baseQuery.where(eq(customerOrderTable.status, status as CustomerOrderStatus));
     }
   }
 
@@ -116,13 +113,14 @@ export const getCustomerOrdersWithPaginationRepository = async (
   // Sorting
   if (sort && Object.keys(sort).length > 0) {
     const [sortKey, sortDir] = Object.entries(sort)[0];
-    const columnMap: Record<string, any> = {
-      orderDate: customerOrderTable.orderDate,
-      status: customerOrderTable.status,
-    };
-    const column = columnMap[sortKey];
-    if (column) {
-      baseQuery = baseQuery.orderBy(sortDir === "asc" ? column : sql`${column} DESC`);
+    if (sortKey === "orderDate") {
+      baseQuery = baseQuery.orderBy(
+        sortDir === "asc" ? customerOrderTable.orderDate : sql`${customerOrderTable.orderDate} DESC`,
+      );
+    } else if (sortKey === "status") {
+      baseQuery = baseQuery.orderBy(
+        sortDir === "asc" ? customerOrderTable.status : sql`${customerOrderTable.status} DESC`,
+      );
     } else {
       baseQuery = baseQuery.orderBy(sql`${customerOrderTable.createdAt} DESC`);
     }
@@ -150,7 +148,7 @@ export const getCustomerOrdersCountRepository = async (queryParams: TIndexCustom
       const statuses = status.split(',');
       baseQuery = baseQuery.where(sql`${customerOrderTable.status} IN (${statuses.join(',')})`);
     } else {
-      baseQuery = baseQuery.where(eq(customerOrderTable.status, status as any));
+      baseQuery = baseQuery.where(eq(customerOrderTable.status, status as CustomerOrderStatus));
     }
   }
 
@@ -167,7 +165,7 @@ export const updateCustomerOrderStatusRepository = async (id: number, status: st
     const result = await db
       .update(customerOrderTable)
       .set({
-        status: status as any,
+        status: status as CustomerOrderStatus,
         updatedAt: new Date()
       })
       .where(eq(customerOrderTable.id, id))

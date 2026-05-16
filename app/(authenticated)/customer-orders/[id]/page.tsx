@@ -54,15 +54,6 @@ export default function CustomerOrderDetailPage() {
                 <TableCell className="bg-muted">Status</TableCell>
                 <TableCell>
                   <Badge>{toTitleCase(order?.status || "")}</Badge>
-                  {availableActions.length > 0 && (
-                    <div className="mt-3 space-x-2">
-                      {availableActions.map((action) => (
-                        <Button key={action} size="sm" variant="outline" onClick={() => handleStatusChange(action)}>
-                          {toTitleCase(action)}
-                        </Button>
-                      ))}
-                    </div>
-                  )}
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -85,13 +76,13 @@ export default function CustomerOrderDetailPage() {
                 <TableCell>Subtotal</TableCell>
               </TableRow>
               {order?.items?.map((item) => {
-                const title = `${item.book?.bookTitle?.subject?.name || ""} Kelas ${item.book?.bookTitle?.grade || ""} ${item.book?.bookTitle?.level || ""}`;
+                const title = `${item.bookName}`;
                 const subtotal = Number(item.price) * item.quantity;
                 const shippedQty = (item as any).shippedQuantity || 0;
                 const remainingQty = (item as any).remainingQuantity || item.quantity;
                 return (
                   <TableRow key={item.id}>
-                    <TableCell>{item.book?.code}</TableCell>
+                    <TableCell>{item.bookCode}</TableCell>
                     <TableCell>{title.trim()}</TableCell>
                     <TableCell>{item.quantity}</TableCell>
                     <TableCell>{shippedQty}</TableCell>

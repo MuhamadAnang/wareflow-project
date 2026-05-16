@@ -12,12 +12,8 @@ import { useEffect } from "react";
 import {
   Package,
   Warehouse,
-  AlertTriangle,
   Users,
-  Building2,
   Clock,
-  DollarSign,
-  Truck,
 } from "lucide-react";
 
 export default function DashboardPage() {
@@ -37,7 +33,7 @@ export default function DashboardPage() {
       description="Selamat datang di Warehouse Management System. Pantau aktivitas gudang dan distribusi buku di sini."
     >
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 mb-6">
         <StatsCard
           title="Total Buku"
           value={stats?.totalBooks || 0}
@@ -52,13 +48,7 @@ export default function DashboardPage() {
           description="Total eksemplar di gudang"
           iconColor="text-green-500"
         />
-        <StatsCard
-          title="Stok Menipis"
-          value={stats?.lowStockItems || 0}
-          icon={AlertTriangle}
-          description="Buku dengan stok < 50"
-          iconColor="text-orange-500"
-        />
+        
         <StatsCard
           title="Total Customer"
           value={stats?.totalCustomers || 0}
@@ -66,13 +56,7 @@ export default function DashboardPage() {
           description="Customer aktif"
           iconColor="text-purple-500"
         />
-        <StatsCard
-          title="Total Supplier"
-          value={stats?.totalSuppliers || 0}
-          icon={Building2}
-          description="Penerbit aktif"
-          iconColor="text-cyan-500"
-        />
+        
         <StatsCard
           title="Order Pending"
           value={stats?.pendingOrders || 0}
@@ -80,20 +64,20 @@ export default function DashboardPage() {
           description="Order confirmed/parsial"
           iconColor="text-yellow-500"
         />
-        <StatsCard
+        {/* <StatsCard
           title="Nilai Pending"
           value={stats?.pendingOrdersValue || 0}
           icon={DollarSign}
           description="Total nilai order pending"
           iconColor="text-emerald-500"
-        />
-        <StatsCard
+        /> */}
+        {/* <StatsCard
           title="Pengiriman Bulan Ini"
           value={stats?.shippedOrdersThisMonth || 0}
           icon={Truck}
           description="Jumlah pengiriman"
           iconColor="text-indigo-500"
-        />
+        /> */}
       </div>
 
       {/* Two Column Layout */}

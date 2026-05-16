@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "./_components/ui/button";
+import { Button } from "../_components/ui/button";
 import { ArrowRight, BarChart3, CheckCircle2, Package, Shield, Star, TrendingUp, Truck, Undo2, Users, Warehouse, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
-import Logo from "./_components/logo";
+import Logo from "../_components/logo";
 
 export default function Page() {
   const [scrolled, setScrolled] = useState(false);

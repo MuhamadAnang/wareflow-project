@@ -16,9 +16,9 @@ import { TBookListItem } from "@/types/database";
 export const createBookController = async (req: NextRequest) => {
   try {
     const formData = await req.formData();
-    const body: any = {};
+    const body: Record<string, FormDataEntryValue | number | null> = {};
 
-    console.log("✅ FormData diterima, jumlah field:", formData.entries().length);
+    console.log("✅ FormData diterima, jumlah field:", Array.from(formData.entries()).length);
 
     for (const [key, value] of formData.entries()) {
       console.log(`Field: ${key} → tipe: ${value instanceof File ? "FILE" : typeof value}`);
@@ -40,15 +40,15 @@ export const createBookController = async (req: NextRequest) => {
     console.log("Body setelah parsing:", {
       code: body.code,
       hasImage: body.image instanceof File,
-      imageName: body.image?.name,
+      imageName: body.image instanceof File ? body.image.name : undefined,
     });
 
     validateSchema(CreateOrUpdateBookSchema, body);
 
-    await createBookService(body);
+    const createdBook = await createBookService(body);
 
-    return responseFormatter.created({ message: "Buku berhasil dibuat" });
-  } catch (error: any) {
+    return responseFormatter.created({ data: createdBook, message: "Buku berhasil dibuat" });
+  } catch (error) {
     console.error("❌ Create Book Error:", error);
     return handleException(error);
   }
@@ -106,7 +106,7 @@ export const getBookByIdController = async (id: number) => {
 
 export const updateBookController = async (id: number, req: NextRequest) => {
   try {
-    const body: any = {};
+    const body: Record<string, FormDataEntryValue | number | null> = {};
     const contentType = req.headers.get("content-type") || "";
 
     if (contentType.includes("multipart/form-data") || contentType.includes("application/x-www-form-urlencoded")) {
@@ -122,7 +122,7 @@ export const updateBookController = async (id: number, req: NextRequest) => {
       }
     } else {
       // Fallback ke JSON
-      const json = await req.json();
+      const json = (await req.json()) as Record<string, FormDataEntryValue | number | null>;
       Object.assign(body, json);
     }
 
@@ -140,7 +140,7 @@ export const updateBookController = async (id: number, req: NextRequest) => {
       data: updated,
       message: "Buku berhasil diperbarui",
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("❌ Update Book Error:", error);
     return handleException(error);
   }

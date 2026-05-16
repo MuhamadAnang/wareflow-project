@@ -15,13 +15,13 @@ interface StatsCardProps {
   iconColor?: string;
 }
 
-export const StatsCard = ({ 
-  title, 
-  value, 
-  icon: Icon, 
-  description, 
+export const StatsCard = ({
+  title,
+  value,
+  icon: Icon,
+  description,
   trend,
-  iconColor = "text-muted-foreground" 
+  iconColor = "text-muted-foreground"
 }: StatsCardProps) => {
   // Format currency if value is number and title contains "Nilai"
   const formattedValue = typeof value === "number" && title.toLowerCase().includes("nilai")
@@ -29,22 +29,25 @@ export const StatsCard = ({
     : value;
 
   return (
-    <Card>
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div>
+    <Card className="h-32">
+      <CardContent className="p-4 h-full">
+        <div className="flex items-center justify-between h-full">
+          <div className="space-y-1">
             <p className="text-sm font-medium text-muted-foreground">{title}</p>
-            <p className="text-2xl font-bold mt-1">{formattedValue}</p>
+            <p className="text-xl font-bold">{formattedValue}</p>
+
             {description && (
-              <p className="text-xs text-muted-foreground mt-1">{description}</p>
+              <p className="text-xs text-muted-foreground">{description}</p>
             )}
+
             {trend && (
-              <p className={`text-xs mt-2 ${trend.isPositive ? "text-green-600" : "text-red-600"}`}>
+              <p className={`text-xs ${trend.isPositive ? "text-green-600" : "text-red-600"}`}>
                 {trend.isPositive ? "↑" : "↓"} {Math.abs(trend.value)}% dari bulan lalu
               </p>
             )}
           </div>
-          <Icon className={`h-8 w-8 ${iconColor}`} />
+
+          <Icon className={`h-6 w-6 ${iconColor}`} />
         </div>
       </CardContent>
     </Card>

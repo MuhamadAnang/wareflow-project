@@ -16,6 +16,7 @@ import { useGetBooksDropdownQuery } from "../__hooks/use-get-books-dropdown.quer
 import { Plus, Trash } from "lucide-react";
 import { CreateCustomerDialog } from "./create-customer-dialog";
 import { useCreateOrderForm } from "../__hooks/use-create-order-form";
+import { CreateBookDialog } from "./create-book-dialog";
 
 interface Props {
   form: ReturnType<typeof useCreateOrderForm>;
@@ -30,7 +31,7 @@ type OrderItem = {
 
 export const CreateOrderForm = ({ form, isPending }: Props) => {
   const { data: customersData, refetch: refetchCustomers } = useGetCustomersDropdownQuery();
-  const { data: booksData } = useGetBooksDropdownQuery();
+  const { data: booksData, refetch: refetchBooks } = useGetBooksDropdownQuery();
 
   const handleCustomerCreated = async (newCustomerId: number) => {
     await refetchCustomers();
@@ -99,8 +100,14 @@ export const CreateOrderForm = ({ form, isPending }: Props) => {
               <FieldLabel>Deadline (Opsional)</FieldLabel>
               <Input
                 type="date"
-                value={field.state.value || ""}
-                onChange={(e) => field.handleChange(e.target.value || null)}
+                value={
+                  field.state.value instanceof Date
+                    ? field.state.value.toISOString().split("T")[0]
+                    : ""
+                }
+                onChange={(e) =>
+                  field.handleChange(e.target.value ? new Date(e.target.value) : null)
+                }
               />
               <p className="text-xs text-muted-foreground mt-1">
                 Kosongkan jika tidak ada deadline khusus
@@ -119,6 +126,11 @@ export const CreateOrderForm = ({ form, isPending }: Props) => {
               const next = [...items];
               next[index] = { ...next[index], bookId: Number(value) };
               itemsField.handleChange(next);
+            };
+
+            const handleBookCreated = async (index: number, bookId: number) => {
+              await refetchBooks();
+              handleBookChange(index, bookId.toString());
             };
 
             const handleQuantityChange = (index: number, value: string) => {
@@ -170,7 +182,10 @@ export const CreateOrderForm = ({ form, isPending }: Props) => {
                         </Button>
 
                         <Field>
-                          <FieldLabel>Book</FieldLabel>
+                          <div className="flex justify-between items-center">
+                            <FieldLabel>Book</FieldLabel>
+                            <CreateBookDialog onBookCreated={(bookId) => handleBookCreated(idx, bookId)} />
+                          </div>
                           <Select
                             value={item.bookId > 0 ? item.bookId.toString() : ""}
                             onValueChange={(val) => handleBookChange(idx, val)}

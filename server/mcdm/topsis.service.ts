@@ -1,9 +1,3 @@
-type TOrderDetail = {
-    bookId: number;
-    quantity: number;
-    price: string;
-};
-
 interface TopsisInput {
     alternatives: Array<{
         id: number;
@@ -14,7 +8,7 @@ interface TopsisInput {
             contractStatus: number;
             returnRate: number;
         };
-        orderDetails?: TOrderDetail[];
+        orderDetails?: unknown;
     }>;
     weights: number[];
 }
@@ -24,7 +18,7 @@ interface TopsisResult {
     customerName: string;
     score: number;
     rank: number;
-    orderDetails?: TOrderDetail[];
+    orderDetails?: unknown;
 }
 
 export class TopsisService {

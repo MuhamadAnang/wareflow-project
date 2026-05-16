@@ -30,8 +30,27 @@ interface ShipmentItem {
   bookName: string;
   orderedQuantity: number;
   shippedQuantity: number;
+  currentStock: number;
   toShip: number;
 }
+
+type ShipmentOrderItem = {
+  bookId: number;
+  bookCode: string;
+  bookName: string;
+  quantity: number;
+  shippedQuantity?: number;
+  remainingQuantity?: number;
+  currentStock: number;
+};
+
+type ApiError = {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+};
 
 export const CreateGoodsOutForm = ({ onSubmit, isPending }: Props) => {
   const { data: ordersData } = useGetAvailableOrdersQuery();
@@ -58,14 +77,21 @@ export const CreateGoodsOutForm = ({ onSubmit, isPending }: Props) => {
       }
       
       // Struktur baru: bookCode dan bookName sudah langsung di item
-      const mappedItems: ShipmentItem[] = order.items.map((item) => ({
-        bookId: item.bookId,
-        bookCode: item.bookCode || "Unknown Code",
-        bookName: item.bookName || "Unknown Title",
-        orderedQuantity: item.quantity,
-        shippedQuantity: (item as any).shippedQuantity || 0,
-        toShip: (item as any).remainingQuantity || item.quantity,
-      }));
+      const mappedItems: ShipmentItem[] = order.items.map((item: ShipmentOrderItem) => {
+        const remainingQuantity = item.remainingQuantity ?? item.quantity;
+        const currentStock = item.currentStock ?? 0;
+        const maxShippable = Math.min(remainingQuantity, currentStock);
+
+        return {
+          bookId: item.bookId,
+          bookCode: item.bookCode || "Unknown Code",
+          bookName: item.bookName || "Unknown Title",
+          orderedQuantity: item.quantity,
+          shippedQuantity: item.shippedQuantity ?? 0,
+          currentStock,
+          toShip: maxShippable,
+        };
+      });
       
       setItems(mappedItems);
     }
@@ -78,9 +104,15 @@ export const CreateGoodsOutForm = ({ onSubmit, isPending }: Props) => {
 
   const updateToShip = (bookId: number, value: number) => {
     setItems((prev) =>
-      prev.map((item) =>
-        item.bookId === bookId ? { ...item, toShip: value } : item,
-      ),
+      prev.map((item) => {
+        if (item.bookId !== bookId) return item;
+
+        const remainingQuantity = item.orderedQuantity - item.shippedQuantity;
+        const maxShippable = Math.min(remainingQuantity, item.currentStock);
+        const nextQuantity = Math.max(0, Math.min(value, maxShippable));
+
+        return { ...item, toShip: nextQuantity };
+      }),
     );
   };
 
@@ -95,6 +127,14 @@ export const CreateGoodsOutForm = ({ onSubmit, isPending }: Props) => {
     const itemsToShip = items.filter((item) => item.toShip > 0);
     if (itemsToShip.length === 0) {
       toast.error("Minimal satu item harus dikirim");
+      return;
+    }
+
+    const overStockItem = itemsToShip.find((item) => item.toShip > item.currentStock);
+    if (overStockItem) {
+      toast.error(
+        `Stok ${overStockItem.bookCode} tidak mencukupi. Tersedia ${overStockItem.currentStock}, diminta ${overStockItem.toShip}.`,
+      );
       return;
     }
 
@@ -117,7 +157,9 @@ export const CreateGoodsOutForm = ({ onSubmit, isPending }: Props) => {
       toast.success("Pengiriman berhasil dibuat");
     } catch (error) {
       console.error("Submit error:", error);
-      toast.error("Gagal membuat pengiriman");
+      const message =
+        (error as ApiError).response?.data?.message || "Gagal membuat pengiriman";
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }
@@ -176,35 +218,55 @@ export const CreateGoodsOutForm = ({ onSubmit, isPending }: Props) => {
             ) : (
               <div className="space-y-3">
                 {items.length > 0 ? (
-                  items.map((item) => (
-                    <Card key={item.bookId}>
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <p className="font-medium">{item.bookCode}</p>
-                            <p className="text-sm text-muted-foreground">{item.bookName}</p>
-                            <p className="text-sm mt-1">
-                              Pesanan: {item.orderedQuantity} | Sudah dikirim:{" "}
-                              {item.shippedQuantity} | Sisa:{" "}
-                              {item.orderedQuantity - item.shippedQuantity}
-                            </p>
+                  items.map((item) => {
+                    const remainingQuantity = item.orderedQuantity - item.shippedQuantity;
+                    const maxShippable = Math.min(remainingQuantity, item.currentStock);
+                    const stockTextClass =
+                      item.currentStock < remainingQuantity
+                        ? "text-sm text-destructive mt-1"
+                        : "text-sm text-muted-foreground mt-1";
+
+                    return (
+                      <Card
+                        key={item.bookId}
+                        className={item.currentStock <= 0 ? "border-destructive/60" : ""}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <p className="font-medium">{item.bookCode}</p>
+                              <p className="text-sm text-muted-foreground">{item.bookName}</p>
+                              <p className="text-sm mt-1">
+                                Pesanan: {item.orderedQuantity} | Sudah dikirim:{" "}
+                                {item.shippedQuantity} | Sisa: {remainingQuantity}
+                              </p>
+                              <p className={stockTextClass}>
+                                Stok tersedia: {item.currentStock} | Maks. kirim: {maxShippable}
+                              </p>
+                              {item.currentStock <= 0 && (
+                                <p className="text-xs text-destructive mt-1">
+                                  Buku ini belum bisa dikirim karena stok kosong.
+                                </p>
+                              )}
+                            </div>
+                            <div className="w-32">
+                              <Label className="text-sm">Jumlah Kirim</Label>
+                              <Input
+                                type="number"
+                                min={0}
+                                max={maxShippable}
+                                value={item.toShip}
+                                onChange={(e) =>
+                                  updateToShip(item.bookId, parseInt(e.target.value) || 0)
+                                }
+                                disabled={maxShippable <= 0}
+                              />
+                            </div>
                           </div>
-                          <div className="w-32">
-                            <Label className="text-sm">Jumlah Kirim</Label>
-                            <Input
-                              type="number"
-                              min={0}
-                              max={item.orderedQuantity - item.shippedQuantity}
-                              value={item.toShip}
-                              onChange={(e) =>
-                                updateToShip(item.bookId, parseInt(e.target.value) || 0)
-                              }
-                            />
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
+                        </CardContent>
+                      </Card>
+                    );
+                  })
                 ) : (
                   <div className="text-center text-muted-foreground py-8 border rounded-md">
                     Tidak ada item dalam order ini

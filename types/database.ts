@@ -156,6 +156,7 @@ export type TCustomerOrderDetail = TCustomerOrder & {
   items: (TCustomerOrderItem & {
     bookCode: string;
     bookName: string;
+    currentStock: number;
     shippedQuantity?: number;
     remainingQuantity?: number;
   })[];

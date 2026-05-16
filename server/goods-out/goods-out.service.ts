@@ -3,16 +3,17 @@ import { paginationResponseMapper } from "@/lib/pagination";
 import { TCreateGoodsOut, TIndexGoodsOutQuery } from "@/schemas/goods-out.schema";
 import { TGoodsOutDetail, TGoodsOutListItem } from "@/types/database";
 import {
-  createGoodsOutRepository,
   getGoodsOutByIdRepository,
   getGoodsOutCountRepository,
   getGoodsOutListRepository,
   getGoodsOutByOrderIdRepository,
 } from "./goods-out.repository";
 import { getCustomerOrderByIdService, updateCustomerOrderStatusService } from "../customer-orders/customer-order.service";
-import { createStockMovementService, processStockMovement } from "../stock-movements/stock-movement.service";
-import { goodsOutItemTable, goodsOutTable } from "@/drizzle/schema";
+import { processStockMovement } from "../stock-movements/stock-movement.service";
+import { bookTable, goodsOutItemTable, goodsOutTable } from "@/drizzle/schema";
 import { db } from "@/lib/db";
+import { eq } from "drizzle-orm";
+import { BadRequestException } from "@/common/exception/bad-request.exception";
 
 // ==================== CREATE ====================
 
@@ -52,6 +53,25 @@ export const createGoodsOutService = async (data: TCreateGoodsOut) => {
     if (item.quantity > remaining) {
       throw new Error(`Quantity for book ID ${item.bookId} exceeds remaining (${remaining})`);
     }
+
+    const [book] = await db
+      .select({
+        code: bookTable.code,
+        currentStock: bookTable.currentStock,
+      })
+      .from(bookTable)
+      .where(eq(bookTable.id, item.bookId))
+      .limit(1);
+
+    if (!book) {
+      throw new NotFoundException(`Buku dengan ID ${item.bookId} tidak ditemukan`);
+    }
+
+    if (item.quantity > book.currentStock) {
+      throw new BadRequestException(
+        `Stok buku ${book.code} tidak mencukupi. Tersedia ${book.currentStock}, diminta ${item.quantity}.`,
+      );
+    }
   }
 
   // 4. Create goods out + stock movements dalam 1 transaction
@@ -59,7 +79,7 @@ export const createGoodsOutService = async (data: TCreateGoodsOut) => {
   return await db.transaction(async (tx) => {
     const goodsOutData = {
       customerOrderId,
-      shippedDate: shippedDate as any,
+      shippedDate: shippedDate.toISOString().split("T")[0],
       note: note || null,
     };
 
@@ -82,14 +102,22 @@ export const createGoodsOutService = async (data: TCreateGoodsOut) => {
 
     // 5. 🚀 Create stock movements dengan tx yang sama
     for (const item of items) {
-      await processStockMovement({
-        bookId: item.bookId,
-        type: "OUT_SALES",
-        referenceType: "goods_out",
-        referenceId: goodsOut.id,
-        quantity: item.quantity,
-        note: `Pengiriman untuk customer order #${customerOrderId}`,
-      }, tx); // 👈 PASS TX
+      try {
+        await processStockMovement({
+          bookId: item.bookId,
+          type: "OUT_SALES",
+          referenceType: "goods_out",
+          referenceId: goodsOut.id,
+          quantity: item.quantity,
+          note: `Pengiriman untuk customer order #${customerOrderId}`,
+        }, tx); // 👈 PASS TX
+      } catch (error) {
+        if (error instanceof Error && error.message.includes("Stok tidak mencukupi")) {
+          throw new BadRequestException(error.message);
+        }
+
+        throw error;
+      }
     }
     console.log("Stock movements created");
 
