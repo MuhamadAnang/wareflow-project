@@ -265,7 +265,6 @@ export async function calculateDistributionPriority(orderIds?: number[]) {
 
   const results = topsis.calculate({ alternatives, weights: [0.56, 0.26, 0.12, 0.06] });
   
-  // Tambahkan detail tambahan untuk hasil
   return results.map(result => {
     const order = pendingOrders.find(o => o.orderId === result.id);
     return {

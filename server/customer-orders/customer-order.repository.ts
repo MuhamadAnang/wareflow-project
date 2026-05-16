@@ -1,8 +1,8 @@
-import { bookTable, customerOrderItemTable, customerOrderStatusEnum, customerOrderTable, customerTable } from "@/drizzle/schema";
+import { bookTable, customerOrderItemTable, customerOrderStatusEnum, customerOrderTable, customerTable, customerPaymentTable, goodsOutTable, goodsOutItemTable } from "@/drizzle/schema";
 import { db } from "@/lib/db";
 import { TIndexCustomerOrderQuery } from "@/schemas/customer-order.schema";
 import { TNewCustomerOrder, TNewCustomerOrderItem } from "@/types/database";
-import {  eq, sql } from "drizzle-orm";
+import {  eq, inArray, sql } from "drizzle-orm";
 
 type CustomerOrderStatus = (typeof customerOrderStatusEnum.enumValues)[number];
 
@@ -181,9 +181,30 @@ export const updateCustomerOrderStatusRepository = async (id: number, status: st
 
 export const deleteCustomerOrderRepository = async (id: number) => {
   return await db.transaction(async (tx) => {
+    const goodsOutRecords = await tx
+      .select({ id: goodsOutTable.id })
+      .from(goodsOutTable)
+      .where(eq(goodsOutTable.customerOrderId, id));
+
+    const goodsOutIds = goodsOutRecords.map((record) => record.id);
+
+    if (goodsOutIds.length > 0) {
+      await tx
+        .delete(goodsOutItemTable)
+        .where(inArray(goodsOutItemTable.goodsOutId, goodsOutIds));
+
+      await tx
+        .delete(goodsOutTable)
+        .where(inArray(goodsOutTable.id, goodsOutIds));
+    }
+
     await tx
       .delete(customerOrderItemTable)
       .where(eq(customerOrderItemTable.customerOrderId, id));
+
+    await tx
+      .delete(customerPaymentTable)
+      .where(eq(customerPaymentTable.customerOrderId, id));
 
     const [deleted] = await tx
       .delete(customerOrderTable)

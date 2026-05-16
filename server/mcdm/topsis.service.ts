@@ -29,10 +29,9 @@ export class TopsisService {
         this.weights = weights;
         this.criteriaTypes = ['benefit', 'benefit', 'benefit', 'cost'];
     }
-    // ... method lainnya
     /**
-   * Normalisasi matriks (Euclidean normalization)
-   */
+    * Normalisasi matriks (Euclidean normalization)
+    */
     private normalizeMatrix(matrix: number[][]): number[][] {
         const normalized: number[][] = [];
         const numCols = matrix[0].length;
@@ -129,72 +128,72 @@ export class TopsisService {
     /**
    * Skor preferensi (kedekatan relatif terhadap solusi ideal)
    */
-  private calculateScores(
-    distPositive: number[],
-    distNegative: number[]
-  ): number[] {
-    const scores: number[] = [];
-    
-    for (let i = 0; i < distPositive.length; i++) {
-      const sum = distPositive[i] + distNegative[i];
-      scores[i] = sum === 0 ? 0 : distNegative[i] / sum;
-    }
-    
-    return scores;
-  }
+    private calculateScores(
+        distPositive: number[],
+        distNegative: number[]
+    ): number[] {
+        const scores: number[] = [];
 
-  /**
-   * Main method untuk menghitung TOPSIS
-   */
-  calculate(input: TopsisInput): TopsisResult[] {
-    const { alternatives } = input;
-    
-    if (alternatives.length === 0) {
-      return [];
+        for (let i = 0; i < distPositive.length; i++) {
+            const sum = distPositive[i] + distNegative[i];
+            scores[i] = sum === 0 ? 0 : distNegative[i] / sum;
+        }
+
+        return scores;
     }
-    
-    // 1. Buat matriks keputusan
-    const decisionMatrix: number[][] = alternatives.map(alt => [
-      alt.criteria.stockFulfillment,
-      alt.criteria.urgency,
-      alt.criteria.contractStatus,
-      alt.criteria.returnRate,
-    ]);
-    
-    // 2. Normalisasi matriks
-    const normalizedMatrix = this.normalizeMatrix(decisionMatrix);
-    
-    // 3. Matriks ternormalisasi terbobot
-    const weightedMatrix = this.weightedNormalizedMatrix(normalizedMatrix);
-    
-    // 4. Solusi ideal
-    const { idealPositive, idealNegative } = this.calculateIdealSolutions(weightedMatrix);
-    
-    // 5. Jarak ke solusi ideal
-    const { distPositive, distNegative } = this.calculateDistances(
-      weightedMatrix,
-      idealPositive,
-      idealNegative
-    );
-    
-    // 6. Skor preferensi
-    const scores = this.calculateScores(distPositive, distNegative);
-    
-    // 7. Combine results
-    const results: TopsisResult[] = alternatives.map((alt, idx) => ({
-      id: alt.id,
-      customerName: alt.customerName,
-      score: scores[idx],
-      rank: 0,
-      orderDetails: alt.orderDetails,
-    }));
-    
-    // Sort berdasarkan score (descending) dan beri ranking
-    results.sort((a, b) => b.score - a.score);
-    results.forEach((result, idx) => {
-      result.rank = idx + 1;
-    });
-    
-    return results;
-  }
+
+    /**
+     * Main method untuk menghitung TOPSIS
+     */
+    calculate(input: TopsisInput): TopsisResult[] {
+        const { alternatives } = input;
+
+        if (alternatives.length === 0) {
+            return [];
+        }
+
+        // 1. Buat matriks keputusan
+        const decisionMatrix: number[][] = alternatives.map(alt => [
+            alt.criteria.stockFulfillment,
+            alt.criteria.urgency,
+            alt.criteria.contractStatus,
+            alt.criteria.returnRate,
+        ]);
+
+        // 2. Normalisasi matriks
+        const normalizedMatrix = this.normalizeMatrix(decisionMatrix);
+
+        // 3. Matriks ternormalisasi terbobot
+        const weightedMatrix = this.weightedNormalizedMatrix(normalizedMatrix);
+
+        // 4. Solusi ideal
+        const { idealPositive, idealNegative } = this.calculateIdealSolutions(weightedMatrix);
+
+        // 5. Jarak ke solusi ideal
+        const { distPositive, distNegative } = this.calculateDistances(
+            weightedMatrix,
+            idealPositive,
+            idealNegative
+        );
+
+        // 6. Skor preferensi
+        const scores = this.calculateScores(distPositive, distNegative);
+
+        // 7. Combine results
+        const results: TopsisResult[] = alternatives.map((alt, idx) => ({
+            id: alt.id,
+            customerName: alt.customerName,
+            score: scores[idx],
+            rank: 0,
+            orderDetails: alt.orderDetails,
+        }));
+
+        // Sort berdasarkan score (descending) dan beri ranking
+        results.sort((a, b) => b.score - a.score);
+        results.forEach((result, idx) => {
+            result.rank = idx + 1;
+        });
+
+        return results;
+    }
 }
