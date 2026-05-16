@@ -6,7 +6,7 @@ import { useGetCustomer } from "./__hooks/use-get-customer.query";
 import { Table, TableBody, TableCell, TableRow } from "@/app/_components/ui/table";
 import { Card, CardContent } from "@/app/_components/ui/card";
 import { Badge } from "@/app/_components/ui/badge";
-import { convertUtcToLocalTime, toTitleCase } from "@/lib/utils";
+import { convertUtcToLocalTime, formatCustomerStatus } from "@/lib/utils";
 
 export default function CustomerDetailPage() {
   const params = useParams();
@@ -46,7 +46,7 @@ export default function CustomerDetailPage() {
               <TableRow>
                 <TableCell className="w-auto bg-background">Status Pelanggan</TableCell>
                 <TableCell className="w-full">
-                  <Badge>{data && toTitleCase(data?.data.status)}</Badge>
+                  <Badge>{data && formatCustomerStatus(data.data.status)}</Badge>
                 </TableCell>
               </TableRow>
               <TableRow>

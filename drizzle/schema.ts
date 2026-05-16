@@ -20,8 +20,8 @@ import {
 // drizzle/schema.ts (bagian enum)
 export const customerStatusEnum = pgEnum("customer_status_enum", [
   "CONTRACT",      // Kontrak resmi (bobot 5)
-  "NON-CONTRACT",  // Langganan tetap non kontrak (bobot 3)
-  "MOU",           // Nota kesepahaman (bobot 1, setara REGULER)
+  "NON-CONTRACT",  // Pelanggan biasa tanpa hubungan kontrak/langganan (bobot 1)
+  "MOU",           // Langganan (bobot 3)
 ]);
 
 export const semesterEnum = pgEnum("semester_enum", [

@@ -9,7 +9,7 @@ import DataTable from "@/app/_components/data-table";
 import { TSortOption } from "@/app/_components/data-table/sort";
 import { ColumnDef } from "@tanstack/react-table";
 import { TCustomer } from "@/types/database";
-import { toTitleCase } from "@/lib/utils";
+import { formatCustomerStatus, toTitleCase } from "@/lib/utils";
 import { useBreadcrumb } from "@/app/_contexts/breadcrumb.context";
 import { useFilters } from "@/app/_hooks/use-filters";
 import { IndexCustomerQuerySchema } from "@/schemas/customer.schema";
@@ -55,7 +55,7 @@ export default function CustomersPage() {
       accessorKey: "status",
       cell: ({ row }) => {
         const customer = row.original;
-        return <Badge>{toTitleCase(customer.status)}</Badge>;
+        return <Badge>{formatCustomerStatus(customer.status)}</Badge>;
       },
     },
     {
@@ -133,7 +133,7 @@ export default function CustomersPage() {
             name: "status",
             label: "Status",
             options: customerStatusEnum.enumValues.map((value) => ({
-              label: toTitleCase(value),
+              label: formatCustomerStatus(value),
               value,
             })),
             value: filters.status,

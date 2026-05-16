@@ -244,10 +244,10 @@ export default function PriorityDistributionPage() {
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <Trophy className="h-4 w-4 text-green-500" />
-                <p className="font-semibold">C3 - Status Kontrak</p>
+                <p className="font-semibold">C3 - Status Pelanggan</p>
               </div>
               <p className="text-2xl font-bold text-green-600">12%</p>
-              <p className="text-xs text-muted-foreground">Benefit (Kontrak=5, Langganan=3, Reguler=1)</p>
+              <p className="text-xs text-muted-foreground">Benefit (Kontrak=5, Langganan=3, Non Kontrak=1)</p>
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2">

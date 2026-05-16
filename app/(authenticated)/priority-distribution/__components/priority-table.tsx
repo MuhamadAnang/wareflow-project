@@ -66,7 +66,7 @@ export const PriorityTable = ({ priorities, isLoading }: PriorityTableProps) => 
             <TableHead>Customer</TableHead>
             <TableHead className="min-w-[150px]">Stok Tersedia (C1)</TableHead>
             <TableHead className="min-w-[120px]">Urgensi (C2)</TableHead>
-            <TableHead className="min-w-[130px]">Status Kontrak (C3)</TableHead>
+            <TableHead className="min-w-[130px]">Status Pelanggan (C3)</TableHead>
             <TableHead className="min-w-[130px]">Riwayat Retur (C4)</TableHead>
             <TableHead className="min-w-[80px]">Skor</TableHead>
             <TableHead className="text-right">Action</TableHead>
@@ -119,7 +119,7 @@ export const PriorityTable = ({ priorities, isLoading }: PriorityTableProps) => 
                 ) : item.criteria.contractStatus === 3 ? (
                   <Badge className="bg-blue-500">Langganan (3)</Badge>
                 ) : (
-                  <Badge variant="outline">Reguler (1)</Badge>
+                  <Badge variant="outline">Non Kontrak (1)</Badge>
                 )}
               </TableCell>
               <TableCell>

@@ -13,7 +13,7 @@ import { Input } from "@/app/_components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/app/_components/ui/radio-group";
 import { Textarea } from "@/app/_components/ui/textarea";
 import { customerStatusEnum } from "@/drizzle/schema";
-import { toTitleCase } from "@/lib/utils";
+import { formatCustomerStatus } from "@/lib/utils";
 import { useCustomerForm } from "../__hooks/use-customer-form";
 
 interface Props {
@@ -146,7 +146,7 @@ export const CreateOrUpdateForm = ({ form, isPending }: Props) => {
                     <FieldLabel key={status} htmlFor={`form-tanstack-radiogroup-${status}`}>
                       <Field orientation="horizontal" data-invalid={isInvalid}>
                         <FieldContent>
-                          <FieldTitle>{toTitleCase(status)}</FieldTitle>
+                          <FieldTitle>{formatCustomerStatus(status)}</FieldTitle>
                         </FieldContent>
                         <RadioGroupItem
                           value={status}

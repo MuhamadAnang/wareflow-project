@@ -29,6 +29,19 @@ export function toTitleCase(str: string) {
   });
 }
 
+export function formatCustomerStatus(status: string) {
+  switch (status) {
+    case "CONTRACT":
+      return "Kontrak";
+    case "MOU":
+      return "Langganan";
+    case "NON-CONTRACT":
+      return "Non Kontrak";
+    default:
+      return toTitleCase(status);
+  }
+}
+
 export const truncateText = (text: string, maxLength: number) => {
   if (text.length <= maxLength) {
     return text;

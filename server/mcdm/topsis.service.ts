@@ -20,7 +20,7 @@ interface TopsisResult {
     rank: number;
     orderDetails?: unknown;
 }
-
+// server/priority/topsis.service.ts
 export class TopsisService {
     private weights: number[];
     private criteriaTypes: ('benefit' | 'cost')[];
@@ -29,7 +29,7 @@ export class TopsisService {
         this.weights = weights;
         this.criteriaTypes = ['benefit', 'benefit', 'benefit', 'cost'];
     }
-
+    // ... method lainnya
     /**
    * Normalisasi matriks (Euclidean normalization)
    */

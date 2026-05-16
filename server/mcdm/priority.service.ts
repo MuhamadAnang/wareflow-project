@@ -115,8 +115,10 @@ async function calculateContractStatus(customerId: number): Promise<number> {
   switch (status) {
     case "CONTRACT":
       return 5;
-    case "NON-CONTRACT":
+    case "MOU":
       return 3;
+    case "NON-CONTRACT":
+      return 1;
     default:
       return 1;
   }
