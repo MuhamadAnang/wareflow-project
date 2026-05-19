@@ -39,9 +39,12 @@ export const createSupplierReturnService = async (data: TCreateSupplierReturn) =
   }
 
   // 3. Siapkan data untuk insert
+  const normalizedReturnDate =
+    returnDate instanceof Date ? returnDate.toISOString().split("T")[0] : String(returnDate);
+
   const returnData = {
     supplierId,
-    returnDate: returnDate as any,
+    returnDate: normalizedReturnDate,
     reason: reason || null,
   };
 
@@ -112,7 +115,7 @@ export const getSupplierReturnListService = async (queryParams: TIndexSupplierRe
   const mappedEntries: TSupplierReturnListItem[] = entries.map((entry) => ({
     id: entry.id,
     supplierName: entry.supplierName,
-    returnDate: entry.returnDate,
+    returnDate: new Date(entry.returnDate),
     reason: entry.reason,
     totalItems: entry.totalItems,
     totalQuantity: entry.totalQuantity,

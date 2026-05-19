@@ -2,7 +2,11 @@ import { handleException } from "@/common/exception/helper";
 import { parseQueryParams, validateSchema } from "@/lib/validation";
 import { parseSortParams } from "@/lib/query-param";
 import { responseFormatter } from "@/lib/response-formatter";
-import { CreateCustomerReturnSchema, IndexCustomerReturnQuerySchema } from "@/schemas/customer-return.schema";
+import {
+  CreateCustomerReturnSchema,
+  IndexCustomerReturnQuerySchema,
+  type TCreateCustomerReturn,
+} from "@/schemas/customer-return.schema";
 import { NextRequest } from "next/server";
 import {
   createCustomerReturnService,
@@ -14,8 +18,8 @@ import { TCustomerReturnDetail, TCustomerReturnListItem } from "@/types/database
 export const createCustomerReturnController = async (req: NextRequest) => {
   try {
     const body = await req.json();
-    validateSchema(CreateCustomerReturnSchema, body);
-    const customerReturn = await createCustomerReturnService(body);
+    const validatedBody = validateSchema<TCreateCustomerReturn>(CreateCustomerReturnSchema, body).data;
+    const customerReturn = await createCustomerReturnService(validatedBody);
     return responseFormatter.created({
       data: customerReturn,
       message: "Customer return created successfully",

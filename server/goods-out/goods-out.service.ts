@@ -179,7 +179,7 @@ export const getGoodsOutListService = async (queryParams: TIndexGoodsOutQuery) =
     customerName: entry.customerName,
     customerAddress: entry.customerAddress,
     customerInstitution: entry.customerInstitution,
-    shippedDate: entry.shippedDate,
+    shippedDate: new Date(entry.shippedDate),
     note: entry.note,
     totalItems: entry.totalItems,
     totalQuantity: entry.totalQuantity,

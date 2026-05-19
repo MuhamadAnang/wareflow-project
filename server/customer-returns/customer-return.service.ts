@@ -81,9 +81,12 @@ export const createCustomerReturnService = async (data: TCreateCustomerReturn) =
   }
 
   // 3. Create customer return (dengan transaction)
+  const normalizedReturnDate =
+    returnDate instanceof Date ? returnDate.toISOString().split("T")[0] : String(returnDate);
+
   const returnData = {
     customerId,
-    returnDate: returnDate as any,
+    returnDate: normalizedReturnDate,
     reason: reason || null,
   };
 
@@ -152,7 +155,7 @@ export const getCustomerReturnListService = async (queryParams: TIndexCustomerRe
   const mappedEntries: TCustomerReturnListItem[] = entries.map((entry) => ({
     id: entry.id,
     customerName: entry.customerName,
-    returnDate: entry.returnDate,
+    returnDate: new Date(entry.returnDate),
     reason: entry.reason,
     totalItems: entry.totalItems,
     totalQuantity: entry.totalQuantity,

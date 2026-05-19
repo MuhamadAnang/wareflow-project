@@ -221,8 +221,8 @@ export async function getRecentOrders(limit: number = 5): Promise<RecentOrder[]>
     result.push({
       id: order.id,
       customerName: order.customerName,
-      orderDate: order.orderDate,
-      deadline: order.deadline,
+      orderDate: new Date(order.orderDate),
+      deadline: order.deadline ? new Date(order.deadline) : null,
       status: order.status,
       totalItems: items.length,
       totalQuantity: totalQuantity,

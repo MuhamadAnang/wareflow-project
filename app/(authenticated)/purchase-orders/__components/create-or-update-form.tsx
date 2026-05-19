@@ -12,11 +12,13 @@ import {
   SelectValue,
 } from "@/app/_components/ui/select";
 import { Plus, Trash2, Package, ShoppingCart, FileText, User } from "lucide-react";
+import { TCreatePurchaseOrder } from "@/schemas/purchase-order.schema";
 import { TSupplier } from "@/types/database";
 
+type PurchaseOrderItemField = TCreatePurchaseOrder["items"][number];
+
 interface Props {
-  // esl
-  form: ReturnType<typeof import("@tanstack/react-form").useForm<any>>;
+  form: ReturnType<typeof import("@tanstack/react-form").useForm>;
   suppliers: TSupplier[];
   books: { id: number; displayTitle: string }[];
   isPending?: boolean;
@@ -177,12 +179,10 @@ export const CreateOrUpdatePurchaseOrderForm = ({
           {/* Summary — mt-auto mendorong ke paling bawah area flex */}
           <form.Field name="items">
             {(itemsField) => {
-              const validItems = itemsField.state.value.filter(
-                (item: any) => item.bookId > 0
-              );
-              const totalQty = itemsField.state.value.reduce(
-                (acc: number, item: any) =>
-                  acc + (Number(item.quantity) || 0),
+              const items = itemsField.state.value as PurchaseOrderItemField[];
+              const validItems = items.filter((item) => item.bookId > 0);
+              const totalQty = items.reduce(
+                (acc: number, item) => acc + (Number(item.quantity) || 0),
                 0
               );
               return (
@@ -298,8 +298,8 @@ export const CreateOrUpdatePurchaseOrderForm = ({
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border">
-                        {itemsField.state.value.map(
-                          (item: any, index: number) => {
+                        {(itemsField.state.value as PurchaseOrderItemField[]).map(
+                          (item, index: number) => {
                             const bookSelectValue =
                               item.bookId && item.bookId > 0
                                 ? item.bookId.toString()
@@ -322,13 +322,14 @@ export const CreateOrUpdatePurchaseOrderForm = ({
                                   <Select
                                     value={bookSelectValue}
                                     onValueChange={(v) => {
-                                      const newItems =
-                                        itemsField.state.value.map(
-                                          (it: any, i: number) =>
-                                            i === index
-                                              ? { ...it, bookId: Number(v) }
-                                              : it
-                                        );
+                                      const currentItems =
+                                        itemsField.state.value as PurchaseOrderItemField[];
+                                      const newItems = currentItems.map(
+                                        (it, i: number) =>
+                                          i === index
+                                            ? { ...it, bookId: Number(v) }
+                                            : it
+                                      );
                                       itemsField.setValue(newItems);
                                     }}
                                   >
@@ -355,18 +356,17 @@ export const CreateOrUpdatePurchaseOrderForm = ({
                                     min={1}
                                     value={item.quantity ?? 1}
                                     onChange={(e) => {
-                                      const newItems =
-                                        itemsField.state.value.map(
-                                          (it: any, i: number) =>
-                                            i === index
-                                              ? {
-                                                  ...it,
-                                                  quantity: Number(
-                                                    e.target.value
-                                                  ),
-                                                }
-                                              : it
-                                        );
+                                      const currentItems =
+                                        itemsField.state.value as PurchaseOrderItemField[];
+                                      const newItems = currentItems.map(
+                                        (it, i: number) =>
+                                          i === index
+                                            ? {
+                                                ...it,
+                                                quantity: Number(e.target.value),
+                                              }
+                                            : it
+                                      );
                                       itemsField.setValue(newItems);
                                     }}
                                     className="w-full text-sm"
@@ -381,9 +381,10 @@ export const CreateOrUpdatePurchaseOrderForm = ({
                                     size="icon"
                                     className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-all"
                                     onClick={() => {
-                                      const newItems =
-                                        itemsField.state.value.filter(
-                                          (_: any, i: number) => i !== index
+                                      const currentItems =
+                                        itemsField.state.value as PurchaseOrderItemField[];
+                                      const newItems = currentItems.filter(
+                                          (_item, i: number) => i !== index
                                         );
                                       itemsField.setValue(newItems);
                                     }}

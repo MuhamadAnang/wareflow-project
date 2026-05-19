@@ -2,7 +2,11 @@ import { handleException } from "@/common/exception/helper";
 import { parseQueryParams, validateSchema } from "@/lib/validation";
 import { parseSortParams } from "@/lib/query-param";
 import { responseFormatter } from "@/lib/response-formatter";
-import { CreateSupplierReturnSchema, IndexSupplierReturnQuerySchema } from "@/schemas/supplier-return.schema";
+import {
+  CreateSupplierReturnSchema,
+  IndexSupplierReturnQuerySchema,
+  type TCreateSupplierReturn,
+} from "@/schemas/supplier-return.schema";
 import { TSupplierReturnDetail, TSupplierReturnListItem } from "@/types/database";
 import { NextRequest } from "next/server";
 import {
@@ -14,8 +18,8 @@ import {
 export const createSupplierReturnController = async (req: NextRequest) => {
   try {
     const body = await req.json();
-    validateSchema(CreateSupplierReturnSchema, body);
-    const supplierReturn = await createSupplierReturnService(body);
+    const validatedBody = validateSchema<TCreateSupplierReturn>(CreateSupplierReturnSchema, body).data;
+    const supplierReturn = await createSupplierReturnService(validatedBody);
     return responseFormatter.created({
       data: supplierReturn,
       message: "Supplier return created successfully",

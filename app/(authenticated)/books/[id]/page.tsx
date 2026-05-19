@@ -139,15 +139,17 @@ export default function BookDetailPage() {
                   <TableRow key={mov.id}>
                     <TableCell>
                       {mov.createdAt
-                        ? convertUtcToLocalTime(mov.createdAt)?.toLocaleString('id-ID', {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })
-                        : "-"
-                      }
+                          ? convertUtcToLocalTime({
+                              utcDateStr: mov.createdAt instanceof Date ? mov.createdAt.toISOString() : mov.createdAt,
+                            })?.toLocaleString('id-ID', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })
+                          : "-"
+                        }
                     </TableCell>
                     <TableCell>
                       <Badge

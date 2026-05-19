@@ -1,7 +1,7 @@
 import { NotFoundException } from "@/common/exception/not-found.exception";
 import { paginationResponseMapper } from "@/lib/pagination";
 import { TCreateCustomerOrder, TIndexCustomerOrderQuery } from "@/schemas/customer-order.schema";
-import { TCustomerOrder, TCustomerOrderDetail, TCustomerOrderListItem, TNewCustomerOrder } from "@/types/database";
+import { TCustomerOrderDetail, TCustomerOrderListItem, TNewCustomerOrder, TNewCustomerOrderItem } from "@/types/database";
 import {
   createCustomerOrderRepository,
   deleteCustomerOrderRepository,
@@ -18,10 +18,12 @@ import { eq, sql } from "drizzle-orm";
 export const createCustomerOrderService = async (data: TCreateCustomerOrder) => {
   const { customerId, orderDate, deadline, note, items } = data;  // ← tambah deadline
 
+  const normalizedDeadline = deadline ? (deadline instanceof Date ? deadline.toISOString().split("T")[0] : String(deadline)) : null;
+
   const orderData: TNewCustomerOrder = {
     customerId,
-    orderDate: orderDate as any,
-    deadline: deadline || null,
+    orderDate,
+    deadline: normalizedDeadline,
     note: note || null,
     status: "DRAFT" as const,
   };
@@ -30,7 +32,7 @@ export const createCustomerOrderService = async (data: TCreateCustomerOrder) => 
     bookId: item.bookId,
     quantity: item.quantity,
     price: item.price.toString(),
-  }));
+  })) as TNewCustomerOrderItem[];
 
   const order = await createCustomerOrderRepository(orderData, orderItems);
   return order;
@@ -46,7 +48,7 @@ export const getCustomerOrdersWithPaginationService = async (queryParams: TIndex
     id: entry.id,
     customerId: entry.customerId,
     customerName: entry.customerName,
-    orderDate: entry.orderDate,
+    orderDate: new Date(entry.orderDate),
     status: entry.status,
     note: entry.note,
     createdAt: entry.createdAt,

@@ -4,6 +4,7 @@ import {
   CreateCustomerOrderFormSchema,
   IndexCustomerOrderQuerySchema,
   UpdateCustomerOrderStatusSchema,
+  type TCreateCustomerOrder,
 } from "@/schemas/customer-order.schema";
 import { NextRequest } from "next/server";
 import {
@@ -22,8 +23,8 @@ import { TCustomerOrderDetail, TCustomerOrderListItem } from "@/types/database";
 export const createCustomerOrderController = async (req: NextRequest) => {
   try {
     const body = await req.json();
-    validateSchema(CreateCustomerOrderFormSchema, body);
-    const order = await createCustomerOrderService(body);
+    const validatedBody = validateSchema<TCreateCustomerOrder>(CreateCustomerOrderFormSchema, body).data;
+    const order = await createCustomerOrderService(validatedBody);
     return responseFormatter.created({ data: order, message: "Customer order created successfully" });
   } catch (error) {
     return handleException(error);

@@ -8,6 +8,8 @@ import { usePurchaseOrderForm } from "../../__hooks/use-purchase-order-form";
 import { CreateOrUpdatePurchaseOrderForm } from "../../__components/create-or-update-form";
 import { useGetPurchaseOrder } from "../__hooks/use-get-purchase-order.query";
 import { useUpdatePurchaseOrderMutation } from "./__hooks/use-update-purchase-order.mutation";
+import { TPurchaseOrderDetail, TSupplier, TBookListItem } from "@/types/database";
+import { TCreatePurchaseOrder } from "@/schemas/purchase-order.schema";
 
 export default function UpdatePurchaseOrderPage() {
   const params = useParams();
@@ -23,8 +25,8 @@ export default function UpdatePurchaseOrderPage() {
     pageSize: 100,
   });
 
-  const suppliers = suppliersData?.data ?? [];
-  const books = booksData?.data ?? [];
+  const suppliers: TSupplier[] = suppliersData?.data ?? [];
+  const books: TBookListItem[] = booksData?.data ?? [];
   const po = poData?.data;
 
   const { mutateAsync, isPending } = useUpdatePurchaseOrderMutation(id);
@@ -32,7 +34,6 @@ export default function UpdatePurchaseOrderPage() {
   // FIX: Tampilkan loading sampai SEMUA data siap.
   // Dengan begitu form hanya dibuat sekali dengan defaultValues yang sudah lengkap.
   const isLoading = poLoading || suppliersLoading || booksLoading;
-  const isReady = !isLoading && !!po && suppliers.length > 0 && books.length > 0;
 
   if (isLoading) {
     return <Page title="Loading..." description="">Memuat data...</Page>;
@@ -48,7 +49,7 @@ export default function UpdatePurchaseOrderPage() {
       suppliers={suppliers}
       books={books}
       isPending={isPending}
-      onSubmit={mutateAsync}
+      onSubmit={async (data: TCreatePurchaseOrder) => await mutateAsync(data)}
     />
   );
 }
@@ -63,11 +64,11 @@ function UpdateForm({
   isPending,
   onSubmit,
 }: {
-  po: any;
-  suppliers: any[];
-  books: any[];
+  po: TPurchaseOrderDetail;
+  suppliers: TSupplier[];
+  books: TBookListItem[];
   isPending: boolean;
-  onSubmit: (values: any) => Promise<any>;
+  onSubmit: (values: TCreatePurchaseOrder) => Promise<unknown>;
 }) {
   const form = usePurchaseOrderForm({
     defaultValues: {
@@ -76,7 +77,7 @@ function UpdateForm({
         ? new Date(po.orderDate).toISOString().split("T")[0]
         : "",
       note: po.note ?? "",
-      items: po.items.map((item: any) => ({
+      items: po.items.map((item) => ({
         bookId: item.bookId,
         quantity: item.quantity,
       })),
