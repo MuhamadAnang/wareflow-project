@@ -1,15 +1,51 @@
 import { db } from "@/lib/db";
 import { goodsReceiptTable, goodsReceiptItemTable, purchaseOrderTable, supplierTable } from "@/drizzle/schema";
-import { asc, desc, eq, ilike, or, sql } from "drizzle-orm";
-import { TCreateGoodsReceipt, TGoodsReceiptDetail, TNewGoodsReceipt, TNewGoodsReceiptItem } from "@/types/database";
+import { asc, desc, eq, ilike, or, sql, type SQL } from "drizzle-orm";
+import { TIndexGoodsReceiptQuery } from "@/schemas/goods-receipt.schema";
+import {
+  TCreateGoodsReceipt,
+  TGoodsReceiptDetail,
+  TGoodsReceiptItem,
+  TNewGoodsReceipt,
+  TNewGoodsReceiptItem,
+} from "@/types/database";
 import { bookTable, subjectTable } from "@/drizzle/schema";
-import { NodePgDatabase } from "drizzle-orm/node-postgres";
 
 type OnReceiptCreatedCallback = (
-  tx: NodePgDatabase<typeof schema>,
+  tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
   receipt: typeof goodsReceiptTable.$inferSelect,
   items: Array<{ bookId: number; quantity: number }>
 ) => Promise<void>;
+
+type GoodsReceiptHeaderUpdate = Omit<Partial<TNewGoodsReceipt>, "receivedDate"> & {
+  receivedDate?: string | Date;
+};
+
+const toDateOnlyString = (date: string | Date) => {
+  if (date instanceof Date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  }
+
+  return date;
+};
+
+const buildGoodsReceiptSearchCondition = (search?: string): SQL | undefined => {
+  if (!search) return undefined;
+
+  return or(
+    ilike(supplierTable.name, `%${search}%`),
+    ilike(goodsReceiptTable.note, `%${search}%`),
+  );
+};
+
+const normalizeGoodsReceiptUpdate = (data: GoodsReceiptHeaderUpdate): Partial<TNewGoodsReceipt> => ({
+  ...data,
+  receivedDate: data.receivedDate ? toDateOnlyString(data.receivedDate) : undefined,
+});
 
 export const createGoodsReceiptRepository = async (
   data: TCreateGoodsReceipt,
@@ -62,56 +98,48 @@ export const getGoodsReceiptsRepository = async () => {
 
 export const getGoodsReceiptsWithPaginationRepository = async (queryParams: TIndexGoodsReceiptQuery) => {
   const { page = 1, pageSize = 20, search, sort } = queryParams;
+  const whereClause = buildGoodsReceiptSearchCondition(search);
 
-  let query = db
+  const query = db
     .select({
       id: goodsReceiptTable.id,
       purchaseOrderId: goodsReceiptTable.purchaseOrderId,
       receivedDate: goodsReceiptTable.receivedDate,
       note: goodsReceiptTable.note,
       createdAt: goodsReceiptTable.createdAt,
-      supplierName: supplierTable.name,
+      supplierName: sql<string>`COALESCE(${supplierTable.name}, '')`,
+      items: sql<TGoodsReceiptItem[]>`'[]'::json`,
     })
     .from(goodsReceiptTable)
     .leftJoin(purchaseOrderTable, eq(goodsReceiptTable.purchaseOrderId, purchaseOrderTable.id))
-    .leftJoin(supplierTable, eq(purchaseOrderTable.supplierId, supplierTable.id));
-
-  if (search) {
-    query = query.where(
-      or(
-        ilike(supplierTable.name, `%${search}%`),
-        ilike(goodsReceiptTable.note, `%${search}%`)
-      )
-    );
-  }
-
-  if (sort?.field && sort?.direction) {
-    const orderBy = sort.direction === "asc" ? asc : desc;
-    const column = sort.field === "supplierName" ? supplierTable.name : goodsReceiptTable.receivedDate;
-    if (column) query = query.orderBy(orderBy(column));
-  } else {
-    query = query.orderBy(desc(goodsReceiptTable.createdAt));
-  }
+    .leftJoin(supplierTable, eq(purchaseOrderTable.supplierId, supplierTable.id))
+    .where(whereClause);
 
   const offset = (page - 1) * pageSize;
-  const data = await query.offset(offset).limit(pageSize);
+  const [activeSort] = sort ?? [];
+  const data =
+    activeSort?.key === "supplierName"
+      ? await query
+          .orderBy(activeSort.direction === "asc" ? asc(supplierTable.name) : desc(supplierTable.name))
+          .offset(offset)
+          .limit(pageSize)
+      : activeSort?.key === "receivedDate"
+        ? await query
+            .orderBy(
+              activeSort.direction === "asc" ? asc(goodsReceiptTable.receivedDate) : desc(goodsReceiptTable.receivedDate),
+            )
+            .offset(offset)
+            .limit(pageSize)
+        : await query.orderBy(desc(goodsReceiptTable.createdAt)).offset(offset).limit(pageSize);
 
   // Count total
-  let countQuery = db
-    .select({ count: sql<number>`count(*)` })
+  const totalResult = await db
+    .select({ count: sql<number>`count(*)`.mapWith(Number) })
     .from(goodsReceiptTable)
     .leftJoin(purchaseOrderTable, eq(goodsReceiptTable.purchaseOrderId, purchaseOrderTable.id))
-    .leftJoin(supplierTable, eq(purchaseOrderTable.supplierId, supplierTable.id));
-  if (search) {
-    countQuery = countQuery.where(
-      or(
-        ilike(supplierTable.name, `%${search}%`),
-        ilike(goodsReceiptTable.note, `%${search}%`)
-      )
-    );
-  }
-  const totalResult = await countQuery;
-  const total = Number(totalResult[0]?.count) || 0;
+    .leftJoin(supplierTable, eq(purchaseOrderTable.supplierId, supplierTable.id))
+    .where(whereClause);
+  const total = totalResult[0]?.count ?? 0;
 
   return { data, total };
 };
@@ -125,7 +153,7 @@ export const getGoodsReceiptByIdRepository = async (id: number): Promise<TGoodsR
       receivedDate: goodsReceiptTable.receivedDate,
       note: goodsReceiptTable.note,
       createdAt: goodsReceiptTable.createdAt,
-      supplierName: supplierTable.name,
+      supplierName: sql<string>`COALESCE(${supplierTable.name}, '')`,
     })
     .from(goodsReceiptTable)
     .leftJoin(purchaseOrderTable, eq(goodsReceiptTable.purchaseOrderId, purchaseOrderTable.id))
@@ -174,10 +202,10 @@ export const deleteGoodsReceiptByIdRepository = async (id: number) => {
   });
 };
 
-export const updateGoodsReceiptByIdRepository = async (id: number, updateData: Partial<TNewGoodsReceipt>) => {
+export const updateGoodsReceiptByIdRepository = async (id: number, updateData: GoodsReceiptHeaderUpdate) => {
   return await db
     .update(goodsReceiptTable)
-    .set(updateData)
+    .set(normalizeGoodsReceiptUpdate(updateData))
     .where(eq(goodsReceiptTable.id, id))
     .returning();
 };
@@ -203,11 +231,11 @@ export const replaceGoodsReceiptItemsRepository = async (
 
 export const updateGoodsReceiptHeaderRepository = async (
   id: number,
-  updateData: Partial<TNewGoodsReceipt>
+  updateData: GoodsReceiptHeaderUpdate
 ) => {
   return await db
     .update(goodsReceiptTable)
-    .set(updateData)
+    .set(normalizeGoodsReceiptUpdate(updateData))
     .where(eq(goodsReceiptTable.id, id))
     .returning();
 };

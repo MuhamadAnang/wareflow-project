@@ -167,7 +167,7 @@ export type TCustomerOrderListItem = {
   customerId: number;
   customerName: string;
   orderDate: Date;
-  status: string;
+  status: TCustomerOrder["status"];
   note: string | null;
   createdAt: Date;
   updatedAt: Date;

@@ -13,7 +13,9 @@ interface IConvertUtcToLocalTimeParams {
   format?: string;
 }
 
-export function convertUtcToLocalTime(params: IConvertUtcToLocalTimeParams) {
+export function convertUtcToLocalTime(params: IConvertUtcToLocalTimeParams & { format: string }): string;
+export function convertUtcToLocalTime(params: IConvertUtcToLocalTimeParams & { format?: undefined }): Date;
+export function convertUtcToLocalTime(params: IConvertUtcToLocalTimeParams): string | Date {
   const { utcDateStr, format } = params;
 
   const date = new Date(utcDateStr);

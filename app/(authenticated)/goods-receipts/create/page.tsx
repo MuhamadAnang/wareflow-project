@@ -8,6 +8,13 @@ import { useGetPurchaseOrdersQuery } from "../../purchase-orders/__hooks/use-get
 import { useGetPurchaseOrderDetailQuery } from "./__hooks/use-get-purchase-order-detail.query";
 import { useGetBooksQuery } from "../../books/__hooks/use-get-book.query";
 import { useState, useEffect } from "react";
+import { getApiList } from "@/lib/api-list";
+import { TBookListItem, TPurchaseOrderWithSupplier } from "@/types/database";
+
+type PurchaseOrderDetailItem = {
+  bookId: number;
+  quantity: number;
+};
 
 export default function CreateGoodsReceiptPage() {
   const { mutateAsync, isPending } = useCreateGoodsReceiptMutation();
@@ -15,8 +22,8 @@ export default function CreateGoodsReceiptPage() {
 
   const { data: poListData } = useGetPurchaseOrdersQuery({ page: 1, pageSize: 100 });
   const { data: poDetail } = useGetPurchaseOrderDetailQuery(selectedPoId);
-  const { data: booksData } = useGetBooksQuery({ page: 1, pageSize: 1000 });
-  const books = booksData?.data ?? [];
+  const { data: booksData } = useGetBooksQuery({ page: 1, pageSize: 100 });
+  const books = getApiList<TBookListItem>(booksData);
 
   const form = useGoodsReceiptCreateForm({
     defaultValues: {
@@ -32,7 +39,7 @@ export default function CreateGoodsReceiptPage() {
 
   useEffect(() => {
     if (poDetail && poDetail.items && poDetail.items.length > 0) {
-      const items = poDetail.items.map((item: any) => ({
+      const items = poDetail.items.map((item: PurchaseOrderDetailItem) => ({
         bookId: item.bookId,
         quantity: item.quantity,
       }));
@@ -58,7 +65,7 @@ export default function CreateGoodsReceiptPage() {
         <GoodsReceiptCreateForm
           form={form}
           isPending={isPending}
-          purchaseOrders={poListData?.data || []}
+          purchaseOrders={getApiList<TPurchaseOrderWithSupplier>(poListData)}
           books={books}
           onPoChange={handlePoChange}
         />

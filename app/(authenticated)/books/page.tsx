@@ -2,13 +2,11 @@
 
 import Page from "@/app/_components/page";
 import { Button } from "@/app/_components/ui/button";
-import { Badge } from "@/app/_components/ui/badge";
 import { Eye, Pencil, Plus, Trash } from "lucide-react";
 import Link from "next/link";
 import DataTable from "@/app/_components/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { TBookListItem } from "@/types/database";
-import { toTitleCase } from "@/lib/utils";
 import { useDeleteBookMutation } from "./__hooks/use-delete-book.mutation";
 import { useGetBooksQuery } from "./__hooks/use-get-book.query";
 import { useFilters } from "@/app/_hooks/use-filters";
@@ -21,8 +19,6 @@ export default function BooksPage() {
     pageSize: pagination.pageSize,
     search,
     sort: filters.sort,
-    subjectId: filters.subjectId,
-    semester: filters.semester,
   });
 
   const { mutateAsync: deleteBook, isPending: isDeleting } = useDeleteBookMutation();

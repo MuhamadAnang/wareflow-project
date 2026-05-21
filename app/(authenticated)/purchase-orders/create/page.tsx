@@ -6,13 +6,15 @@ import { useGetBooksQuery } from "../../books/__hooks/use-get-book.query";
 import { useCreatePurchaseOrderMutation } from "./__hooks/use-create-purchase-order.mutation";
 import { usePurchaseOrderForm } from "../__hooks/use-purchase-order-form";
 import { CreateOrUpdatePurchaseOrderForm } from "../__components/create-or-update-form";
+import { getApiList } from "@/lib/api-list";
+import { TBookListItem, TSupplier } from "@/types/database";
 
 export default function CreatePurchaseOrderPage() {
   const { data: suppliersData } = useGetSuppliersQuery({ page: 1, pageSize: 100 });
   const { data: booksData } = useGetBooksQuery({ page: 1, pageSize: 100 });
 
-  const suppliers = suppliersData?.data ?? [];
-  const books = booksData?.data ?? [];
+  const suppliers = getApiList<TSupplier>(suppliersData);
+  const books = getApiList<TBookListItem>(booksData);
 
   const { mutateAsync, isPending } = useCreatePurchaseOrderMutation();
 

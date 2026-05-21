@@ -1,6 +1,6 @@
 import useAuthenticatedClient from "@/app/_hooks/use-authenticated-client";
 import { TBookListItem } from "@/types/database";
-import { TPaginationResponse } from "@/types/meta";
+import { TApiSuccessResponseWithPagination } from "@/types/response";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetBooksDropdownQuery = () => {
@@ -8,8 +8,9 @@ export const useGetBooksDropdownQuery = () => {
 
   return useQuery({
     queryKey: ["books-dropdown"],
-    queryFn: async (): Promise<TPaginationResponse<TBookListItem>> => {
-      return await api.get("/books", { params: { page: 1, pageSize: 100 } });
+    queryFn: async (): Promise<TApiSuccessResponseWithPagination<TBookListItem>> => {
+      const response = await api.get("/books", { params: { page: 1, pageSize: 100 } });
+      return response.data;
     },
   });
 };

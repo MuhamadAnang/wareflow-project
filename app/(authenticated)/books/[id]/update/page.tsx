@@ -6,7 +6,8 @@ import { useGetBook } from "../__hooks/use-get-book.query";
 import { useUpdateBookMutation } from "./__hooks/use-update-book.mutation";
 import { useGetSubjectsQuery } from "../../__hooks/use-get-subjects.query";
 import { useGetPercetakansQuery } from "../../__hooks/use-get-percetakans.query";
-import { useBookForm } from "../../__hooks/use-book-form";
+import {useBookForm } from "../../__hooks/use-book-form";
+import { bookLevelEnum, curriculumEnum, semesterEnum } from "@/drizzle/schema";
 import { BookForm } from "../../__components/create-or-update.form";
 
 
@@ -27,11 +28,11 @@ export default function UpdateBookPage() {
   const form = useBookForm({
     defaultValues: {
       code: book?.code || "",
-      subjectId: book?.subjectId || 0,
-      grade: book?.grade || 0,
-      level: book?.level || "",
-      curriculum: book?.curriculum || "",
-      semester: book?.semester || "GANJIL",
+      subjectId: book?.subjectId ?? 0,
+      grade: book?.grade ?? 0,
+      level: (book?.level as typeof bookLevelEnum.enumValues[number]) ?? undefined,
+      curriculum: (book?.curriculum as typeof curriculumEnum.enumValues[number]) ?? undefined,
+      semester: (book?.semester as typeof semesterEnum.enumValues[number]) ?? "GANJIL",
       pages: book?.pages ?? null,
       productionYear: book?.productionYear ?? null,
       percetakanId: book?.percetakanId || 0,

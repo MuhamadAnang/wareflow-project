@@ -14,11 +14,12 @@ import {
 import { Plus, Trash2, Package, ShoppingCart, FileText, User } from "lucide-react";
 import { TCreatePurchaseOrder } from "@/schemas/purchase-order.schema";
 import { TSupplier } from "@/types/database";
+import { usePurchaseOrderForm } from "../__hooks/use-purchase-order-form";
 
 type PurchaseOrderItemField = TCreatePurchaseOrder["items"][number];
 
 interface Props {
-  form: ReturnType<typeof import("@tanstack/react-form").useForm>;
+  form: ReturnType<typeof usePurchaseOrderForm>;
   suppliers: TSupplier[];
   books: { id: number; displayTitle: string }[];
   isPending?: boolean;

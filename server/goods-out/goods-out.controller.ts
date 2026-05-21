@@ -14,8 +14,8 @@ import {
 export const createGoodsOutController = async (req: NextRequest) => {
   try {
     const body = await req.json();
-    validateSchema(CreateGoodsOutSchema, body);
-    const goodsOut = await createGoodsOutService(body);
+    const validationResult = validateSchema<TCreateGoodsOut>(CreateGoodsOutSchema, body);
+    const goodsOut = await createGoodsOutService(validationResult.data);
     return responseFormatter.created({
       data: goodsOut,
       message: "Goods out created successfully",

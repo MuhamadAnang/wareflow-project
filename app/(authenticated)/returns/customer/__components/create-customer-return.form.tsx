@@ -18,6 +18,8 @@ import { useGetReturnableBooksQuery } from "../__hooks/use-get-returnable-books.
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Undo2 } from "lucide-react";
+import { getApiList } from "@/lib/api-list";
+import { TBookListItem, TCustomer } from "@/types/database";
 
 interface Props {
   onSubmit: (data: TCreateCustomerReturn) => Promise<void>;
@@ -35,7 +37,9 @@ interface ReturnItem {
 export const CreateCustomerReturnForm = ({ onSubmit, isPending }: Props) => {
   const { data: customersData } = useGetReturnableCustomersQuery();
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | undefined>(undefined);
-  const { data: booksData, refetch: refetchBooks } = useGetReturnableBooksQuery(selectedCustomerId);
+  const { data: booksData } = useGetReturnableBooksQuery(selectedCustomerId);
+  const customers = getApiList<TCustomer>(customersData);
+  const books = getApiList<TBookListItem>(booksData);
   
   const [returnDate, setReturnDate] = useState(new Date().toISOString().split("T")[0]);
   const [reason, setReason] = useState("");
@@ -58,7 +62,7 @@ export const CreateCustomerReturnForm = ({ onSubmit, isPending }: Props) => {
   };
 
   const updateItemBook = (index: number, bookId: number) => {
-    const book = booksData?.data?.find((b) => b.id === bookId);
+    const book = books.find((b) => b.id === bookId);
     if (book) {
       const newItems = [...items];
       newItems[index] = {
@@ -124,7 +128,7 @@ export const CreateCustomerReturnForm = ({ onSubmit, isPending }: Props) => {
               <SelectValue placeholder="Pilih customer" />
             </SelectTrigger>
             <SelectContent>
-              {customersData?.data.map((customer) => (
+              {customers.map((customer) => (
                 <SelectItem key={customer.id} value={customer.id.toString()}>
                   {customer.name} - {customer.institution}
                 </SelectItem>
@@ -179,7 +183,7 @@ export const CreateCustomerReturnForm = ({ onSubmit, isPending }: Props) => {
                             <SelectValue placeholder="Pilih buku" />
                           </SelectTrigger>
                           <SelectContent>
-                            {booksData?.data.map((book) => (
+                            {books.map((book) => (
                               <SelectItem key={book.id} value={book.id.toString()}>
                                 {book.code} - {book.displayTitle || book.name} (Stok: {book.currentStock})
                               </SelectItem>

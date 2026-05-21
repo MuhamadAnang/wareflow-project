@@ -2,7 +2,42 @@ import { goodsOutTable, goodsOutItemTable, customerOrderTable, customerTable, bo
 import { db } from "@/lib/db";
 import { TIndexGoodsOutQuery } from "@/schemas/goods-out.schema";
 import { TNewGoodsOut, TNewGoodsOutItem } from "@/types/database";
-import { eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, sql, type SQL } from "drizzle-orm";
+
+const toDateOnlyString = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+const buildGoodsOutWhereConditions = ({
+  search,
+  customerOrderId,
+  startDate,
+  endDate,
+}: Pick<TIndexGoodsOutQuery, "search" | "customerOrderId" | "startDate" | "endDate">) => {
+  const conditions: SQL[] = [];
+
+  if (customerOrderId) {
+    conditions.push(eq(goodsOutTable.customerOrderId, customerOrderId));
+  }
+
+  if (startDate) {
+    conditions.push(sql`${goodsOutTable.shippedDate} >= ${toDateOnlyString(startDate)}`);
+  }
+
+  if (endDate) {
+    conditions.push(sql`${goodsOutTable.shippedDate} <= ${toDateOnlyString(endDate)}`);
+  }
+
+  if (search) {
+    conditions.push(ilike(customerTable.name, `%${search}%`));
+  }
+
+  return conditions.length ? and(...conditions) : undefined;
+};
 
 // ==================== CREATE ====================
 
@@ -34,17 +69,13 @@ export const getGoodsOutByIdRepository = async (id: number) => {
       shippedDate: goodsOutTable.shippedDate,
       note: goodsOutTable.note,
       createdAt: goodsOutTable.createdAt,
-      customerOrder: {
-        id: customerOrderTable.id,
-        orderDate: customerOrderTable.orderDate,
-        status: customerOrderTable.status,
-        customer: {
-          id: customerTable.id,
-          name: customerTable.name,
-          phone: customerTable.phone,
-          address: customerTable.address,
-        },
-      },
+      orderId: customerOrderTable.id,
+      orderDate: customerOrderTable.orderDate,
+      orderStatus: customerOrderTable.status,
+      customerId: customerTable.id,
+      customerName: customerTable.name,
+      customerPhone: customerTable.phone,
+      customerAddress: customerTable.address,
     })
     .from(goodsOutTable)
     .innerJoin(customerOrderTable, eq(goodsOutTable.customerOrderId, customerOrderTable.id))
@@ -87,7 +118,22 @@ export const getGoodsOutByIdRepository = async (id: number) => {
   }));
 
   return {
-    ...goodsOut,
+    id: goodsOut.id,
+    customerOrderId: goodsOut.customerOrderId,
+    shippedDate: goodsOut.shippedDate,
+    note: goodsOut.note,
+    createdAt: goodsOut.createdAt,
+    customerOrder: {
+      id: goodsOut.orderId,
+      orderDate: goodsOut.orderDate,
+      status: goodsOut.orderStatus,
+      customer: {
+        id: goodsOut.customerId,
+        name: goodsOut.customerName,
+        phone: goodsOut.customerPhone,
+        address: goodsOut.customerAddress,
+      },
+    },
     items,
   };
 };
@@ -95,9 +141,15 @@ export const getGoodsOutByIdRepository = async (id: number) => {
 // ==================== GET LIST WITH PAGINATION ====================
 
 export const getGoodsOutListRepository = async (queryParams: TIndexGoodsOutQuery) => {
-  const { page, pageSize, sort, search, startDate, endDate } = queryParams;
+  const { page, pageSize, sort, search, customerOrderId, startDate, endDate } = queryParams;
+  const whereClause = buildGoodsOutWhereConditions({
+    search,
+    customerOrderId,
+    startDate,
+    endDate,
+  });
 
-  let baseQuery = db
+  const baseQuery = db
     .select({
       id: goodsOutTable.id,
       customerOrderId: goodsOutTable.customerOrderId,
@@ -114,56 +166,45 @@ export const getGoodsOutListRepository = async (queryParams: TIndexGoodsOutQuery
     .innerJoin(customerOrderTable, eq(goodsOutTable.customerOrderId, customerOrderTable.id))
     .innerJoin(customerTable, eq(customerOrderTable.customerId, customerTable.id))
     .leftJoin(goodsOutItemTable, eq(goodsOutItemTable.goodsOutId, goodsOutTable.id))
+    .where(whereClause)
     .groupBy(goodsOutTable.id, customerTable.name, customerTable.address, customerTable.institution);
 
-  // Filters
-  if (startDate) {
-    baseQuery = baseQuery.where(sql`${goodsOutTable.shippedDate} >= ${startDate}`);
-  }
-  if (endDate) {
-    baseQuery = baseQuery.where(sql`${goodsOutTable.shippedDate} <= ${endDate}`);
-  }
-  if (search) {
-    baseQuery = baseQuery.where(sql`${customerTable.name} ILIKE ${`%${search}%`}`);
-  }
+  const offset = (page - 1) * pageSize;
 
   // Sorting
   if (sort && Object.keys(sort).length > 0) {
     const [sortKey, sortDir] = Object.entries(sort)[0];
+
     if (sortKey === "shippedDate") {
-      baseQuery = baseQuery.orderBy(sortDir === "asc" ? goodsOutTable.shippedDate : sql`${goodsOutTable.shippedDate} DESC`);
-    } else {
-      baseQuery = baseQuery.orderBy(sql`${goodsOutTable.createdAt} DESC`);
+      return await baseQuery
+        .orderBy(sortDir === "asc" ? asc(goodsOutTable.shippedDate) : desc(goodsOutTable.shippedDate))
+        .limit(pageSize)
+        .offset(offset);
     }
-  } else {
-    baseQuery = baseQuery.orderBy(sql`${goodsOutTable.createdAt} DESC`);
   }
 
-  const offset = (page - 1) * pageSize;
-  const data = await baseQuery.limit(pageSize).offset(offset);
-  return data;
+  return await baseQuery
+    .orderBy(desc(goodsOutTable.createdAt))
+    .limit(pageSize)
+    .offset(offset);
 };
 
 export const getGoodsOutCountRepository = async (queryParams: TIndexGoodsOutQuery) => {
-  const { search, startDate, endDate } = queryParams;
+  const { search, customerOrderId, startDate, endDate } = queryParams;
+  const whereClause = buildGoodsOutWhereConditions({
+    search,
+    customerOrderId,
+    startDate,
+    endDate,
+  });
 
-  let baseQuery = db
-    .select({ count: sql<number>`COUNT(DISTINCT ${goodsOutTable.id})` })
+  const result = await db
+    .select({ count: sql<number>`COUNT(DISTINCT ${goodsOutTable.id})`.mapWith(Number) })
     .from(goodsOutTable)
     .innerJoin(customerOrderTable, eq(goodsOutTable.customerOrderId, customerOrderTable.id))
-    .innerJoin(customerTable, eq(customerOrderTable.customerId, customerTable.id));
+    .innerJoin(customerTable, eq(customerOrderTable.customerId, customerTable.id))
+    .where(whereClause);
 
-  if (startDate) {
-    baseQuery = baseQuery.where(sql`${goodsOutTable.shippedDate} >= ${startDate}`);
-  }
-  if (endDate) {
-    baseQuery = baseQuery.where(sql`${goodsOutTable.shippedDate} <= ${endDate}`);
-  }
-  if (search) {
-    baseQuery = baseQuery.where(sql`${customerTable.name} ILIKE ${`%${search}%`}`);
-  }
-
-  const result = await baseQuery;
   return result[0]?.count ?? 0;
 };
 
@@ -177,7 +218,7 @@ export const getGoodsOutByOrderIdRepository = async (customerOrderId: number) =>
       shippedDate: goodsOutTable.shippedDate,
       note: goodsOutTable.note,
       createdAt: goodsOutTable.createdAt,
-      items: sql<any>`
+      items: sql<Array<{ id: number; bookId: number; quantity: number }>>`
         COALESCE(
           json_agg(
             json_build_object(

@@ -77,9 +77,12 @@ export const createGoodsOutService = async (data: TCreateGoodsOut) => {
   // 4. Create goods out + stock movements dalam 1 transaction
   // 👇 Kita bungkus manual agar bisa pass tx ke processStockMovement
   return await db.transaction(async (tx) => {
+    const normalizedShippedDate =
+      shippedDate instanceof Date ? shippedDate.toISOString().split("T")[0] : String(shippedDate);
+
     const goodsOutData = {
       customerOrderId,
-      shippedDate: shippedDate.toISOString().split("T")[0],
+      shippedDate: normalizedShippedDate,
       note: note || null,
     };
 

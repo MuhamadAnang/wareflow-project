@@ -18,6 +18,8 @@ import { useGetReturnableBooksSupplierQuery } from "../__hooks/use-get-returnabl
 import { useState } from "react";
 import { toast } from "sonner";
 import { Undo2 } from "lucide-react";
+import { getApiList } from "@/lib/api-list";
+import { TBookListItem, TSupplier } from "@/types/database";
 
 interface Props {
   onSubmit: (data: TCreateSupplierReturn) => Promise<void>;
@@ -36,6 +38,8 @@ export const CreateSupplierReturnForm = ({ onSubmit, isPending }: Props) => {
   const { data: suppliersData } = useGetReturnableSuppliersQuery();
   const [selectedSupplierId, setSelectedSupplierId] = useState<number | undefined>(undefined);
   const { data: booksData } = useGetReturnableBooksSupplierQuery();
+  const suppliers = getApiList<TSupplier>(suppliersData);
+  const books = getApiList<TBookListItem>(booksData);
   
   const [returnDate, setReturnDate] = useState(new Date().toISOString().split("T")[0]);
   const [reason, setReason] = useState("");
@@ -53,7 +57,7 @@ export const CreateSupplierReturnForm = ({ onSubmit, isPending }: Props) => {
   };
 
   const updateItemBook = (index: number, bookId: number) => {
-    const book = booksData?.data?.find((b) => b.id === bookId);
+    const book = books.find((b) => b.id === bookId);
     if (book) {
       const newItems = [...items];
       newItems[index] = {
@@ -124,7 +128,7 @@ export const CreateSupplierReturnForm = ({ onSubmit, isPending }: Props) => {
               <SelectValue placeholder="Pilih supplier" />
             </SelectTrigger>
             <SelectContent>
-              {suppliersData?.data.map((supplier) => (
+              {suppliers.map((supplier) => (
                 <SelectItem key={supplier.id} value={supplier.id.toString()}>
                   {supplier.name}
                 </SelectItem>
@@ -179,7 +183,7 @@ export const CreateSupplierReturnForm = ({ onSubmit, isPending }: Props) => {
                             <SelectValue placeholder="Pilih buku" />
                           </SelectTrigger>
                           <SelectContent>
-                            {booksData?.data.map((book) => (
+                            {books.map((book) => (
                               <SelectItem key={book.id} value={book.id.toString()}>
                                 {book.code} - {book.displayTitle || book.name} (Stok: {book.currentStock})
                               </SelectItem>

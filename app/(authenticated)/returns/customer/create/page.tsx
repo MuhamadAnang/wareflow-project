@@ -7,12 +7,16 @@ import { CreateCustomerReturnForm } from "../__components/create-customer-return
 export default function CreateCustomerReturnPage() {
   const { mutateAsync, isPending } = useCreateCustomerReturnMutation();
 
+  const handleSubmit = async (data: Parameters<typeof mutateAsync>[0]) => {
+    await mutateAsync(data);
+  };
+
   return (
     <Page
       title="Buat Retur Customer"
       description="Buat retur barang dari customer. Stok akan bertambah secara otomatis."
     >
-      <CreateCustomerReturnForm onSubmit={mutateAsync} isPending={isPending} />
+      <CreateCustomerReturnForm onSubmit={handleSubmit} isPending={isPending} />
     </Page>
   );
 }

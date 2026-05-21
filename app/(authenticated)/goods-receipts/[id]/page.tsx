@@ -41,7 +41,7 @@ export default function GoodsReceiptDetailPage() {
                 {receipt.items.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell>{item.bookCode}</TableCell>
-                    <TableCell>{item.displayTitle}</TableCell>
+                    <TableCell>{item.bookName}</TableCell>
                     <TableCell className="text-right">{item.quantity}</TableCell>
                   </TableRow>
                 ))}

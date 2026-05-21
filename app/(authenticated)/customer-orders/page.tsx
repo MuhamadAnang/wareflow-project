@@ -12,14 +12,19 @@ import { TCustomerOrderListItem } from "@/types/database";
 import { toTitleCase } from "@/lib/utils";
 import { useBreadcrumb } from "@/app/_contexts/breadcrumb.context";
 import { useFilters } from "@/app/_hooks/use-filters";
-import { IndexCustomerOrderQuerySchema } from "@/schemas/customer-order.schema";
+import {
+  IndexCustomerOrderQuerySchema,
+  TUpdateCustomerOrderStatus,
+} from "@/schemas/customer-order.schema";
 import { useEffect } from "react";
 import { customerOrderStatusEnum } from "@/drizzle/schema";
 import { Badge } from "@/app/_components/ui/badge";
 import { useDeleteCustomerOrderMutation } from "./__hooks/use-delete-customer-order.mutation";
 import { useUpdateOrderStatusMutation } from "./__hooks/use-update-order-status.mutation";
 
-const statusTransitions: Record<string, string[]> = {
+type CustomerOrderStatus = TUpdateCustomerOrderStatus["status"];
+
+const statusTransitions: Record<CustomerOrderStatus, CustomerOrderStatus[]> = {
   DRAFT: ["CONFIRMED", "CANCELLED"],
   CONFIRMED: ["PARTIALLY_SHIPPED", "SHIPPED", "CANCELLED"],
   PARTIALLY_SHIPPED: ["SHIPPED", "CANCELLED"],
@@ -36,7 +41,7 @@ function CustomerOrderActionsCell({
 }: {
   order: TCustomerOrderListItem;
   onDelete: (id: number) => Promise<void>;
-  onStatusChange: (id: number, status: string) => Promise<void>;
+  onStatusChange: (id: number, status: CustomerOrderStatus) => Promise<void>;
   isUpdating: boolean;
   isDeleting: boolean;
 }) {
@@ -99,13 +104,13 @@ export default function CustomerOrdersPage() {
     status: filters.status,
   });
   const { mutateAsync: deleteOrder, isPending: isDeleting } = useDeleteCustomerOrderMutation();
-  const { mutateAsync: updateStatus, isLoading: isUpdatingStatus } = useUpdateOrderStatusMutation();
+  const { mutateAsync: updateStatus, isPending: isUpdatingStatus } = useUpdateOrderStatusMutation();
 
   const handleDelete = async (id: number) => {
     await deleteOrder(id);
   };
 
-  const handleStatusChange = async (id: number, status: string) => {
+  const handleStatusChange = async (id: number, status: CustomerOrderStatus) => {
     await updateStatus({ id, status });
   };
 

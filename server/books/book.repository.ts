@@ -4,7 +4,7 @@ import { TIndexBookQuery } from "@/schemas/book.schema";
 import { TNewBook, TUpdateBook } from "@/types/database";
 import { bookTable, subjectTable, percetakanTable } from "@/drizzle/schema";
 
-const displayTitleExpr = sql<string>`CONCAT(
+const displayTitleSql = sql<string>`CONCAT(
   ${subjectTable.name},
   ' Kelas ',
   ${bookTable.grade}::text,
@@ -14,7 +14,9 @@ const displayTitleExpr = sql<string>`CONCAT(
   REPLACE(${bookTable.curriculum}::text, '_', ' '),
   ' - ',
   ${bookTable.semester}
-)`.as("displayTitle");
+)`;
+
+const displayTitleExpr = displayTitleSql.as("displayTitle");
 
 export async function createBookRepository(data: TNewBook) {
   // Cek duplikat code
@@ -50,7 +52,7 @@ export async function getBooksWithPaginationRepository(params: TIndexBookQuery) 
     searchWhere = or(
       ilike(bookTable.code, like),
       ilike(bookTable.name, like),
-      ilike(displayTitleExpr, like)
+      ilike(displayTitleSql, like)
     );
   }
 
@@ -75,6 +77,7 @@ export async function getBooksWithPaginationRepository(params: TIndexBookQuery) 
   const countQuery = db
     .select({ count: count() })
     .from(bookTable)
+    .leftJoin(subjectTable, eq(bookTable.subjectId, subjectTable.id))
     .where(and(...baseWhere, searchWhere));
 
   const [items, totalResult] = await Promise.all([dataQuery, countQuery]);

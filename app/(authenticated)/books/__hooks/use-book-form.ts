@@ -13,7 +13,7 @@ export const useBookForm = ({ defaultValues, onSubmit }: Params) => {
       code: "",
       subjectId: 0,
       grade: 0,
-      level: "",
+      level: "SD",
       curriculum: "",
       semester: "GANJIL",
       image: "",

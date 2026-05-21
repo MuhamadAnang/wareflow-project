@@ -2,7 +2,53 @@ import { supplierReturnTable, supplierReturnItemTable, supplierTable, bookTable 
 import { db } from "@/lib/db";
 import { TIndexSupplierReturnQuery } from "@/schemas/supplier-return.schema";
 import { TNewSupplierReturn, TNewSupplierReturnItem } from "@/types/database";
-import { eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, sql, type SQL } from "drizzle-orm";
+
+interface SupplierReturnItem {
+  id: number;
+  quantity: number;
+  book: {
+    id: number;
+    code: string;
+    name: string;
+    currentStock: number;
+  };
+}
+
+const toDateOnlyString = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+const buildSupplierReturnWhereConditions = ({
+  search,
+  supplierId,
+  startDate,
+  endDate,
+}: Pick<TIndexSupplierReturnQuery, "search" | "supplierId" | "startDate" | "endDate">) => {
+  const conditions: SQL[] = [];
+
+  if (supplierId) {
+    conditions.push(eq(supplierReturnTable.supplierId, supplierId));
+  }
+
+  if (startDate) {
+    conditions.push(sql`${supplierReturnTable.returnDate} >= ${toDateOnlyString(startDate)}`);
+  }
+
+  if (endDate) {
+    conditions.push(sql`${supplierReturnTable.returnDate} <= ${toDateOnlyString(endDate)}`);
+  }
+
+  if (search) {
+    conditions.push(ilike(supplierTable.name, `%${search}%`));
+  }
+
+  return conditions.length ? and(...conditions) : undefined;
+};
 
 // ==================== CREATE ====================
 
@@ -36,7 +82,7 @@ export const getSupplierReturnByIdRepository = async (id: number) => {
         phone: supplierTable.phone,
         address: supplierTable.address,
       },
-      items: sql<any>`
+      items: sql<SupplierReturnItem[]>`
         COALESCE(
           json_agg(
             json_build_object(
@@ -74,8 +120,14 @@ export const getSupplierReturnByIdRepository = async (id: number) => {
 
 export const getSupplierReturnListRepository = async (queryParams: TIndexSupplierReturnQuery) => {
   const { page, pageSize, sort, search, supplierId, startDate, endDate } = queryParams;
+  const whereClause = buildSupplierReturnWhereConditions({
+    search,
+    supplierId,
+    startDate,
+    endDate,
+  });
 
-  let baseQuery = db
+  const baseQuery = db
     .select({
       id: supplierReturnTable.id,
       supplierId: supplierReturnTable.supplierId,
@@ -89,58 +141,42 @@ export const getSupplierReturnListRepository = async (queryParams: TIndexSupplie
     .from(supplierReturnTable)
     .innerJoin(supplierTable, eq(supplierReturnTable.supplierId, supplierTable.id))
     .leftJoin(supplierReturnItemTable, eq(supplierReturnItemTable.supplierReturnId, supplierReturnTable.id))
+    .where(whereClause)
     .groupBy(supplierReturnTable.id, supplierTable.name);
 
-  if (supplierId) {
-    baseQuery = baseQuery.where(eq(supplierReturnTable.supplierId, supplierId));
-  }
-  if (startDate) {
-    baseQuery = baseQuery.where(sql`${supplierReturnTable.returnDate} >= ${startDate}`);
-  }
-  if (endDate) {
-    baseQuery = baseQuery.where(sql`${supplierReturnTable.returnDate} <= ${endDate}`);
-  }
-  if (search) {
-    baseQuery = baseQuery.where(sql`${supplierTable.name} ILIKE ${`%${search}%`}`);
-  }
+  const offset = (page - 1) * pageSize;
 
   if (sort && Object.keys(sort).length > 0) {
     const [sortKey, sortDir] = Object.entries(sort)[0];
+
     if (sortKey === "returnDate") {
-      baseQuery = baseQuery.orderBy(sortDir === "asc" ? supplierReturnTable.returnDate : sql`${supplierReturnTable.returnDate} DESC`);
-    } else {
-      baseQuery = baseQuery.orderBy(sql`${supplierReturnTable.createdAt} DESC`);
+      return await baseQuery
+        .orderBy(sortDir === "asc" ? asc(supplierReturnTable.returnDate) : desc(supplierReturnTable.returnDate))
+        .limit(pageSize)
+        .offset(offset);
     }
-  } else {
-    baseQuery = baseQuery.orderBy(sql`${supplierReturnTable.createdAt} DESC`);
   }
 
-  const offset = (page - 1) * pageSize;
-  const data = await baseQuery.limit(pageSize).offset(offset);
-  return data;
+  return await baseQuery
+    .orderBy(desc(supplierReturnTable.createdAt))
+    .limit(pageSize)
+    .offset(offset);
 };
 
 export const getSupplierReturnCountRepository = async (queryParams: TIndexSupplierReturnQuery) => {
   const { search, supplierId, startDate, endDate } = queryParams;
+  const whereClause = buildSupplierReturnWhereConditions({
+    search,
+    supplierId,
+    startDate,
+    endDate,
+  });
 
-  let baseQuery = db
-    .select({ count: sql<number>`COUNT(DISTINCT ${supplierReturnTable.id})` })
+  const result = await db
+    .select({ count: sql<number>`COUNT(DISTINCT ${supplierReturnTable.id})`.mapWith(Number) })
     .from(supplierReturnTable)
-    .innerJoin(supplierTable, eq(supplierReturnTable.supplierId, supplierTable.id));
+    .innerJoin(supplierTable, eq(supplierReturnTable.supplierId, supplierTable.id))
+    .where(whereClause);
 
-  if (supplierId) {
-    baseQuery = baseQuery.where(eq(supplierReturnTable.supplierId, supplierId));
-  }
-  if (startDate) {
-    baseQuery = baseQuery.where(sql`${supplierReturnTable.returnDate} >= ${startDate}`);
-  }
-  if (endDate) {
-    baseQuery = baseQuery.where(sql`${supplierReturnTable.returnDate} <= ${endDate}`);
-  }
-  if (search) {
-    baseQuery = baseQuery.where(sql`${supplierTable.name} ILIKE ${`%${search}%`}`);
-  }
-
-  const result = await baseQuery;
   return result[0]?.count ?? 0;
 };

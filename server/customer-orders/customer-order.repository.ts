@@ -2,9 +2,71 @@ import { bookTable, customerOrderItemTable, customerOrderStatusEnum, customerOrd
 import { db } from "@/lib/db";
 import { TIndexCustomerOrderQuery } from "@/schemas/customer-order.schema";
 import { TNewCustomerOrder, TNewCustomerOrderItem } from "@/types/database";
-import {  eq, inArray, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, sql, type SQL } from "drizzle-orm";
 
 type CustomerOrderStatus = (typeof customerOrderStatusEnum.enumValues)[number];
+
+const customerOrderStatuses = new Set<string>(customerOrderStatusEnum.enumValues);
+
+const toDateOnlyString = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+const getStatusFilterValues = (status?: string): CustomerOrderStatus[] => {
+  if (!status) return [];
+
+  return status
+    .split(",")
+    .map((value) => value.trim())
+    .filter((value): value is CustomerOrderStatus => customerOrderStatuses.has(value));
+};
+
+const buildCustomerOrderWhereConditions = ({
+  search,
+  customerId,
+  status,
+  startDate,
+  endDate,
+}: Pick<
+  TIndexCustomerOrderQuery,
+  "search" | "customerId" | "status" | "startDate" | "endDate"
+>) => {
+  const conditions: SQL[] = [];
+
+  if (customerId) {
+    conditions.push(eq(customerOrderTable.customerId, customerId));
+  }
+
+  if (status) {
+    const statuses = getStatusFilterValues(status);
+
+    if (!statuses.length) {
+      conditions.push(sql`false`);
+    } else if (statuses.length === 1) {
+      conditions.push(eq(customerOrderTable.status, statuses[0]));
+    } else {
+      conditions.push(inArray(customerOrderTable.status, statuses));
+    }
+  }
+
+  if (startDate) {
+    conditions.push(sql`${customerOrderTable.orderDate} >= ${toDateOnlyString(startDate)}`);
+  }
+
+  if (endDate) {
+    conditions.push(sql`${customerOrderTable.orderDate} <= ${toDateOnlyString(endDate)}`);
+  }
+
+  if (search) {
+    conditions.push(ilike(customerTable.name, `%${search}%`));
+  }
+
+  return conditions.length ? and(...conditions) : undefined;
+};
 
 // ==================== HEADER ====================
 
@@ -71,8 +133,15 @@ export const getCustomerOrdersWithPaginationRepository = async (
   queryParams: TIndexCustomerOrderQuery
 ) => {
   const { page, pageSize, sort, search, customerId, status, startDate, endDate } = queryParams;
+  const whereClause = buildCustomerOrderWhereConditions({
+    search,
+    customerId,
+    status,
+    startDate,
+    endDate,
+  });
 
-  let baseQuery = db
+  const baseQuery = db
     .select({
       id: customerOrderTable.id,
       customerId: customerOrderTable.customerId,
@@ -84,79 +153,49 @@ export const getCustomerOrdersWithPaginationRepository = async (
       updatedAt: customerOrderTable.updatedAt,
     })
     .from(customerOrderTable)
-    .innerJoin(customerTable, eq(customerOrderTable.customerId, customerTable.id));
-
-  if (customerId) {
-    baseQuery = baseQuery.where(eq(customerOrderTable.customerId, customerId));
-  }
-
-  // Handle status yang bisa berupa string CSV
-  if (status) {
-    if (typeof status === 'string' && status.includes(',')) {
-      const statuses = status.split(',');
-      baseQuery = baseQuery.where(sql`${customerOrderTable.status} IN (${statuses.join(',')})`);
-    } else {
-      baseQuery = baseQuery.where(eq(customerOrderTable.status, status as CustomerOrderStatus));
-    }
-  }
-
-  if (startDate) {
-    baseQuery = baseQuery.where(sql`${customerOrderTable.orderDate} >= ${startDate}`);
-  }
-  if (endDate) {
-    baseQuery = baseQuery.where(sql`${customerOrderTable.orderDate} <= ${endDate}`);
-  }
-  if (search) {
-    baseQuery = baseQuery.where(sql`${customerTable.name} ILIKE ${`%${search}%`}`);
-  }
+    .innerJoin(customerTable, eq(customerOrderTable.customerId, customerTable.id))
+    .where(whereClause);
 
   // Sorting
+  const offset = (page - 1) * pageSize;
+
   if (sort && Object.keys(sort).length > 0) {
     const [sortKey, sortDir] = Object.entries(sort)[0];
     if (sortKey === "orderDate") {
-      baseQuery = baseQuery.orderBy(
-        sortDir === "asc" ? customerOrderTable.orderDate : sql`${customerOrderTable.orderDate} DESC`,
-      );
+      return await baseQuery
+        .orderBy(sortDir === "asc" ? asc(customerOrderTable.orderDate) : desc(customerOrderTable.orderDate))
+        .limit(pageSize)
+        .offset(offset);
     } else if (sortKey === "status") {
-      baseQuery = baseQuery.orderBy(
-        sortDir === "asc" ? customerOrderTable.status : sql`${customerOrderTable.status} DESC`,
-      );
-    } else {
-      baseQuery = baseQuery.orderBy(sql`${customerOrderTable.createdAt} DESC`);
+      return await baseQuery
+        .orderBy(sortDir === "asc" ? asc(customerOrderTable.status) : desc(customerOrderTable.status))
+        .limit(pageSize)
+        .offset(offset);
     }
-  } else {
-    baseQuery = baseQuery.orderBy(sql`${customerOrderTable.createdAt} DESC`);
   }
 
-  const offset = (page - 1) * pageSize;
-  const data = await baseQuery.limit(pageSize).offset(offset);
-  return data;
+  return await baseQuery
+    .orderBy(desc(customerOrderTable.createdAt))
+    .limit(pageSize)
+    .offset(offset);
 };
 
 export const getCustomerOrdersCountRepository = async (queryParams: TIndexCustomerOrderQuery) => {
   const { search, customerId, status, startDate, endDate } = queryParams;
+  const whereClause = buildCustomerOrderWhereConditions({
+    search,
+    customerId,
+    status,
+    startDate,
+    endDate,
+  });
 
-  let baseQuery = db
-    .select({ count: sql<number>`count(*)` })
+  const result = await db
+    .select({ count: sql<number>`count(*)`.mapWith(Number) })
     .from(customerOrderTable)
-    .innerJoin(customerTable, eq(customerOrderTable.customerId, customerTable.id));
+    .innerJoin(customerTable, eq(customerOrderTable.customerId, customerTable.id))
+    .where(whereClause);
 
-  if (customerId) baseQuery = baseQuery.where(eq(customerOrderTable.customerId, customerId));
-
-  if (status) {
-    if (typeof status === 'string' && status.includes(',')) {
-      const statuses = status.split(',');
-      baseQuery = baseQuery.where(sql`${customerOrderTable.status} IN (${statuses.join(',')})`);
-    } else {
-      baseQuery = baseQuery.where(eq(customerOrderTable.status, status as CustomerOrderStatus));
-    }
-  }
-
-  if (startDate) baseQuery = baseQuery.where(sql`${customerOrderTable.orderDate} >= ${startDate}`);
-  if (endDate) baseQuery = baseQuery.where(sql`${customerOrderTable.orderDate} <= ${endDate}`);
-  if (search) baseQuery = baseQuery.where(sql`${customerTable.name} ILIKE ${`%${search}%`}`);
-
-  const result = await baseQuery;
   return result[0]?.count ?? 0;
 };
 
@@ -217,9 +256,11 @@ export const deleteCustomerOrderRepository = async (id: number) => {
 };
 
 export const getCustomerOrderStatusRepository = async (id: number) => {
-  const order = await db.query.customerOrderTable.findFirst({
-    where: eq(customerOrderTable.id, id),
-    columns: { status: true },
-  });
+  const [order] = await db
+    .select({ status: customerOrderTable.status })
+    .from(customerOrderTable)
+    .where(eq(customerOrderTable.id, id))
+    .limit(1);
+
   return order?.status;
 };

@@ -12,7 +12,7 @@ export default function CreateSupplierReturnPage() {
       title="Buat Retur Supplier"
       description="Buat retur barang ke supplier. Stok akan berkurang secara otomatis."
     >
-      <CreateSupplierReturnForm onSubmit={mutateAsync} isPending={isPending} />
+      <CreateSupplierReturnForm onSubmit={(data) => mutateAsync(data).then(() => {})} isPending={isPending} />
     </Page>
   );
 }

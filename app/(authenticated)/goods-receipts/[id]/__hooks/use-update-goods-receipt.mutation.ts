@@ -1,5 +1,7 @@
 import useAuthenticatedClient from "@/app/_hooks/use-authenticated-client";
 import { TUpdateGoodsReceipt } from "@/schemas/goods-receipt.schema";
+import type { TBaseApiResponse } from "@/types/response";
+import type { AxiosError, AxiosResponse } from "axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -9,7 +11,7 @@ export const useUpdateGoodsReceiptMutation = (id: number) => {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<AxiosResponse<unknown>, AxiosError<TBaseApiResponse>, TUpdateGoodsReceipt>({
     mutationFn: async (payload: TUpdateGoodsReceipt) => {
       return await api.put(`/goods-receipts/${id}`, payload);
     },
@@ -19,7 +21,7 @@ export const useUpdateGoodsReceiptMutation = (id: number) => {
       queryClient.invalidateQueries({ queryKey: ["goods-receipt", id] });
       router.push(`/goods-receipts/${id}`);
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast.error(error.response?.data?.message || "Failed to update goods receipt");
     },
   });

@@ -12,9 +12,11 @@ import {
   SelectValue,
 } from "@/app/_components/ui/select";
 import { Plus, Trash } from "lucide-react";
+import type { useGoodsReceiptUpdateForm } from "../[id]/__hooks/use-goods-receipt-update-form";
+import type { TUpdateGoodsReceipt } from "@/schemas/goods-receipt.schema";
 
 interface UpdateFormProps {
-  form: any;
+  form: ReturnType<typeof useGoodsReceiptUpdateForm>;
   books: { id: number; displayTitle: string }[];
   isPending?: boolean;
 }
@@ -71,7 +73,7 @@ export function GoodsReceiptUpdateForm({ form, books, isPending }: UpdateFormPro
             };
 
             const removeItem = (index: number) => {
-              const newItems = items.filter((_: any, i: number) => i !== index);
+              const newItems = items.filter((_, i) => i !== index);
               itemsField.setValue(newItems);
             };
 
@@ -85,7 +87,7 @@ export function GoodsReceiptUpdateForm({ form, books, isPending }: UpdateFormPro
                 </div>
 
                 <div className="border rounded-lg overflow-hidden">
-                  {items.map((item: any, index: number) => (
+                  {items.map((item: TUpdateGoodsReceipt["items"][number], index: number) => (
                     <div
                       key={`${item.bookId}-${index}`}
                       className="grid grid-cols-12 gap-4 p-4 border-b last:border-0 items-end"

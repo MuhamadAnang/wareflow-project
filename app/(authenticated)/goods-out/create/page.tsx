@@ -12,7 +12,7 @@ export default function CreateGoodsOutPage() {
       title="Buat Pengiriman Barang"
       description="Pilih customer order yang sudah dikonfirmasi, tentukan item dan jumlah yang akan dikirim."
     >
-      <CreateGoodsOutForm onSubmit={mutateAsync} isPending={isPending} />
+      <CreateGoodsOutForm onSubmit={(data) => mutateAsync(data).then(() => {})} isPending={isPending} />
     </Page>
   );
 }

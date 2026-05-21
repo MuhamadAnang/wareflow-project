@@ -7,6 +7,9 @@ import { GoodsReceiptUpdateForm } from "../../__components/update-form";
 import { useGoodsReceiptUpdateForm } from "../__hooks/use-goods-receipt-update-form";
 import { useGetGoodsReceipt } from "../__hooks/use-get-good-receipt.query";
 import { useUpdateGoodsReceiptMutation } from "../__hooks/use-update-goods-receipt.mutation";
+import type { TUpdateGoodsReceipt } from "@/schemas/goods-receipt.schema";
+import type { TBookListItem, TGoodsReceiptDetail } from "@/types/database";
+import { getApiList } from "@/lib/api-list";
 
 // Komponen form yang hanya dirender setelah data receipt siap
 function UpdateFormContent({
@@ -15,15 +18,15 @@ function UpdateFormContent({
   onUpdate,
   isPending,
 }: {
-  receipt: any;
-  books: any[];
-  onUpdate: (values: any) => Promise<void>;
+  receipt: TGoodsReceiptDetail;
+  books: Pick<TBookListItem, "id" | "displayTitle">[];
+  onUpdate: (values: TUpdateGoodsReceipt) => Promise<void>;
   isPending: boolean;
 }) {
-  const defaultValues = {
+  const defaultValues: TUpdateGoodsReceipt = {
     receivedDate: new Date(receipt.receivedDate).toISOString().split("T")[0],
     note: receipt.note ?? "",
-    items: receipt.items.map((item: any) => ({
+    items: receipt.items.map((item) => ({
       bookId: item.bookId,
       quantity: item.quantity,
     })),
@@ -42,11 +45,14 @@ export default function UpdateGoodsReceiptPage() {
   const id = Number(params.id);
 
   const { data, isLoading } = useGetGoodsReceipt(id);
-  const { data: booksData } = useGetBooksQuery({ page: 1, pageSize: 1000 });
+  const { data: booksData } = useGetBooksQuery({ page: 1, pageSize: 100 });
   const { mutateAsync, isPending } = useUpdateGoodsReceiptMutation(id);
 
-  const books = booksData?.data ?? [];
+  const books: Pick<TBookListItem, "id" | "displayTitle">[] = getApiList<TBookListItem>(booksData);
   const receipt = data?.data;
+  const handleUpdate = async (values: TUpdateGoodsReceipt) => {
+    await mutateAsync(values);
+  };
 
   if (isLoading) {
     return <Page title="Loading..." description="">Loading...</Page>;
@@ -65,7 +71,7 @@ export default function UpdateGoodsReceiptPage() {
       <UpdateFormContent
         receipt={receipt}
         books={books}
-        onUpdate={mutateAsync}
+        onUpdate={handleUpdate}
         isPending={isPending}
       />
     </Page>

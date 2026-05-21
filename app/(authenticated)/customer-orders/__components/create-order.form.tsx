@@ -17,6 +17,8 @@ import { Plus, Trash } from "lucide-react";
 import { CreateCustomerDialog } from "./create-customer-dialog";
 import { useCreateOrderForm } from "../__hooks/use-create-order-form";
 import { CreateBookDialog } from "./create-book-dialog";
+import { getApiList } from "@/lib/api-list";
+import { TBookListItem, TCustomer } from "@/types/database";
 
 interface Props {
   form: ReturnType<typeof useCreateOrderForm>;
@@ -32,6 +34,8 @@ type OrderItem = {
 export const CreateOrderForm = ({ form, isPending }: Props) => {
   const { data: customersData, refetch: refetchCustomers } = useGetCustomersDropdownQuery();
   const { data: booksData, refetch: refetchBooks } = useGetBooksDropdownQuery();
+  const customers = getApiList<TCustomer>(customersData);
+  const books = getApiList<TBookListItem>(booksData);
 
   const handleCustomerCreated = async (newCustomerId: number) => {
     await refetchCustomers();
@@ -63,7 +67,7 @@ export const CreateOrderForm = ({ form, isPending }: Props) => {
                     <SelectValue placeholder="Select customer" />
                   </SelectTrigger>
                   <SelectContent>
-                    {customersData?.data.map((c) => (
+                    {customers.map((c) => (
                       <SelectItem key={c.id} value={c.id.toString()}>
                         {c.name}
                       </SelectItem>
@@ -196,7 +200,7 @@ export const CreateOrderForm = ({ form, isPending }: Props) => {
                               <SelectValue placeholder="Select book" />
                             </SelectTrigger>
                             <SelectContent>
-                              {booksData?.data.map((book) => (
+                              {books.map((book) => (
                                 <SelectItem key={book.id} value={book.id.toString()}>
                                   {book.code} - {book.displayTitle}
                                 </SelectItem>

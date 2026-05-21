@@ -10,6 +10,7 @@ import { useGetPurchaseOrder } from "../__hooks/use-get-purchase-order.query";
 import { useUpdatePurchaseOrderMutation } from "./__hooks/use-update-purchase-order.mutation";
 import { TPurchaseOrderDetail, TSupplier, TBookListItem } from "@/types/database";
 import { TCreatePurchaseOrder } from "@/schemas/purchase-order.schema";
+import { getApiList } from "@/lib/api-list";
 
 export default function UpdatePurchaseOrderPage() {
   const params = useParams();
@@ -25,8 +26,8 @@ export default function UpdatePurchaseOrderPage() {
     pageSize: 100,
   });
 
-  const suppliers: TSupplier[] = suppliersData?.data ?? [];
-  const books: TBookListItem[] = booksData?.data ?? [];
+  const suppliers: TSupplier[] = getApiList<TSupplier>(suppliersData);
+  const books: TBookListItem[] = getApiList<TBookListItem>(booksData);
   const po = poData?.data;
 
   const { mutateAsync, isPending } = useUpdatePurchaseOrderMutation(id);

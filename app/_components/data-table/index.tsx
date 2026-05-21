@@ -22,6 +22,7 @@ import { TFilterItem } from "./filter-collections/factory";
 import { FilterTable } from "./filter";
 import { DateRange } from "react-day-picker";
 import { TPaginationResponse } from "@/types/meta";
+import type { AxiosResponse } from "axios";
 
 export type TFilterValue =
   | string
@@ -32,7 +33,14 @@ export type TFilterValue =
   | Array<string | number>;
 
 interface IDataTableProps<TData, TValue = unknown> {
-  source?: TPaginationResponse<TData>;
+  source?:
+    | TPaginationResponse<TData>
+    | AxiosResponse<TPaginationResponse<TData>>
+    | TData[]
+    | {
+        data?: TData[] | TPaginationResponse<TData>;
+        meta?: TPaginationResponse<TData>["meta"];
+      };
   columns: ColumnDef<TData, TValue>[];
   isLoading?: boolean;
   placeholderSearch?: string;
@@ -69,7 +77,35 @@ const DataTable = <TData, TValue = unknown>(props: IDataTableProps<TData, TValue
     placeholderSearch,
     selectable,
   } = props;
-  const { data = [], meta } = source || {};
+  const normalizedSource = useMemo(() => {
+    if (!source) {
+      return { data: [] as TData[], meta: undefined as TPaginationResponse<TData>["meta"] | undefined };
+    }
+
+    if (Array.isArray(source)) {
+      return { data: source, meta: undefined };
+    }
+
+    const directData = (source as TPaginationResponse<TData>).data;
+    if (Array.isArray(directData)) {
+      return {
+        data: directData,
+        meta: (source as TPaginationResponse<TData>).meta,
+      };
+    }
+
+    const nestedData = (source as AxiosResponse<TPaginationResponse<TData>>).data;
+    if (nestedData && Array.isArray(nestedData.data)) {
+      return {
+        data: nestedData.data,
+        meta: nestedData.meta,
+      };
+    }
+
+    return { data: [] as TData[], meta: undefined as TPaginationResponse<TData>["meta"] | undefined };
+  }, [source]);
+
+  const { data = [], meta } = normalizedSource;
   const { page, pageSize } = pagination;
   const { total } = meta || {};
 
