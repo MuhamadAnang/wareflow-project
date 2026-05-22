@@ -50,7 +50,8 @@ export const getPurchaseOrdersWithPaginationRepository = async (
     })
     .from(purchaseOrderTable)
     .leftJoin(supplierTable, eq(purchaseOrderTable.supplierId, supplierTable.id))
-    .where(isNull(purchaseOrderTable.deletedAt));
+    .where(isNull(purchaseOrderTable.deletedAt))
+    .$dynamic();
 
   if (supplierId) {
     query = query.where(eq(purchaseOrderTable.supplierId, supplierId));
@@ -66,13 +67,12 @@ export const getPurchaseOrdersWithPaginationRepository = async (
   }
 
   // Sorting
-  if (sort?.field && sort?.direction) {
-    const orderBy = sort.direction === "asc" ? asc : desc;
-    let column: any;
-    if (sort.field === "supplierName") column = supplierTable.name;
-    else if (sort.field === "orderDate") column = purchaseOrderTable.orderDate;
-    else column = purchaseOrderTable[sort.field as keyof typeof purchaseOrderTable];
-    if (column) query = query.orderBy(orderBy(column));
+  const firstSort = sort?.[0];
+  if (firstSort) {
+    const orderBy = firstSort.direction === "asc" ? asc : desc;
+    const column =
+      firstSort.key === "supplierName" ? supplierTable.name : purchaseOrderTable.orderDate;
+    query = query.orderBy(orderBy(column));
   } else {
     query = query.orderBy(desc(purchaseOrderTable.createdAt));
   }
@@ -82,7 +82,8 @@ export const getPurchaseOrdersWithPaginationRepository = async (
     .select({ count: sql<number>`count(*)` })
     .from(purchaseOrderTable)
     .leftJoin(supplierTable, eq(purchaseOrderTable.supplierId, supplierTable.id))
-    .where(isNull(purchaseOrderTable.deletedAt));
+    .where(isNull(purchaseOrderTable.deletedAt))
+    .$dynamic();
 
   if (supplierId) countQuery = countQuery.where(eq(purchaseOrderTable.supplierId, supplierId));
   if (search) {
@@ -103,7 +104,7 @@ export const getPurchaseOrdersWithPaginationRepository = async (
   return { data, total };
 };
 
-// Get single PO by ID with items and book details (displayTitle diformat di JS)
+// Get single PO by ID with items and book details
 export const getPurchaseOrderByIdRepository = async (id: number): Promise<TPurchaseOrderDetail | null> => {
   // Get header with supplier name
   const orderResult = await db
@@ -144,14 +145,14 @@ export const getPurchaseOrderByIdRepository = async (id: number): Promise<TPurch
     .innerJoin(subjectTable, eq(bookTable.subjectId, subjectTable.id))     // ✅ langsung dari bookTable
     .where(eq(purchaseOrderItemTable.purchaseOrderId, id));
 
-  // Format displayTitle di JavaScript (sama persis dengan yang dipakai di Book Titles)
+  // Format bookName di JavaScript (sama persis dengan yang dipakai di Book Titles)
   const items = itemsRaw.map((item) => ({
     id: item.id,
     purchaseOrderId: item.purchaseOrderId,
     bookId: item.bookId,
     quantity: item.quantity,
     bookCode: item.bookCode,
-    displayTitle: `${item.subjectName} Kelas ${item.grade} ${item.level} ${item.curriculum.replace('_', ' ')}`,
+    bookName: `${item.subjectName} Kelas ${item.grade} ${item.level} ${item.curriculum.replace("_", " ")}`,
   }));
 
   return {

@@ -1,10 +1,10 @@
 import { db } from "@/lib/db";
-import { stockMovementTable, bookTable, stockMovementTypeEnum, schema } from "@/drizzle/schema";
+import { stockMovementTable, bookTable, stockMovementTypeEnum } from "@/drizzle/schema";
 import { desc, eq } from "drizzle-orm";
-import { NodePgDatabase } from "drizzle-orm/node-postgres";
 
 
 export type StockMovementType = typeof stockMovementTypeEnum.enumValues[number];
+type StockMovementTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 const STOCK_DIRECTION: Record<Exclude<StockMovementType, "ADJUSTMENT">, 1 | -1> = {
   IN_PURCHASE: 1,
@@ -27,14 +27,9 @@ export const processStockMovement = async (
     referenceId: number;
     note?: string;
   },
-  tx?: NodePgDatabase<typeof schema>
+  tx?: StockMovementTransaction
 ) => {
-  const { bookId, type, quantity, referenceType, referenceId, note } = params;
-
-  if (quantity <= 0) throw new Error("Quantity harus lebih dari 0");
-
-  // Gunakan tx yang diterima, atau db jika tidak ada
-  const executor = tx || db;
+  if (params.quantity <= 0) throw new Error("Quantity harus lebih dari 0");
 
   // Jika tidak ada tx, bungkus dengan transaction. Jika ada, langsung execute.
   if (!tx) {
@@ -50,7 +45,7 @@ export const processStockMovement = async (
  * 🔐 Logic eksekusi stok (dipisah agar reusable)
  */
 const executeStockLogic = async (
-  tx: NodePgDatabase<typeof schema>,
+  tx: StockMovementTransaction,
   params: {
     bookId: number;
     type: StockMovementType;

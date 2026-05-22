@@ -196,7 +196,7 @@ export type TGoodsOutListItem = {
 export type TGoodsOutDetail = TGoodsOut & {
   customerOrder: {
     id: number;
-    orderDate: Date;
+    orderDate: string;
     status: string;
     customer: {
       id: number;

@@ -5,18 +5,14 @@ import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/_components/ui/select";
 import { Textarea } from "@/app/_components/ui/textarea";
-import { Form } from "@tanstack/react-form";
-// import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input";
-// import { Label } from "@/components/ui/label";
-// import { Textarea } from "@/components/ui/textarea";
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { TPurchaseOrderDetail, TPurchaseOrderWithSupplier } from "@/types/database";
+import type { useGoodsReceiptCreateForm } from "../__hooks/use-goods-receipt-create-form";
 
 type CreateOrUpdateGoodsReceiptFormProps = {
-  form: any;
+  form: ReturnType<typeof useGoodsReceiptCreateForm>;
   isPending: boolean;
-  purchaseOrders: any[];
-  poDetail?: any;
+  purchaseOrders: Pick<TPurchaseOrderWithSupplier, "id" | "supplierName">[];
+  poDetail?: Pick<TPurchaseOrderDetail, "items"> | null;
   onPoChange?: (poId: number) => void;
 };
 
@@ -27,22 +23,21 @@ export function CreateOrUpdateGoodsReceiptForm({
   poDetail,
   onPoChange,
 }: CreateOrUpdateGoodsReceiptFormProps) {
-    return (
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          form.handleSubmit();
-        }}
-        className="space-y-6"
-      >
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        form.handleSubmit();
+      }}
+      className="space-y-6"
+    >
       <div className="space-y-6">
-        {/* Purchase Order */}
-        <form.Field
-          name="purchaseOrderId"
-                    // eslint-disable-next-line react/no-children-prop
-          children={(field) => (
+        <form.Field name="purchaseOrderId">
+          {(field) => (
             <div>
-              <Label>Purchase Order <span className="text-red-500">*</span></Label>
+              <Label>
+                Purchase Order <span className="text-red-500">*</span>
+              </Label>
               <Select
                 value={field.state.value?.toString() || ""}
                 onValueChange={(value) => {
@@ -55,24 +50,23 @@ export function CreateOrUpdateGoodsReceiptForm({
                   <SelectValue placeholder="Pilih Purchase Order" />
                 </SelectTrigger>
                 <SelectContent>
-                  {purchaseOrders.map((po: any) => (
+                  {purchaseOrders.map((po) => (
                     <SelectItem key={po.id} value={po.id.toString()}>
-                      PO #{po.id} — Supplier: {po.supplierName || "-"}
+                      PO #{po.id} - Supplier: {po.supplierName || "-"}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
           )}
-        />
+        </form.Field>
 
-        {/* Received Date */}
-        <form.Field
-          name="receivedDate"
-                    // eslint-disable-next-line react/no-children-prop
-          children={(field) => (
+        <form.Field name="receivedDate">
+          {(field) => (
             <div>
-              <Label>Tanggal Terima <span className="text-red-500">*</span></Label>
+              <Label>
+                Tanggal Terima <span className="text-red-500">*</span>
+              </Label>
               <Input
                 type="date"
                 value={field.state.value || ""}
@@ -80,13 +74,10 @@ export function CreateOrUpdateGoodsReceiptForm({
               />
             </div>
           )}
-        />
+        </form.Field>
 
-        {/* Note */}
-        <form.Field
-          name="note"
-                    // eslint-disable-next-line react/no-children-prop
-          children={(field) => (
+        <form.Field name="note">
+          {(field) => (
             <div>
               <Label>Catatan</Label>
               <Textarea
@@ -97,29 +88,28 @@ export function CreateOrUpdateGoodsReceiptForm({
               />
             </div>
           )}
-        />
+        </form.Field>
 
-        {/* Items Preview */}
         <div>
           <Label className="mb-3 block">Items yang akan diterima</Label>
-          {poDetail?.items?.length > 0 ? (
+          {poDetail?.items?.length ? (
             <div className="border rounded-md divide-y bg-gray-50 p-4">
-              {poDetail.items.map((item: any, index: number) => (
-                <div key={index} className="py-3 flex justify-between items-center">
-                  <div>Book ID: <strong>{item.bookId}</strong></div>
+              {poDetail.items.map((item, index) => (
+                <div key={`${item.bookId}-${index}`} className="py-3 flex justify-between items-center">
+                  <div>
+                    Book ID: <strong>{item.bookId}</strong>
+                  </div>
                   <div className="font-medium">Qty: {item.quantity}</div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 italic text-sm">
-              Pilih Purchase Order terlebih dahulu
-            </p>
+            <p className="text-gray-500 italic text-sm">Pilih Purchase Order terlebih dahulu</p>
           )}
         </div>
 
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           disabled={isPending || !form.getFieldValue("purchaseOrderId")}
           className="w-full py-6"
         >

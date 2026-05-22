@@ -4,8 +4,7 @@ import Page from "@/app/_components/page";
 import { useParams } from "next/navigation";
 import { Table, TableBody, TableCell, TableRow } from "@/app/_components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/_components/ui/card";
-import { Badge } from "@/app/_components/ui/badge";
-import { convertUtcToLocalTime, toTitleCase } from "@/lib/utils";
+import { convertUtcToLocalTime } from "@/lib/utils";
 import { useGetPurchaseOrder } from "./__hooks/use-get-purchase-order.query";
 
 export default function PurchaseOrderDetailPage() {
@@ -93,7 +92,7 @@ export default function PurchaseOrderDetailPage() {
                 {po.items.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell>{item.bookCode}</TableCell>
-                    <TableCell>{item.displayTitle}</TableCell>
+                    <TableCell>{item.bookName}</TableCell>
                     <TableCell className="text-right">{item.quantity}</TableCell>
                   </TableRow>
                 ))}

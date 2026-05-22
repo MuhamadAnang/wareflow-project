@@ -8,14 +8,16 @@ interface UsePurchaseOrderFormParams {
   isEdit?: boolean; // tambahkan ini
 }
 
-export const usePurchaseOrderForm = ({ defaultValues, onSubmit, isEdit }: UsePurchaseOrderFormParams) => {
+export const usePurchaseOrderForm = ({ defaultValues, onSubmit, isEdit: _isEdit }: UsePurchaseOrderFormParams) => {
+  const formDefaultValues: TCreatePurchaseOrder = {
+    supplierId: defaultValues.supplierId ?? 0,
+    orderDate: defaultValues.orderDate ?? new Date().toISOString().split("T")[0],
+    note: defaultValues.note ?? "",
+    items: defaultValues.items ?? [{ bookId: 0, quantity: 1 }],
+  };
+
   return useForm({
-    defaultValues: {
-      supplierId: defaultValues.supplierId ?? 0,
-      orderDate: defaultValues.orderDate ?? new Date().toISOString().split("T")[0],
-      note: defaultValues.note ?? "",
-      items: defaultValues.items ?? [{ bookId: 0, quantity: 1 }],
-    },
+    defaultValues: formDefaultValues,
     validators: {
       onChange: CreatePurchaseOrderSchema,
       onSubmit: CreatePurchaseOrderSchema,
@@ -29,8 +31,8 @@ export const usePurchaseOrderForm = ({ defaultValues, onSubmit, isEdit }: UsePur
       const payload = { ...value, items: validItems };
       await onSubmit(payload);
     },
-    onSubmitInvalid: ({ errors }) => {
-      console.error("Form validation errors:", errors);
+    onSubmitInvalid: ({ formApi }) => {
+      console.error("Form validation errors:", formApi.state.errorMap);
       toast.error("Mohon lengkapi data dengan benar.");
     },
   });

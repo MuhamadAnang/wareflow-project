@@ -11,8 +11,8 @@ export const useGoodsReceiptCreateForm = ({ defaultValues, onSubmit }: UseGoodsR
     defaultValues: {
       purchaseOrderId: defaultValues.purchaseOrderId ?? 0,
       receivedDate: defaultValues.receivedDate ?? new Date().toISOString().split("T")[0],
-      note: defaultValues.note ?? "",
       items: defaultValues.items ?? [],
+      ...(defaultValues.note === undefined ? {} : { note: defaultValues.note }),
     },
     validators: {
       onChange: CreateGoodsReceiptSchema,

@@ -165,7 +165,7 @@ export const getGoodsOutByIdService = async (id: number): Promise<TGoodsOutDetai
   if (!goodsOut) {
     throw new NotFoundException(`Goods out with ID ${id} not found`);
   }
-  return goodsOut as TGoodsOutDetail;
+  return goodsOut;
 };
 
 // ==================== GET LIST ====================

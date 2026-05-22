@@ -44,8 +44,8 @@ export default function UpdatePercetakanPage() {
           percetakanId={Number(params.id)}
           defaultValues={{
             name: data.data.name,
-            phone: data.data.phone,
-            address: data.data.address,
+            phone: data.data.phone ?? "",
+            address: data.data.address ?? "",
           }}
         />
       )}

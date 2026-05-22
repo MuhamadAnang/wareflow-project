@@ -14,7 +14,7 @@ import { paginationResponseMapper } from "@/lib/pagination";
 export const createPurchaseOrderService = async (data: TCreatePurchaseOrder) => {
   const orderData = {
     supplierId: data.supplierId,
-    orderDate: new Date(data.orderDate),
+    orderDate: data.orderDate,
     note: data.note || null,
   };
 
@@ -57,7 +57,7 @@ export const updatePurchaseOrderService = async (id: number, data: TUpdatePurcha
   // Update header
   const updateData = {
     supplierId: data.supplierId,
-    orderDate: new Date(data.orderDate),
+    orderDate: data.orderDate,
     note: data.note || null,
   };
   await updatePurchaseOrderHeaderRepository(id, updateData);

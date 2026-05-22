@@ -8,70 +8,81 @@ import {
   FieldLabel,
 } from "@/app/_components/ui/field";
 import { Input } from "@/app/_components/ui/input";
-import { Textarea } from "@/app/_components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-
   SelectValue,
 } from "@/app/_components/ui/select";
+import { Textarea } from "@/app/_components/ui/textarea";
+import type { TCreateGoodsReceipt } from "@/schemas/goods-receipt.schema";
+import type { TBookListItem, TPurchaseOrderWithSupplier } from "@/types/database";
 import { Plus, Trash } from "lucide-react";
+import type { useGoodsReceiptCreateForm } from "../__hooks/use-goods-receipt-create-form";
 
 interface CreateFormProps {
-  form: any;
-  purchaseOrders: any[];
-  books: { id: number; displayTitle: string }[];
+  form: ReturnType<typeof useGoodsReceiptCreateForm>;
+  purchaseOrders: Pick<TPurchaseOrderWithSupplier, "id" | "supplierName">[];
+  books: Pick<TBookListItem, "id" | "displayTitle">[];
   isPending?: boolean;
   onPoChange: (poId: number) => void;
 }
 
-export function GoodsReceiptCreateForm({ form, purchaseOrders, books, isPending, onPoChange }: CreateFormProps) {
+export function GoodsReceiptCreateForm({
+  form,
+  purchaseOrders,
+  books,
+  isPending,
+  onPoChange,
+}: CreateFormProps) {
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
         form.handleSubmit();
       }}
-      className="space-y-6 "
+      className="space-y-6"
     >
       <FieldGroup>
         <form.Field name="purchaseOrderId">
-  {(field) => {
-    const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-    // Jika nilai 0 atau undefined, set value ke string kosong agar placeholder muncul
-    const selectValue = field.state.value && field.state.value !== 0 ? field.state.value.toString() : "";
-    return (
-      <Field>
-        <FieldLabel>Pesanan Buku *</FieldLabel>
-        <Select
-          value={selectValue}
-          onValueChange={(value) => {
-            const poId = Number(value);
-            field.handleChange(poId);
-            onPoChange(poId);
+          {(field) => {
+            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+            const selectValue =
+              field.state.value && field.state.value !== 0 ? field.state.value.toString() : "";
+
+            return (
+              <Field>
+                <FieldLabel>Pesanan Buku *</FieldLabel>
+                <Select
+                  value={selectValue}
+                  onValueChange={(value) => {
+                    const poId = Number(value);
+                    field.handleChange(poId);
+                    onPoChange(poId);
+                  }}
+                >
+                  <SelectTrigger aria-invalid={isInvalid}>
+                    <SelectValue placeholder="Pilih Pesanan Buku" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {purchaseOrders.map((po) => (
+                      <SelectItem key={po.id} value={po.id.toString()}>
+                        PO #{po.id} - Supplier: {po.supplierName || "-"}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
           }}
-        >
-          <SelectTrigger aria-invalid={isInvalid}>
-            <SelectValue placeholder="Pilih Pesanan Buku" />
-          </SelectTrigger>
-          <SelectContent>
-            {purchaseOrders.map((po: any) => (
-              <SelectItem key={po.id} value={po.id.toString()}>
-                PO #{po.id} — Supplier: {po.supplierName || "-"}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {isInvalid && <FieldError errors={field.state.meta.errors} />}
-      </Field>
-    );
-  }}
-</form.Field>
+        </form.Field>
+
         <form.Field name="receivedDate">
           {(field) => {
             const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+
             return (
               <Field>
                 <FieldLabel>Tanggal Terima *</FieldLabel>
@@ -87,8 +98,6 @@ export function GoodsReceiptCreateForm({ form, purchaseOrders, books, isPending,
           }}
         </form.Field>
 
-
-        {/* Items */}
         <form.Field name="items">
           {(itemsField) => {
             const isInvalid = itemsField.state.meta.isTouched && !itemsField.state.meta.isValid;
@@ -111,7 +120,7 @@ export function GoodsReceiptCreateForm({ form, purchaseOrders, books, isPending,
             };
 
             const removeItem = (index: number) => {
-              const newItems = items.filter((_: any, i: number) => i !== index);
+              const newItems = items.filter((_, i) => i !== index);
               itemsField.setValue(newItems);
             };
 
@@ -127,12 +136,12 @@ export function GoodsReceiptCreateForm({ form, purchaseOrders, books, isPending,
                 <div className="border rounded-lg overflow-hidden">
                   {items.length === 0 ? (
                     <div className="p-4 text-gray-500 italic text-center">
-                      Belum ada item. Klik "Tambah Item" atau pilih PO untuk mengisi otomatis.
+                      Belum ada item. Klik &quot;Tambah Item&quot; atau pilih PO untuk mengisi otomatis.
                     </div>
                   ) : (
-                    items.map((item: any, index: number) => (
+                    items.map((item: TCreateGoodsReceipt["items"][number], index: number) => (
                       <div
-                        key={index}
+                        key={`${item.bookId}-${index}`}
                         className="grid grid-cols-12 gap-4 p-4 border-b last:border-0 items-end"
                       >
                         <div className="col-span-7">
@@ -153,6 +162,7 @@ export function GoodsReceiptCreateForm({ form, purchaseOrders, books, isPending,
                             </SelectContent>
                           </Select>
                         </div>
+
                         <div className="col-span-3">
                           <FieldLabel>Quantity *</FieldLabel>
                           <Input
@@ -162,6 +172,7 @@ export function GoodsReceiptCreateForm({ form, purchaseOrders, books, isPending,
                             onChange={(e) => handleQuantityChange(index, e.target.value)}
                           />
                         </div>
+
                         <div className="col-span-2">
                           <Button
                             type="button"
@@ -183,6 +194,7 @@ export function GoodsReceiptCreateForm({ form, purchaseOrders, books, isPending,
             );
           }}
         </form.Field>
+
         <form.Field name="note">
           {(field) => (
             <Field>
