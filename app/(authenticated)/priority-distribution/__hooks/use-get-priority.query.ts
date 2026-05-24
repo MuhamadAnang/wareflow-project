@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 export interface PriorityResult {
   id: number;
   customerName: string;
+  customerInstitution: string;
   score: number;
   rank: number;
   criteria: {
@@ -21,6 +22,7 @@ export interface PendingPriorityOrder {
   orderId: number;
   customerId: number;
   customerName: string;
+  customerInstitution: string;
   stockFulfillment: number;
   urgency: number;
   contractStatus: number;

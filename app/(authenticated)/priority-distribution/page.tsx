@@ -39,6 +39,7 @@ export default function PriorityDistributionPage() {
     return pendingOrders.filter((order) => {
       return (
         order.customerName.toLowerCase().includes(keyword) ||
+        order.customerInstitution.toLowerCase().includes(keyword) ||
         String(order.orderId).includes(keyword)
       );
     });
@@ -128,7 +129,9 @@ export default function PriorityDistributionPage() {
                   >
                     <Checkbox checked={isSelected} className="mt-1" aria-label={`Pilih order ${order.orderId}`} />
                     <span className="min-w-0 space-y-1">
-                      <span className="block font-medium truncate">{order.customerName}</span>
+                      <span className="block font-medium truncate">
+                        {order.customerName} | {order.customerInstitution}
+                      </span>
                       <span className="block text-xs text-muted-foreground">
                         Order #{order.orderId} - {order.orderItems.length} item
                       </span>

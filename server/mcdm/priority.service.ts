@@ -14,6 +14,7 @@ interface OrderPriorityInput {
   orderId: number;
   customerId: number;
   customerName: string;
+  customerInstitution: string;
   stockFulfillment: number;
   urgency: number;
   contractStatus: number;
@@ -135,38 +136,76 @@ async function calculateReturnRate(customerId: number): Promise<number> {
     .from(customerOrderTable)
     .where(eq(customerOrderTable.customerId, customerId));
 
-  if (orders.length === 0) return 0;
+  // Jika belum pernah order
+  if (orders.length === 0) {
+    return 0;
+  }
 
   let totalOrdered = 0;
   let totalReturned = 0;
 
+  /**
+   * =========================
+   * HITUNG TOTAL ORDER
+   * =========================
+   */
   for (const order of orders) {
-    // Total pesanan
     const orderItems = await db
-      .select({ quantity: customerOrderItemTable.quantity })
+      .select({
+        quantity: customerOrderItemTable.quantity,
+      })
       .from(customerOrderItemTable)
       .where(eq(customerOrderItemTable.customerOrderId, order.id));
-    
-    totalOrdered += orderItems.reduce((sum, item) => sum + item.quantity, 0);
 
-    // Total retur
-    const returns = await db
-      .select({ id: customerReturnTable.id })
-      .from(customerReturnTable)
-      .where(eq(customerReturnTable.customerId, customerId));
-
-    for (const ret of returns) {
-      const returnItems = await db
-        .select({ quantity: customerReturnItemTable.quantity })
-        .from(customerReturnItemTable)
-        .where(eq(customerReturnItemTable.customerReturnId, ret.id));
-      
-      totalReturned += returnItems.reduce((sum, item) => sum + item.quantity, 0);
-    }
+    totalOrdered += orderItems.reduce(
+      (sum, item) => sum + item.quantity,
+      0
+    );
   }
 
-  if (totalOrdered === 0) return 0;
-  return (totalReturned / totalOrdered) * 100;
+  /**
+   * =========================
+   * HITUNG TOTAL RETUR
+   * =========================
+   */
+  const returns = await db
+    .select({ id: customerReturnTable.id })
+    .from(customerReturnTable)
+    .where(eq(customerReturnTable.customerId, customerId));
+
+  for (const ret of returns) {
+    const returnItems = await db
+      .select({
+        quantity: customerReturnItemTable.quantity,
+      })
+      .from(customerReturnItemTable)
+      .where(eq(customerReturnItemTable.customerReturnId, ret.id));
+
+    totalReturned += returnItems.reduce(
+      (sum, item) => sum + item.quantity,
+      0
+    );
+  }
+
+  // Hindari pembagian nol
+  if (totalOrdered === 0) {
+    return 0;
+  }
+
+  /**
+   * Persentase retur
+   */
+  const returnRate =
+    (totalReturned / totalOrdered) * 100;
+
+  /**
+   * Maksimal 100%
+   * untuk menghindari data anomali
+   */
+  return Math.min(
+    Math.round(returnRate * 100) / 100,
+    100
+  );
 }
 
 /**
@@ -184,6 +223,7 @@ export async function getPendingOrdersForPriority(orderIds?: number[]): Promise<
       id: customerOrderTable.id,
       customerId: customerOrderTable.customerId,
       customerName: customerTable.name,
+      customerInstitution: customerTable.institution,
       orderDate: customerOrderTable.orderDate,
       deadline: customerOrderTable.deadline,
       status: customerOrderTable.status,
@@ -221,6 +261,7 @@ export async function getPendingOrdersForPriority(orderIds?: number[]): Promise<
       orderId: order.id,
       customerId: order.customerId,
       customerName: order.customerName,
+      customerInstitution: order.customerInstitution,
       stockFulfillment,
       urgency,
       contractStatus,
@@ -257,6 +298,7 @@ export async function calculateDistributionPriority(orderIds?: number[]) {
     },
     orderDetails: {
       customerId: order.customerId,
+      customerInstitution: order.customerInstitution,
       deadline: order.deadline,
       orderDate: order.orderDate,
       items: order.orderItems,
@@ -275,6 +317,7 @@ export async function calculateDistributionPriority(orderIds?: number[]) {
         contractStatus: order?.contractStatus || 0,
         returnRate: order?.returnRate || 0,
       },
+      customerInstitution: order?.customerInstitution || "",
       deadline: order?.deadline,
       orderDate: order?.orderDate,
     };

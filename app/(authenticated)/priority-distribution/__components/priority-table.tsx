@@ -81,7 +81,10 @@ export const PriorityTable = ({ priorities, isLoading }: PriorityTableProps) => 
                 </div>
               </TableCell>
               <TableCell className="font-medium">
-                <div>{item.customerName}</div>
+                <div>
+                  {item.customerName}
+                  {item.customerInstitution ? ` | ${item.customerInstitution}` : ""}
+                </div>
                 {item.deadline && (
                   <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
                     <Calendar className="h-3 w-3" />
