@@ -12,23 +12,6 @@ import DataTable from "@/app/_components/data-table";
 import { TGoodsReceiptWithItems } from "@/types/database";
 import { useDeleteGoodsReceiptMutation } from "./__hooks/use-delete-goods-receipt.mutation";
 
-const columns: ColumnDef<TGoodsReceiptWithItems>[] = [
-  { accessorKey: "id", header: "ID" },
-  { accessorKey: "supplierName", header: "Supplier" },
-  { accessorKey: "purchaseOrderId", header: "No. PO" },
-  {
-    accessorKey: "receivedDate",
-    header: "Tanggal Terima",
-    cell: ({ row }) => new Date(row.original.receivedDate).toLocaleDateString("id-ID"),
-  },
-  { accessorKey: "note", header: "Catatan", cell: ({ row }) => row.original.note || "-" },
-  {
-    accessorKey: "createdAt",
-    header: "Dibuat Pada",
-    cell: ({ row }) => new Date(row.original.createdAt).toLocaleString("id-ID"),
-  },
-];
-
 export default function GoodsReceiptsPage() {
   const { search, handleChange, pagination, filters } = useFilters(IndexGoodsReceiptQuerySchema);
   const { mutateAsync: deleteAsync, isPending: deletePending } = useDeleteGoodsReceiptMutation();
@@ -101,9 +84,9 @@ export default function GoodsReceiptsPage() {
       },
     },
   ];
-   return (
-    <Page 
-      title="Buku Masuk" 
+  return (
+    <Page
+      title="Buku Masuk"
       description="Daftar penerimaan barang"
       headerAction={
         <Button asChild>

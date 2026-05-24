@@ -97,7 +97,7 @@ export const CreateOrderForm = ({ form, isPending }: Props) => {
             );
           }}
         </form.Field>
-        
+
         <form.Field name="deadline">
           {(field) => (
             <Field>
@@ -188,7 +188,9 @@ export const CreateOrderForm = ({ form, isPending }: Props) => {
                         <Field>
                           <div className="flex justify-between items-center">
                             <FieldLabel>Book</FieldLabel>
-                            <CreateBookDialog onBookCreated={(bookId) => handleBookCreated(idx, bookId)} />
+                            <CreateBookDialog
+                              onBookCreated={(bookId) => handleBookCreated(idx, bookId)}
+                            />
                           </div>
                           <Select
                             value={item.bookId > 0 ? item.bookId.toString() : ""}
@@ -208,9 +210,13 @@ export const CreateOrderForm = ({ form, isPending }: Props) => {
                             </SelectContent>
                           </Select>
                           {form.state.submissionAttempts > 0 && !(item.bookId > 0) && (
-                            <FieldError errors={[{
-                              message: "Pilih buku terlebih dahulu"
-                            }]} />
+                            <FieldError
+                              errors={[
+                                {
+                                  message: "Pilih buku terlebih dahulu",
+                                },
+                              ]}
+                            />
                           )}
                         </Field>
 
@@ -224,9 +230,13 @@ export const CreateOrderForm = ({ form, isPending }: Props) => {
                             aria-invalid={form.state.submissionAttempts > 0 && !(item.quantity > 0)}
                           />
                           {form.state.submissionAttempts > 0 && !(item.quantity > 0) && (
-                            <FieldError errors={[{
-                              message: "Jumlah harus lebih besar dari 0"
-                            }]} />
+                            <FieldError
+                              errors={[
+                                {
+                                  message: "Jumlah harus lebih besar dari 0",
+                                },
+                              ]}
+                            />
                           )}
                         </Field>
 
@@ -241,9 +251,13 @@ export const CreateOrderForm = ({ form, isPending }: Props) => {
                             aria-invalid={form.state.submissionAttempts > 0 && !(item.price > 0)}
                           />
                           {form.state.submissionAttempts > 0 && !(item.price > 0) && (
-                            <FieldError errors={[{
-                              message: "Harga harus lebih besar dari 0"
-                            }]} />
+                            <FieldError
+                              errors={[
+                                {
+                                  message: "Harga harus lebih besar dari 0",
+                                },
+                              ]}
+                            />
                           )}
                         </Field>
                       </div>
@@ -252,9 +266,13 @@ export const CreateOrderForm = ({ form, isPending }: Props) => {
                 </div>
 
                 {isInvalid && items.length === 0 && (
-                  <FieldError errors={[{
-                    message: "Minimal satu item harus ditambahkan"
-                  }]} />
+                  <FieldError
+                    errors={[
+                      {
+                        message: "Minimal satu item harus ditambahkan",
+                      },
+                    ]}
+                  />
                 )}
               </Field>
             );

@@ -1,7 +1,14 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/_components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/app/_components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/app/_components/ui/table";
 import { Trophy, TrendingUp } from "lucide-react";
 import { TopCustomer } from "../__hooks/use-get-dashboard-stats.query";
 import Link from "next/link";
@@ -59,9 +66,7 @@ export const TopCustomers = ({ customers, isLoading }: TopCustomersProps) => {
               {customers.map((customer, idx) => (
                 <TableRow key={customer.customerId}>
                   <TableCell className="text-center">
-                    <div className="flex justify-center">
-                      {getRankIcon(idx)}
-                    </div>
+                    <div className="flex justify-center">{getRankIcon(idx)}</div>
                   </TableCell>
                   <TableCell>
                     <Link href={`/customers/${customer.customerId}`} className="hover:underline">
@@ -69,7 +74,9 @@ export const TopCustomers = ({ customers, isLoading }: TopCustomersProps) => {
                     </Link>
                   </TableCell>
                   <TableCell className="text-right">{customer.totalOrders}x</TableCell>
-                  <TableCell className="text-right font-medium">{customer.totalQuantity.toLocaleString()}</TableCell>
+                  <TableCell className="text-right font-medium">
+                    {customer.totalQuantity.toLocaleString()}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

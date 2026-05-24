@@ -6,8 +6,20 @@ import { TCustomerReturnDetail, TCustomerReturnListItem } from "@/types/database
 import { getCustomerByIdService } from "../customers/customer.service";
 import { db } from "@/lib/db";
 import { eq, sql } from "drizzle-orm";
-import { bookTable, customerOrderTable, customerReturnItemTable, customerReturnTable, goodsOutItemTable, goodsOutTable, stockMovementTable } from "@/drizzle/schema";
-import { getCustomerReturnByIdRepository, getCustomerReturnCountRepository, getCustomerReturnListRepository } from "./customer-return.repository";
+import {
+  bookTable,
+  customerOrderTable,
+  customerReturnItemTable,
+  customerReturnTable,
+  goodsOutItemTable,
+  goodsOutTable,
+  stockMovementTable,
+} from "@/drizzle/schema";
+import {
+  getCustomerReturnByIdRepository,
+  getCustomerReturnCountRepository,
+  getCustomerReturnListRepository,
+} from "./customer-return.repository";
 
 // Helper: Get shipped quantities for a customer
 const getCustomerShippedQuantities = async (customerId: number) => {
@@ -20,7 +32,7 @@ const getCustomerShippedQuantities = async (customerId: number) => {
     })
     .from(customerOrderTable)
     .where(
-      sql`${customerOrderTable.customerId} = ${customerId} AND ${customerOrderTable.status} IN ('CONFIRMED', 'PARTIALLY_SHIPPED', 'SHIPPED')`
+      sql`${customerOrderTable.customerId} = ${customerId} AND ${customerOrderTable.status} IN ('CONFIRMED', 'PARTIALLY_SHIPPED', 'SHIPPED')`,
     )
     .orderBy(sql`${customerOrderTable.createdAt} DESC`);
 
@@ -76,7 +88,9 @@ export const createCustomerReturnService = async (data: TCreateCustomerReturn) =
   for (const item of items) {
     const shipped = shippedMap.get(item.bookId) || 0;
     if (item.quantity > shipped) {
-      throw new Error(`Quantity retur untuk buku ID ${item.bookId} melebihi jumlah yang sudah dikirim (${shipped})`);
+      throw new Error(
+        `Quantity retur untuk buku ID ${item.bookId} melebihi jumlah yang sudah dikirim (${shipped})`,
+      );
     }
   }
 

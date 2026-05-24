@@ -6,10 +6,7 @@ import { TNewSubject, TUpdateSubject } from "@/types/database";
 import { and, eq, ilike, isNull, not } from "drizzle-orm";
 
 export const getSubjectByNameRepository = async (name: string, excludeId?: number) => {
-  const conditions = [
-    ilike(subjectTable.name, name.trim()),
-    isNull(subjectTable.deletedAt),
-  ];
+  const conditions = [ilike(subjectTable.name, name.trim()), isNull(subjectTable.deletedAt)];
 
   if (excludeId) {
     conditions.push(not(eq(subjectTable.id, excludeId)));
@@ -55,11 +52,7 @@ export const getSubjectByIdRepository = async (id: number) => {
 };
 
 export const updateSubjectByIdRepository = async (id: number, data: TUpdateSubject) => {
-  return await db
-    .update(subjectTable)
-    .set(data)
-    .where(eq(subjectTable.id, id))
-    .returning();
+  return await db.update(subjectTable).set(data).where(eq(subjectTable.id, id)).returning();
 };
 
 export const deleteSubjectByIdRepository = async (id: number) => {

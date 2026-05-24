@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useGetPercetakan } from "./__hooks/use-get-percetakan.query";
 import { Table, TableBody, TableCell, TableRow } from "@/app/_components/ui/table";
 import { Card, CardContent } from "@/app/_components/ui/card";
-import { convertUtcToLocalTime} from "@/lib/utils";
+import { convertUtcToLocalTime } from "@/lib/utils";
 
 export default function PercetakanDetailPage() {
   const params = useParams();

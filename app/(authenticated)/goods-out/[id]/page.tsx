@@ -13,7 +13,11 @@ export default function GoodsOutDetailPage() {
   const goodsOut = data?.data;
 
   return (
-    <Page isLoading={isLoading} title="Detail Pengiriman" description="Informasi lengkap pengiriman barang">
+    <Page
+      isLoading={isLoading}
+      title="Detail Pengiriman"
+      description="Informasi lengkap pengiriman barang"
+    >
       <Card className="shadow-none">
         <CardContent className="p-6">
           {/* Header Info */}
@@ -46,7 +50,9 @@ export default function GoodsOutDetailPage() {
           {goodsOut?.note && (
             <div className="mb-6">
               <h3 className="text-sm font-medium mb-2">Catatan:</h3>
-              <p className="text-sm text-muted-foreground bg-muted p-3 rounded-md">{goodsOut.note}</p>
+              <p className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
+                {goodsOut.note}
+              </p>
             </div>
           )}
 
@@ -72,7 +78,9 @@ export default function GoodsOutDetailPage() {
                 })}
                 {goodsOut?.items?.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={3} className="text-center">Tidak ada item</TableCell>
+                    <TableCell colSpan={3} className="text-center">
+                      Tidak ada item
+                    </TableCell>
                   </TableRow>
                 )}
               </TableBody>

@@ -1,6 +1,5 @@
 import { handleException } from "@/common/exception/helper";
 import { responseFormatter } from "@/lib/response-formatter";
-import { NextRequest } from "next/server";
 import {
   getDashboardStats,
   getLowStockItems,
@@ -9,7 +8,7 @@ import {
   getPriorityPreview,
 } from "./dashboard.service";
 
-export const getDashboardStatsController = async (request: NextRequest) => {
+export const getDashboardStatsController = async () => {
   try {
     const [stats, lowStock, recentOrders, topCustomers, priorityPreview] = await Promise.all([
       getDashboardStats(),
@@ -30,7 +29,6 @@ export const getDashboardStatsController = async (request: NextRequest) => {
       message: "Dashboard data retrieved successfully",
     });
   } catch (error) {
-    console.error("Error in getDashboardStatsController:", error);
     return handleException(error);
   }
 };

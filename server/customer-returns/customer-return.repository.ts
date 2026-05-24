@@ -1,7 +1,11 @@
-import { customerReturnTable, customerReturnItemTable, customerTable, bookTable } from "@/drizzle/schema";
+import {
+  customerReturnTable,
+  customerReturnItemTable,
+  customerTable,
+  bookTable,
+} from "@/drizzle/schema";
 import { db } from "@/lib/db";
 import { TIndexCustomerReturnQuery } from "@/schemas/customer-return.schema";
-import { TNewCustomerReturn, TNewCustomerReturnItem } from "@/types/database";
 import { and, asc, desc, eq, ilike, sql, type SQL } from "drizzle-orm";
 
 interface ReturnItem {
@@ -49,26 +53,6 @@ const buildCustomerReturnWhereConditions = ({
   return conditions.length ? and(...conditions) : undefined;
 };
 
-// ==================== CREATE ====================
-
-export const createCustomerReturnRepository = async (
-  returnData: TNewCustomerReturn,
-  items: TNewCustomerReturnItem[]
-) => {
-  return await db.transaction(async (tx) => {
-    const [customerReturn] = await tx.insert(customerReturnTable).values(returnData).returning();
-    if (!customerReturn) throw new Error("Failed to create customer return");
-
-    const returnItems = items.map((item) => ({
-      ...item,
-      customerReturnId: customerReturn.id,
-    }));
-    await tx.insert(customerReturnItemTable).values(returnItems);
-    
-    return customerReturn;
-  });
-};
-
 // ==================== GET BY ID ====================
 
 export const getCustomerReturnByIdRepository = async (id: number) => {
@@ -101,7 +85,10 @@ export const getCustomerReturnByIdRepository = async (id: number) => {
     })
     .from(customerReturnTable)
     .innerJoin(customerTable, eq(customerReturnTable.customerId, customerTable.id))
-    .leftJoin(customerReturnItemTable, eq(customerReturnItemTable.customerReturnId, customerReturnTable.id))
+    .leftJoin(
+      customerReturnItemTable,
+      eq(customerReturnItemTable.customerReturnId, customerReturnTable.id),
+    )
     .leftJoin(bookTable, eq(customerReturnItemTable.bookId, bookTable.id))
     .where(eq(customerReturnTable.id, id))
     .groupBy(customerReturnTable.id, customerTable.id);
@@ -139,7 +126,10 @@ export const getCustomerReturnListRepository = async (queryParams: TIndexCustome
     })
     .from(customerReturnTable)
     .innerJoin(customerTable, eq(customerReturnTable.customerId, customerTable.id))
-    .leftJoin(customerReturnItemTable, eq(customerReturnItemTable.customerReturnId, customerReturnTable.id))
+    .leftJoin(
+      customerReturnItemTable,
+      eq(customerReturnItemTable.customerReturnId, customerReturnTable.id),
+    )
     .where(whereClause)
     .groupBy(customerReturnTable.id, customerTable.name);
 
@@ -150,7 +140,11 @@ export const getCustomerReturnListRepository = async (queryParams: TIndexCustome
 
     if (sortKey === "returnDate") {
       return await baseQuery
-        .orderBy(sortDir === "asc" ? asc(customerReturnTable.returnDate) : desc(customerReturnTable.returnDate))
+        .orderBy(
+          sortDir === "asc"
+            ? asc(customerReturnTable.returnDate)
+            : desc(customerReturnTable.returnDate),
+        )
         .limit(pageSize)
         .offset(offset);
     }

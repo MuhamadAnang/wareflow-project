@@ -1,4 +1,4 @@
-import type { TPaginationMeta, TPaginationResponse } from "./meta";
+import type { TPaginationMeta } from "./meta";
 
 export type TBaseApiResponse = {
   success: boolean;
@@ -31,8 +31,6 @@ export type ValidationErrorDetail = {
 export type TApiValidationErrorResponse = TBaseApiResponse & {
   errors: ValidationErrorDetail[];
 };
-
-export type TApiListResponse<T> = TBaseApiResponse & TPaginationResponse<T>;
 
 export const HTTP_STATUS = {
   OK: 200,

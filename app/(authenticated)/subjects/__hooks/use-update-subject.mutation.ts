@@ -1,7 +1,9 @@
 import useAuthenticatedClient from "@/app/_hooks/use-authenticated-client";
 import { TCreateOrUpdateSubject } from "@/schemas/subject.schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export const useUpdateSubjectMutation = (subjectId: number) => {
   const api = useAuthenticatedClient();
@@ -18,7 +20,11 @@ export const useUpdateSubjectMutation = (subjectId: number) => {
       router.push("/subjects");
     },
     onError: (error) => {
-      console.error("Update subject error:", error);
+      if (isAxiosError(error)) {
+        const message =
+          error.response?.data?.message || "Failed to update subject. Please try again.";
+        toast.error(message);
+      }
     },
   });
 };

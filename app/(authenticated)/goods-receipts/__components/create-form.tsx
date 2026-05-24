@@ -1,12 +1,7 @@
 "use client";
 
 import { Button } from "@/app/_components/ui/button";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/app/_components/ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/app/_components/ui/field";
 import { Input } from "@/app/_components/ui/input";
 import {
   Select,
@@ -136,7 +131,8 @@ export function GoodsReceiptCreateForm({
                 <div className="border rounded-lg overflow-hidden">
                   {items.length === 0 ? (
                     <div className="p-4 text-gray-500 italic text-center">
-                      Belum ada item. Klik &quot;Tambah Item&quot; atau pilih PO untuk mengisi otomatis.
+                      Belum ada item. Klik &quot;Tambah Item&quot; atau pilih PO untuk mengisi
+                      otomatis.
                     </div>
                   ) : (
                     items.map((item: TCreateGoodsReceipt["items"][number], index: number) => (

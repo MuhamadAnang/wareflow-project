@@ -2,8 +2,18 @@ import { handleException } from "@/common/exception/helper";
 import { NextRequest } from "next/server";
 import { responseFormatter } from "@/lib/response-formatter";
 import { parseQueryParams, validateSchema } from "@/lib/validation";
-import { CreateGoodsReceiptSchema, IndexGoodsReceiptQuerySchema, UpdateGoodsReceiptSchema } from "@/schemas/goods-receipt.schema";
-import { createGoodsReceiptService, getGoodsReceiptsWithPaginationService, getGoodsReceiptByIdService, updateGoodsReceiptService, deleteGoodsReceiptService } from "./goods-receipt.service";
+import {
+  CreateGoodsReceiptSchema,
+  IndexGoodsReceiptQuerySchema,
+  UpdateGoodsReceiptSchema,
+} from "@/schemas/goods-receipt.schema";
+import {
+  createGoodsReceiptService,
+  getGoodsReceiptsWithPaginationService,
+  getGoodsReceiptByIdService,
+  updateGoodsReceiptService,
+  deleteGoodsReceiptService,
+} from "./goods-receipt.service";
 import { parseSortParams } from "@/lib/query-param";
 import { TGoodsReceiptDetail } from "@/types/database";
 
@@ -29,16 +39,22 @@ export const getGoodsReceiptsWithPaginationController = async (request: NextRequ
     };
     const result = parseQueryParams(IndexGoodsReceiptQuerySchema, rawQueryParams);
     if (!result.success) {
-      return responseFormatter.validationError({ error: result.error, message: "Invalid query parameters" });
+      return responseFormatter.validationError({
+        error: result.error,
+        message: "Invalid query parameters",
+      });
     }
     const queryParams = result.data;
     const { data, meta } = await getGoodsReceiptsWithPaginationService(queryParams);
-    return responseFormatter.successWithPagination({ data, meta, message: "Goods receipts retrieved successfully" });
+    return responseFormatter.successWithPagination({
+      data,
+      meta,
+      message: "Goods receipts retrieved successfully",
+    });
   } catch (error) {
     return handleException(error);
   }
 };
-
 
 // Tambahkan controller untuk getById, update, delete
 export const getGoodsReceiptByIdController = async (id: number) => {

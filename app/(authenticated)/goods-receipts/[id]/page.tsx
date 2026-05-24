@@ -13,7 +13,11 @@ export default function GoodsReceiptDetailPage() {
   const receipt = data?.data;
 
   return (
-    <Page isLoading={isLoading} title="Detail Buku Masuk" description="Detail Informasi penerimaan barang di gudang">
+    <Page
+      isLoading={isLoading}
+      title="Detail Buku Masuk"
+      description="Detail Informasi penerimaan barang di gudang"
+    >
       <Card className="shadow-none">
         <CardHeader>
           <CardTitle>Informasi Penerimaan</CardTitle>
@@ -21,23 +25,58 @@ export default function GoodsReceiptDetailPage() {
         <CardContent>
           <Table>
             <TableBody>
-              <TableRow><TableCell className="w-auto bg-background">ID</TableCell><TableCell>{receipt?.id}</TableCell></TableRow>
-              <TableRow><TableCell className="w-auto bg-background">Supplier</TableCell><TableCell>{receipt?.supplierName}</TableCell></TableRow>
-              <TableRow><TableCell className="w-auto bg-background">No. PO</TableCell><TableCell>{receipt?.purchaseOrderId}</TableCell></TableRow>
-              <TableRow><TableCell className="w-auto bg-background">Tanggal Terima</TableCell><TableCell>{receipt?.receivedDate ? new Date(receipt.receivedDate).toLocaleDateString("id-ID") : "-"}</TableCell></TableRow>
-              <TableRow><TableCell className="w-auto bg-background">Catatan</TableCell><TableCell>{receipt?.note || "-"}</TableCell></TableRow>
-              <TableRow><TableCell className="w-auto bg-background">Dibuat Pada</TableCell><TableCell>{receipt?.createdAt ? convertUtcToLocalTime({ utcDateStr: receipt.createdAt.toString(), format: "PPpp" }) : "-"}</TableCell></TableRow>
+              <TableRow>
+                <TableCell className="w-auto bg-background">ID</TableCell>
+                <TableCell>{receipt?.id}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="w-auto bg-background">Supplier</TableCell>
+                <TableCell>{receipt?.supplierName}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="w-auto bg-background">No. PO</TableCell>
+                <TableCell>{receipt?.purchaseOrderId}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="w-auto bg-background">Tanggal Terima</TableCell>
+                <TableCell>
+                  {receipt?.receivedDate
+                    ? new Date(receipt.receivedDate).toLocaleDateString("id-ID")
+                    : "-"}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="w-auto bg-background">Catatan</TableCell>
+                <TableCell>{receipt?.note || "-"}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="w-auto bg-background">Dibuat Pada</TableCell>
+                <TableCell>
+                  {receipt?.createdAt
+                    ? convertUtcToLocalTime({
+                        utcDateStr: receipt.createdAt.toString(),
+                        format: "PPpp",
+                      })
+                    : "-"}
+                </TableCell>
+              </TableRow>
             </TableBody>
           </Table>
         </CardContent>
       </Card>
       {receipt?.items && receipt.items.length > 0 && (
         <Card className="shadow-none mt-6">
-          <CardHeader><CardTitle>Items</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>Items</CardTitle>
+          </CardHeader>
           <CardContent>
             <Table>
               <TableBody>
-                <TableRow><TableCell className="bg-background font-semibold">Kode Buku</TableCell><TableCell className="bg-background font-semibold">Judul Buku</TableCell><TableCell className="bg-background font-semibold text-right">Quantity</TableCell></TableRow>
+                <TableRow>
+                  <TableCell className="bg-background font-semibold">Kode Buku</TableCell>
+                  <TableCell className="bg-background font-semibold">Judul Buku</TableCell>
+                  <TableCell className="bg-background font-semibold text-right">Quantity</TableCell>
+                </TableRow>
                 {receipt.items.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell>{item.bookCode}</TableCell>

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 // Schema untuk item goods out
-export const GoodsOutItemSchema = z.object({
+const GoodsOutItemSchema = z.object({
   bookId: z.number().int().positive(),
   quantity: z.number().int().positive("Quantity harus lebih dari 0"),
 });
@@ -26,5 +26,4 @@ export const IndexGoodsOutQuerySchema = z.object({
 });
 
 export type TCreateGoodsOut = z.infer<typeof CreateGoodsOutSchema>;
-export type TGoodsOutItemInput = z.infer<typeof GoodsOutItemSchema>;
 export type TIndexGoodsOutQuery = z.infer<typeof IndexGoodsOutQuerySchema>;

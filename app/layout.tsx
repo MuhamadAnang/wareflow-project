@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <QueryProvider>
-      <ClerkProvider afterSignOutUrl={"/sign-in"} >
+      <ClerkProvider afterSignOutUrl={"/sign-in"}>
         <BreadcrumbProvider>
           <html lang="en">
             <body className={`antialiased`}>
@@ -31,6 +31,6 @@ export default function RootLayout({
           </html>
         </BreadcrumbProvider>
       </ClerkProvider>
-    </QueryProvider >
+    </QueryProvider>
   );
 }

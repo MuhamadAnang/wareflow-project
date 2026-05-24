@@ -21,7 +21,7 @@ import {
   CollapsibleTrigger,
 } from "@/app/_components/ui/collapsible";
 import { MENU_GROUPS, MenuItem, MenuWithChildren } from "@/common/constants/menu";
-import { ChevronDown,  } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
@@ -45,30 +45,26 @@ export default function AuthenticatedSidebar() {
       </SidebarHeader>
       <SidebarContent>
         {MENU_GROUPS.map((group, idx) => (
-  <SidebarGroup key={idx}>
-    <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+          <SidebarGroup key={idx}>
+            <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
 
-    <SidebarGroupContent>
-      <SidebarMenu>
-        {group.items.map((item, index) =>
-          item.children && item.children.length > 0 ? (
-            <CollapsibleMenuItem
-              key={index}
-              item={item}
-              isActive={isMenuActive}
-            />
-          ) : (
-            <SingleMenuItem
-              key={index}
-              item={item}
-              isActive={isMenuActive(item.href ?? "")}
-            />
-          )
-        )}
-      </SidebarMenu>
-    </SidebarGroupContent>
-  </SidebarGroup>
-))}
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.items.map((item, index) =>
+                  item.children && item.children.length > 0 ? (
+                    <CollapsibleMenuItem key={index} item={item} isActive={isMenuActive} />
+                  ) : (
+                    <SingleMenuItem
+                      key={index}
+                      item={item}
+                      isActive={isMenuActive(item.href ?? "")}
+                    />
+                  ),
+                )}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
     </Sidebar>
   );

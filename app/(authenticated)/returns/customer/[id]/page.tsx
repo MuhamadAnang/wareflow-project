@@ -5,7 +5,6 @@ import { useParams } from "next/navigation";
 import { useGetCustomerReturnDetail } from "../__hooks/use-get-customer-return-detail.query";
 import { Table, TableBody, TableCell, TableRow } from "@/app/_components/ui/table";
 import { Card, CardContent } from "@/app/_components/ui/card";
-import { Badge } from "@/app/_components/ui/badge";
 import { Calendar, User, FileText, Package } from "lucide-react";
 
 export default function CustomerReturnDetailPage() {
@@ -14,7 +13,11 @@ export default function CustomerReturnDetailPage() {
   const customerReturn = data?.data;
 
   return (
-    <Page isLoading={isLoading} title="Detail Retur Customer" description="Informasi lengkap retur dari customer">
+    <Page
+      isLoading={isLoading}
+      title="Detail Retur Customer"
+      description="Informasi lengkap retur dari customer"
+    >
       <Card className="shadow-none">
         <CardContent className="p-6">
           {/* Header Info */}
@@ -28,7 +31,9 @@ export default function CustomerReturnDetailPage() {
               <Calendar className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Tanggal Retur:</span>
               <span className="font-medium">
-                {customerReturn?.returnDate ? new Date(customerReturn.returnDate).toLocaleDateString() : "-"}
+                {customerReturn?.returnDate
+                  ? new Date(customerReturn.returnDate).toLocaleDateString()
+                  : "-"}
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -70,7 +75,9 @@ export default function CustomerReturnDetailPage() {
                 ))}
                 {!customerReturn?.items?.length && (
                   <TableRow>
-                    <TableCell colSpan={3} className="text-center">Tidak ada item</TableCell>
+                    <TableCell colSpan={3} className="text-center">
+                      Tidak ada item
+                    </TableCell>
                   </TableRow>
                 )}
               </TableBody>

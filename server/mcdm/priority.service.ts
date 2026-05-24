@@ -76,28 +76,28 @@ async function calculateUrgency(order: {
 }): Promise<number> {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  
+
   // Tidak ada deadline -> nilai default sedang
   if (!order.deadline) {
     return 10;
   }
-  
+
   const deadline = new Date(order.deadline);
   deadline.setHours(0, 0, 0, 0);
-  
+
   // Sudah melewati deadline -> paling urgent
   if (deadline < today) {
     return 100;
   }
-  
+
   // Hitung sisa hari
   const diffTime = deadline.getTime() - today.getTime();
   let remainingDays = Math.ceil(diffTime / (1000 * 3600 * 24));
   remainingDays = Math.min(remainingDays, 30);
-  
+
   // Urgensi: semakin kecil sisa hari, semakin besar nilainya
   const urgencyScore = (1 / (remainingDays + 1)) * 100;
-  
+
   return Math.round(urgencyScore * 100) / 100;
 }
 
@@ -112,7 +112,7 @@ async function calculateContractStatus(customerId: number): Promise<number> {
     .limit(1);
 
   const status = customer[0]?.status;
-  
+
   switch (status) {
     case "CONTRACT":
       return 5;
@@ -157,10 +157,7 @@ async function calculateReturnRate(customerId: number): Promise<number> {
       .from(customerOrderItemTable)
       .where(eq(customerOrderItemTable.customerOrderId, order.id));
 
-    totalOrdered += orderItems.reduce(
-      (sum, item) => sum + item.quantity,
-      0
-    );
+    totalOrdered += orderItems.reduce((sum, item) => sum + item.quantity, 0);
   }
 
   /**
@@ -181,10 +178,7 @@ async function calculateReturnRate(customerId: number): Promise<number> {
       .from(customerReturnItemTable)
       .where(eq(customerReturnItemTable.customerReturnId, ret.id));
 
-    totalReturned += returnItems.reduce(
-      (sum, item) => sum + item.quantity,
-      0
-    );
+    totalReturned += returnItems.reduce((sum, item) => sum + item.quantity, 0);
   }
 
   // Hindari pembagian nol
@@ -195,24 +189,22 @@ async function calculateReturnRate(customerId: number): Promise<number> {
   /**
    * Persentase retur
    */
-  const returnRate =
-    (totalReturned / totalOrdered) * 100;
+  const returnRate = (totalReturned / totalOrdered) * 100;
 
   /**
    * Maksimal 100%
    * untuk menghindari data anomali
    */
-  return Math.min(
-    Math.round(returnRate * 100) / 100,
-    100
-  );
+  return Math.min(Math.round(returnRate * 100) / 100, 100);
 }
 
 /**
  * Ambil semua order yang perlu diprioritaskan
  * Status: CONFIRMED atau PARTIALLY_SHIPPED
  */
-export async function getPendingOrdersForPriority(orderIds?: number[]): Promise<OrderPriorityInput[]> {
+export async function getPendingOrdersForPriority(
+  orderIds?: number[],
+): Promise<OrderPriorityInput[]> {
   const statusCondition = sql`${customerOrderTable.status} IN ('CONFIRMED', 'PARTIALLY_SHIPPED')`;
   const whereCondition = orderIds?.length
     ? and(statusCondition, inArray(customerOrderTable.id, orderIds))
@@ -280,14 +272,14 @@ export async function getPendingOrdersForPriority(orderIds?: number[]): Promise<
  */
 export async function calculateDistributionPriority(orderIds?: number[]) {
   const pendingOrders = await getPendingOrdersForPriority(orderIds);
-  
+
   if (pendingOrders.length === 0) {
     return [];
   }
 
   const topsis = new TopsisService([0.56, 0.26, 0.12, 0.06]);
-  
-  const alternatives = pendingOrders.map(order => ({
+
+  const alternatives = pendingOrders.map((order) => ({
     id: order.orderId,
     customerName: order.customerName,
     criteria: {
@@ -306,9 +298,9 @@ export async function calculateDistributionPriority(orderIds?: number[]) {
   }));
 
   const results = topsis.calculate({ alternatives, weights: [0.56, 0.26, 0.12, 0.06] });
-  
-  return results.map(result => {
-    const order = pendingOrders.find(o => o.orderId === result.id);
+
+  return results.map((result) => {
+    const order = pendingOrders.find((o) => o.orderId === result.id);
     return {
       ...result,
       criteria: {

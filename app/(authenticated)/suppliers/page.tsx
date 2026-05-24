@@ -99,8 +99,8 @@ export default function SuppliersPage() {
 
   return (
     <Page
-    title="Suppliers"
-    description="Kelola supplier Anda di sini. Anda dapat melihat, menambah, mengedit, dan menghapus informasi supplier sesuai kebutuhan."
+      title="Suppliers"
+      description="Kelola supplier Anda di sini. Anda dapat melihat, menambah, mengedit, dan menghapus informasi supplier sesuai kebutuhan."
       headerAction={
         <Link href={"/suppliers/create"}>
           <Button>

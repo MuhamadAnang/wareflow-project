@@ -17,6 +17,8 @@ import {
   customerReturnItemTable,
   supplierReturnTable,
   supplierReturnItemTable,
+  bookLevelEnum,
+  curriculumEnum,
 } from "@/drizzle/schema";
 
 // ==================== CUSTOMER TYPES ====================
@@ -24,7 +26,6 @@ import {
 export type TCustomer = InferSelectModel<typeof customerTable>;
 export type TNewCustomer = InferInsertModel<typeof customerTable>;
 export type TUpdateCustomer = Omit<TNewCustomer, "createdAt" | "updatedAt">;
-export type TCustomerStatus = TCustomer["status"];
 
 // ==================== PERCETAKAN TYPES ====================
 
@@ -46,8 +47,9 @@ export type TUpdateSupplier = Omit<TNewSupplier, "createdAt" | "updatedAt">;
 
 // ==================== BOOK TYPES (Master Identitas) ====================
 
-export type TBook = InferSelectModel<typeof bookTable>;
 export type TNewBook = InferInsertModel<typeof bookTable>;
+export type TBookLevelEnum = (typeof bookLevelEnum.enumValues)[number];
+export type TCurriculumEnum = (typeof curriculumEnum.enumValues)[number];
 export type TUpdateBook = Partial<Omit<TNewBook, "createdAt" | "updatedAt" | "currentStock">>;
 
 export type TBookListItem = {
@@ -64,27 +66,22 @@ export type TBookListItem = {
   productionYear: number | null;
   percetakanId: number;
   currentStock: number;
-  subjectName: string | null;        // boleh null
-  percetakanName: string | null;     // boleh null
+  subjectName: string | null; // boleh null
+  percetakanName: string | null; // boleh null
   displayTitle: string;
-  
+
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
 };
-export type TBookEnhanced = TBook & {
-  subjectName: string;
-  percetakanName: string;
-  displayTitle: string;
-};
 
 // ==================== PURCHASE ORDER TYPES ====================
 
-export type TPurchaseOrder = InferSelectModel<typeof purchaseOrderTable>;
+type TPurchaseOrder = InferSelectModel<typeof purchaseOrderTable>;
 export type TNewPurchaseOrder = InferInsertModel<typeof purchaseOrderTable>;
 export type TUpdatePurchaseOrder = Partial<Omit<TNewPurchaseOrder, "createdAt" | "updatedAt">>;
 
-export type TPurchaseOrderItem = InferSelectModel<typeof purchaseOrderItemTable>;
+type TPurchaseOrderItem = InferSelectModel<typeof purchaseOrderItemTable>;
 export type TNewPurchaseOrderItem = InferInsertModel<typeof purchaseOrderItemTable>;
 
 export type TPurchaseOrderWithSupplier = TPurchaseOrder & {
@@ -97,13 +94,9 @@ export type TPurchaseOrderDetail = TPurchaseOrderWithSupplier & {
     bookName: string;
   })[];
 };
-export type TPurchaseOrderWithItems = TPurchaseOrder & {
-  supplierName: string;
-  items: TPurchaseOrderItem[];
-};
 // ==================== GOODS RECEIPT TYPES ====================
 
-export type TGoodsReceipt = InferSelectModel<typeof goodsReceiptTable>;
+type TGoodsReceipt = InferSelectModel<typeof goodsReceiptTable>;
 export type TNewGoodsReceipt = InferInsertModel<typeof goodsReceiptTable>;
 
 export type TGoodsReceiptItem = InferSelectModel<typeof goodsReceiptItemTable>;
@@ -129,17 +122,16 @@ export type TGoodsReceiptDetail = TGoodsReceipt & {
   supplierName: string | null;
   items: (TGoodsReceiptItem & {
     bookCode: string;
-    bookName: string;  // ✅ konsisten dengan PO
+    bookName: string; // ✅ konsisten dengan PO
   })[];
 };
 
 // ==================== CUSTOMER ORDER TYPES ====================
 
-export type TCustomerOrder = InferSelectModel<typeof customerOrderTable>;
+type TCustomerOrder = InferSelectModel<typeof customerOrderTable>;
 export type TNewCustomerOrder = InferInsertModel<typeof customerOrderTable>;
-export type TUpdateCustomerOrder = Partial<Omit<TNewCustomerOrder, "createdAt" | "updatedAt">>;
 
-export type TCustomerOrderItem = InferSelectModel<typeof customerOrderItemTable>;
+type TCustomerOrderItem = InferSelectModel<typeof customerOrderItemTable>;
 export type TNewCustomerOrderItem = InferInsertModel<typeof customerOrderItemTable>;
 
 export type TCustomerOrderWithCustomer = TCustomerOrder & {
@@ -175,11 +167,9 @@ export type TCustomerOrderListItem = {
 
 // ==================== GOODS OUT TYPES ====================
 
-export type TGoodsOut = InferSelectModel<typeof goodsOutTable>;
-export type TNewGoodsOut = InferInsertModel<typeof goodsOutTable>;
+type TGoodsOut = InferSelectModel<typeof goodsOutTable>;
 
-export type TGoodsOutItem = InferSelectModel<typeof goodsOutItemTable>;
-export type TNewGoodsOutItem = InferInsertModel<typeof goodsOutItemTable>;
+type TGoodsOutItem = InferSelectModel<typeof goodsOutItemTable>;
 
 export type TGoodsOutListItem = {
   id: number;
@@ -213,11 +203,9 @@ export type TGoodsOutDetail = TGoodsOut & {
 
 // ==================== CUSTOMER RETURN TYPES ====================
 
-export type TCustomerReturn = InferSelectModel<typeof customerReturnTable>;
-export type TNewCustomerReturn = InferInsertModel<typeof customerReturnTable>;
+type TCustomerReturn = InferSelectModel<typeof customerReturnTable>;
 
-export type TCustomerReturnItem = InferSelectModel<typeof customerReturnItemTable>;
-export type TNewCustomerReturnItem = InferInsertModel<typeof customerReturnItemTable>;
+type TCustomerReturnItem = InferSelectModel<typeof customerReturnItemTable>;
 
 export type TCustomerReturnListItem = {
   id: number;
@@ -248,11 +236,9 @@ export type TCustomerReturnDetail = TCustomerReturn & {
 
 // ==================== SUPPLIER RETURN TYPES ====================
 
-export type TSupplierReturn = InferSelectModel<typeof supplierReturnTable>;
-export type TNewSupplierReturn = InferInsertModel<typeof supplierReturnTable>;
+type TSupplierReturn = InferSelectModel<typeof supplierReturnTable>;
 
-export type TSupplierReturnItem = InferSelectModel<typeof supplierReturnItemTable>;
-export type TNewSupplierReturnItem = InferInsertModel<typeof supplierReturnItemTable>;
+type TSupplierReturnItem = InferSelectModel<typeof supplierReturnItemTable>;
 
 export type TSupplierReturnListItem = {
   id: number;

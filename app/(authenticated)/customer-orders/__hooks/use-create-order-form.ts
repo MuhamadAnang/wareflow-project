@@ -27,8 +27,6 @@ export const useCreateOrderForm = ({ handleSubmit, defaultValues }: Params) => {
       onSubmit: CreateCustomerOrderFormSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log("Form submitted with value:", value);
-
       const payload: TCreateCustomerOrder = {
         ...value,
         customerId: value.customerId,

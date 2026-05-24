@@ -1,4 +1,13 @@
-import { bookTable, customerOrderItemTable, customerOrderStatusEnum, customerOrderTable, customerTable, customerPaymentTable, goodsOutTable, goodsOutItemTable } from "@/drizzle/schema";
+import {
+  bookTable,
+  customerOrderItemTable,
+  customerOrderStatusEnum,
+  customerOrderTable,
+  customerTable,
+  customerPaymentTable,
+  goodsOutTable,
+  goodsOutItemTable,
+} from "@/drizzle/schema";
 import { db } from "@/lib/db";
 import { TIndexCustomerOrderQuery } from "@/schemas/customer-order.schema";
 import { TNewCustomerOrder, TNewCustomerOrderItem } from "@/types/database";
@@ -72,7 +81,7 @@ const buildCustomerOrderWhereConditions = ({
 
 export const createCustomerOrderRepository = async (
   orderData: TNewCustomerOrder,
-  items: TNewCustomerOrderItem[]
+  items: TNewCustomerOrderItem[],
 ) => {
   return await db.transaction(async (tx) => {
     const [order] = await tx.insert(customerOrderTable).values(orderData).returning();
@@ -130,7 +139,7 @@ export const getCustomerOrderByIdRepository = async (id: number) => {
 };
 
 export const getCustomerOrdersWithPaginationRepository = async (
-  queryParams: TIndexCustomerOrderQuery
+  queryParams: TIndexCustomerOrderQuery,
 ) => {
   const { page, pageSize, sort, search, customerId, status, startDate, endDate } = queryParams;
   const whereClause = buildCustomerOrderWhereConditions({
@@ -163,21 +172,24 @@ export const getCustomerOrdersWithPaginationRepository = async (
     const [sortKey, sortDir] = Object.entries(sort)[0];
     if (sortKey === "orderDate") {
       return await baseQuery
-        .orderBy(sortDir === "asc" ? asc(customerOrderTable.orderDate) : desc(customerOrderTable.orderDate))
+        .orderBy(
+          sortDir === "asc"
+            ? asc(customerOrderTable.orderDate)
+            : desc(customerOrderTable.orderDate),
+        )
         .limit(pageSize)
         .offset(offset);
     } else if (sortKey === "status") {
       return await baseQuery
-        .orderBy(sortDir === "asc" ? asc(customerOrderTable.status) : desc(customerOrderTable.status))
+        .orderBy(
+          sortDir === "asc" ? asc(customerOrderTable.status) : desc(customerOrderTable.status),
+        )
         .limit(pageSize)
         .offset(offset);
     }
   }
 
-  return await baseQuery
-    .orderBy(desc(customerOrderTable.createdAt))
-    .limit(pageSize)
-    .offset(offset);
+  return await baseQuery.orderBy(desc(customerOrderTable.createdAt)).limit(pageSize).offset(offset);
 };
 
 export const getCustomerOrdersCountRepository = async (queryParams: TIndexCustomerOrderQuery) => {
@@ -205,15 +217,13 @@ export const updateCustomerOrderStatusRepository = async (id: number, status: st
       .update(customerOrderTable)
       .set({
         status: status as CustomerOrderStatus,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       })
       .where(eq(customerOrderTable.id, id))
       .returning();
 
-    console.log("Update status result:", result);
     return result;
   } catch (error) {
-    console.error("Error in updateCustomerOrderStatusRepository:", error);
     throw error;
   }
 };
@@ -228,22 +238,14 @@ export const deleteCustomerOrderRepository = async (id: number) => {
     const goodsOutIds = goodsOutRecords.map((record) => record.id);
 
     if (goodsOutIds.length > 0) {
-      await tx
-        .delete(goodsOutItemTable)
-        .where(inArray(goodsOutItemTable.goodsOutId, goodsOutIds));
+      await tx.delete(goodsOutItemTable).where(inArray(goodsOutItemTable.goodsOutId, goodsOutIds));
 
-      await tx
-        .delete(goodsOutTable)
-        .where(inArray(goodsOutTable.id, goodsOutIds));
+      await tx.delete(goodsOutTable).where(inArray(goodsOutTable.id, goodsOutIds));
     }
 
-    await tx
-      .delete(customerOrderItemTable)
-      .where(eq(customerOrderItemTable.customerOrderId, id));
+    await tx.delete(customerOrderItemTable).where(eq(customerOrderItemTable.customerOrderId, id));
 
-    await tx
-      .delete(customerPaymentTable)
-      .where(eq(customerPaymentTable.customerOrderId, id));
+    await tx.delete(customerPaymentTable).where(eq(customerPaymentTable.customerOrderId, id));
 
     const [deleted] = await tx
       .delete(customerOrderTable)
@@ -253,14 +255,4 @@ export const deleteCustomerOrderRepository = async (id: number) => {
     if (!deleted) throw new Error(`Order ${id} tidak ditemukan`);
     return [deleted];
   });
-};
-
-export const getCustomerOrderStatusRepository = async (id: number) => {
-  const [order] = await db
-    .select({ status: customerOrderTable.status })
-    .from(customerOrderTable)
-    .where(eq(customerOrderTable.id, id))
-    .limit(1);
-
-  return order?.status;
 };

@@ -18,7 +18,10 @@ import { TCustomerReturnDetail, TCustomerReturnListItem } from "@/types/database
 export const createCustomerReturnController = async (req: NextRequest) => {
   try {
     const body = await req.json();
-    const validatedBody = validateSchema<TCreateCustomerReturn>(CreateCustomerReturnSchema, body).data;
+    const validatedBody = validateSchema<TCreateCustomerReturn>(
+      CreateCustomerReturnSchema,
+      body,
+    ).data;
     const customerReturn = await createCustomerReturnService(validatedBody);
     return responseFormatter.created({
       data: customerReturn,
@@ -52,7 +55,7 @@ export const getCustomerReturnListController = async (request: NextRequest) => {
 
     const queryParams = result.data;
     const { data, meta } = await getCustomerReturnListService(queryParams);
-    
+
     return responseFormatter.successWithPagination<TCustomerReturnListItem>({
       data,
       meta,

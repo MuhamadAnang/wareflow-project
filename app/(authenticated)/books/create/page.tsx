@@ -7,6 +7,7 @@ import { useGetPercetakansQuery } from "../__hooks/use-get-percetakans.query";
 import { semesterEnum } from "@/drizzle/schema";
 import { BookForm } from "../__components/create-or-update.form";
 import { useCreateBookMutation } from "./__hooks/use-create-book.mutation";
+import { TBookLevelEnum, TCurriculumEnum } from "@/types/database";
 
 export default function CreateBookPage() {
   const { data: subjectsData, isLoading: loadingSubjects } = useGetSubjectsQuery();
@@ -20,15 +21,15 @@ export default function CreateBookPage() {
   const form = useBookForm({
     defaultValues: {
       code: "",
-      subjectId: 0,           
+      subjectId: 0,
       grade: 0,
-      level: "" as any,       
-      curriculum: "" as any,
+      level: "SD" as TBookLevelEnum,
+      curriculum: "KURIKULUM_MERDEKA" as TCurriculumEnum,
       semester: semesterEnum.enumValues[0],
       pages: null,
       productionYear: null,
       percetakanId: 0,
-    } as any,
+    },
     onSubmit: async (values) => {
       await createBook(values);
     },
@@ -49,8 +50,8 @@ export default function CreateBookPage() {
         subjects={subjects}
         percetakans={percetakans}
         onSubjectCreated={(newId) => {
-    form.setFieldValue("subjectId", newId);   // otomatis pilih subject yang baru dibuat
-  }}
+          form.setFieldValue("subjectId", newId); // otomatis pilih subject yang baru dibuat
+        }}
       />
     </Page>
   );

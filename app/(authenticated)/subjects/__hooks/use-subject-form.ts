@@ -3,7 +3,6 @@
 import { CreateOrUpdateSubjectSchema, TCreateOrUpdateSubject } from "@/schemas/subject.schema";
 import { useForm } from "@tanstack/react-form";
 
-
 interface Params {
   defaultValues?: TCreateOrUpdateSubject;
   onSubmit: (data: TCreateOrUpdateSubject) => Promise<void>;

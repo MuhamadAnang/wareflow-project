@@ -20,7 +20,8 @@ export default function PriorityDistributionPage() {
   const [selectedOrderIds, setSelectedOrderIds] = useState<number[]>([]);
   const [orderSearch, setOrderSearch] = useState("");
   const { data, isLoading, refetch, isFetching } = useGetPriorityDistribution(selectedOrderIds);
-  const { data: pendingOrdersData, isLoading: isPendingOrdersLoading } = useGetPendingPriorityOrders();
+  const { data: pendingOrdersData, isLoading: isPendingOrdersLoading } =
+    useGetPendingPriorityOrders();
   const priorities = data?.data?.priorities || [];
   const totalOrders = data?.data?.totalOrders || 0;
   const calculatedAt = data?.data?.calculatedAt;
@@ -127,7 +128,11 @@ export default function PriorityDistributionPage() {
                     }}
                     className="flex items-start gap-3 rounded-md border p-3 text-left transition-colors hover:bg-muted/60"
                   >
-                    <Checkbox checked={isSelected} className="mt-1" aria-label={`Pilih order ${order.orderId}`} />
+                    <Checkbox
+                      checked={isSelected}
+                      className="mt-1"
+                      aria-label={`Pilih order ${order.orderId}`}
+                    />
                     <span className="min-w-0 space-y-1">
                       <span className="block font-medium truncate">
                         {order.customerName} | {order.customerInstitution}
@@ -136,7 +141,8 @@ export default function PriorityDistributionPage() {
                         Order #{order.orderId} - {order.orderItems.length} item
                       </span>
                       <span className="block text-xs text-muted-foreground">
-                        Stok {order.stockFulfillment.toFixed(1)}% | Urgensi {order.urgency.toFixed(1)}%
+                        Stok {order.stockFulfillment.toFixed(1)}% | Urgensi{" "}
+                        {order.urgency.toFixed(1)}%
                       </span>
                     </span>
                   </div>
@@ -163,7 +169,7 @@ export default function PriorityDistributionPage() {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -177,7 +183,7 @@ export default function PriorityDistributionPage() {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -189,7 +195,7 @@ export default function PriorityDistributionPage() {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -250,7 +256,9 @@ export default function PriorityDistributionPage() {
                 <p className="font-semibold">C3 - Status Pelanggan</p>
               </div>
               <p className="text-2xl font-bold text-green-600">12%</p>
-              <p className="text-xs text-muted-foreground">Benefit (Kontrak=5, Langganan=3, Non Kontrak=1)</p>
+              <p className="text-xs text-muted-foreground">
+                Benefit (Kontrak=5, Langganan=3, Non Kontrak=1)
+              </p>
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2">

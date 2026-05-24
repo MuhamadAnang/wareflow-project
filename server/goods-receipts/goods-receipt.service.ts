@@ -1,5 +1,9 @@
 import { NotFoundException } from "@/common/exception/not-found.exception";
-import { TCreateGoodsReceipt, TIndexGoodsReceiptQuery, TUpdateGoodsReceipt } from "@/schemas/goods-receipt.schema";
+import {
+  TCreateGoodsReceipt,
+  TIndexGoodsReceiptQuery,
+  TUpdateGoodsReceipt,
+} from "@/schemas/goods-receipt.schema";
 import {
   createGoodsReceiptRepository,
   getGoodsReceiptsWithPaginationRepository,
@@ -15,19 +19,24 @@ import { processStockMovement } from "@/server/stock-movements/stock-movement.se
 export const createGoodsReceiptService = async (data: TCreateGoodsReceipt) => {
   return await createGoodsReceiptRepository(data, async (tx, receipt, items) => {
     for (const item of items) {
-      await processStockMovement({
-        bookId: item.bookId,
-        type: "IN_PURCHASE",
-        quantity: item.quantity,
-        referenceType: "goods_receipt",
-        referenceId: receipt.id,
-        note: `Penerimaan dari PO #${data.purchaseOrderId}`,
-      }, tx); // 👈 PASS TX
+      await processStockMovement(
+        {
+          bookId: item.bookId,
+          type: "IN_PURCHASE",
+          quantity: item.quantity,
+          referenceType: "goods_receipt",
+          referenceId: receipt.id,
+          note: `Penerimaan dari PO #${data.purchaseOrderId}`,
+        },
+        tx,
+      ); // 👈 PASS TX
     }
   });
 };
 
-export const getGoodsReceiptsWithPaginationService = async (queryParams: TIndexGoodsReceiptQuery) => {
+export const getGoodsReceiptsWithPaginationService = async (
+  queryParams: TIndexGoodsReceiptQuery,
+) => {
   const { data, total } = await getGoodsReceiptsWithPaginationRepository(queryParams);
   return paginationResponseMapper<TGoodsReceiptWithItems>(data, {
     currentPage: queryParams.page,
@@ -56,7 +65,7 @@ export const updateGoodsReceiptService = async (id: number, data: TUpdateGoodsRe
   };
   await updateGoodsReceiptHeaderRepository(id, updateHeader);
 
-  const items = data.items.map(item => ({
+  const items = data.items.map((item) => ({
     bookId: item.bookId,
     quantity: item.quantity,
   }));

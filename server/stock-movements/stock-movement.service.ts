@@ -2,8 +2,7 @@ import { db } from "@/lib/db";
 import { stockMovementTable, bookTable, stockMovementTypeEnum } from "@/drizzle/schema";
 import { desc, eq } from "drizzle-orm";
 
-
-export type StockMovementType = typeof stockMovementTypeEnum.enumValues[number];
+export type StockMovementType = (typeof stockMovementTypeEnum.enumValues)[number];
 type StockMovementTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 const STOCK_DIRECTION: Record<Exclude<StockMovementType, "ADJUSTMENT">, 1 | -1> = {
@@ -27,7 +26,7 @@ export const processStockMovement = async (
     referenceId: number;
     note?: string;
   },
-  tx?: StockMovementTransaction
+  tx?: StockMovementTransaction,
 ) => {
   if (params.quantity <= 0) throw new Error("Quantity harus lebih dari 0");
 
@@ -53,7 +52,7 @@ const executeStockLogic = async (
     referenceType: string;
     referenceId: number;
     note?: string;
-  }
+  },
 ) => {
   const { bookId, type, quantity, referenceType, referenceId, note } = params;
 
@@ -116,7 +115,6 @@ export const getStockMovementsByBookIdService = async (bookId: number) => {
       .orderBy(desc(stockMovementTable.createdAt));
     return result;
   } catch (err) {
-    console.error("=== ERROR IN STOCK SERVICE ===", err);
     throw err;
   }
 };
@@ -137,71 +135,5 @@ export const adjustStockService = async (data: {
     referenceType: "MANUAL_ADJUSTMENT",
     referenceId: 0,
     note: data.note || `Manual adjustment to ${data.quantity}`,
-  });
-};
-
-/**
- * ✅ CREATE: Wrapper umum untuk IN/OUT/RETURN (standalone)
- * ⚠️ quantity = JUMLAH ABSOLUT (selalu positif)
- * ⚠️ Jika dipanggil dari dalam transaction lain, gunakan processStockMovement langsung + tx
- */
-// export const createStockMovementService = async (params: {
-//   bookId: number;
-//   type: StockMovementType;
-//   referenceType: string;
-//   referenceId: number;
-//   quantity: number;
-//   note?: string;
-// }) => {
-//   return await processStockMovement(params); // Tidak ada tx = standalone transaction
-// };
-
-interface CreateStockMovementParams {
-  bookId: number;
-  type: "IN_PURCHASE" | "OUT_SALES" | "RETURN_CUSTOMER" | "RETURN_SUPPLIER" | "ADJUSTMENT";
-  referenceType: string;
-  referenceId: number;
-  quantity: number;
-  note?: string;
-}
-
-export const createStockMovementService = async (params: CreateStockMovementParams) => {
-  const { bookId, type, referenceType, referenceId, quantity, note } = params;
-  
-  // Gunakan query builder biasa, bukan db.query (yang butuh relations)
-  const book = await db
-    .select({ currentStock: bookTable.currentStock })
-    .from(bookTable)
-    .where(eq(bookTable.id, bookId))
-    .limit(1);
-
-  if (!book || book.length === 0) {
-    throw new Error(`Book with ID ${bookId} not found`);
-  }
-
-  const currentStock = book[0].currentStock;
-  const newStock = currentStock + quantity;
-  
-  if (newStock < 0) {
-    throw new Error(`Insufficient stock for book ID ${bookId}. Current stock: ${currentStock}`);
-  }
-
-  // Gunakan transaction agar semua operasi berjalan atomic
-  await db.transaction(async (tx) => {
-    // Insert stock movement
-    await tx.insert(stockMovementTable).values({
-      bookId,
-      type,
-      referenceType,
-      referenceId,
-      quantity,
-      note: note || null,
-    });
-
-    // Update current stock
-    await tx
-      .update(bookTable)
-      .set({ currentStock: newStock })
-      .where(eq(bookTable.id, bookId));
   });
 };

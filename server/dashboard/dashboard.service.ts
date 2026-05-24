@@ -76,8 +76,8 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     .where(
       and(
         isNull(bookTable.deletedAt),
-        sql`${bookTable.currentStock} < 50 AND ${bookTable.currentStock} > 0`
-      )
+        sql`${bookTable.currentStock} < 50 AND ${bookTable.currentStock} > 0`,
+      ),
     );
 
   // Total customer aktif
@@ -96,9 +96,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   const pendingOrdersResult = await db
     .select({ count: sql<number>`COUNT(*)` })
     .from(customerOrderTable)
-    .where(
-      sql`${customerOrderTable.status} IN ('CONFIRMED', 'PARTIALLY_SHIPPED')`
-    );
+    .where(sql`${customerOrderTable.status} IN ('CONFIRMED', 'PARTIALLY_SHIPPED')`);
 
   // Total nilai pending orders (hitung dari items)
   const pendingOrdersValue = await calculatePendingOrdersValue();
@@ -108,7 +106,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     .select({ count: sql<number>`COUNT(*)` })
     .from(goodsOutTable)
     .where(
-      sql`${goodsOutTable.shippedDate} >= ${firstDayOfMonth} AND ${goodsOutTable.shippedDate} <= ${lastDayOfMonth}`
+      sql`${goodsOutTable.shippedDate} >= ${firstDayOfMonth} AND ${goodsOutTable.shippedDate} <= ${lastDayOfMonth}`,
     );
 
   // Total retur bulan ini
@@ -116,7 +114,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     .select({ count: sql<number>`COUNT(*)` })
     .from(customerReturnTable)
     .where(
-      sql`${customerReturnTable.returnDate} >= ${firstDayOfMonth} AND ${customerReturnTable.returnDate} <= ${lastDayOfMonth}`
+      sql`${customerReturnTable.returnDate} >= ${firstDayOfMonth} AND ${customerReturnTable.returnDate} <= ${lastDayOfMonth}`,
     );
 
   return {
@@ -139,9 +137,7 @@ async function calculatePendingOrdersValue(): Promise<number> {
   const pendingOrders = await db
     .select({ id: customerOrderTable.id })
     .from(customerOrderTable)
-    .where(
-      sql`${customerOrderTable.status} IN ('CONFIRMED', 'PARTIALLY_SHIPPED')`
-    );
+    .where(sql`${customerOrderTable.status} IN ('CONFIRMED', 'PARTIALLY_SHIPPED')`);
 
   let totalValue = 0;
 
@@ -176,8 +172,8 @@ export async function getLowStockItems(limit: number = 10): Promise<LowStockItem
     .where(
       and(
         isNull(bookTable.deletedAt),
-        sql`${bookTable.currentStock} < 50 AND ${bookTable.currentStock} > 0`
-      )
+        sql`${bookTable.currentStock} < 50 AND ${bookTable.currentStock} > 0`,
+      ),
     )
     .orderBy(bookTable.currentStock)
     .limit(limit);
@@ -199,9 +195,7 @@ export async function getRecentOrders(limit: number = 5): Promise<RecentOrder[]>
     })
     .from(customerOrderTable)
     .innerJoin(customerTable, eq(customerOrderTable.customerId, customerTable.id))
-    .where(
-      sql`${customerOrderTable.status} IN ('CONFIRMED', 'PARTIALLY_SHIPPED')`
-    )
+    .where(sql`${customerOrderTable.status} IN ('CONFIRMED', 'PARTIALLY_SHIPPED')`)
     .orderBy(desc(customerOrderTable.createdAt))
     .limit(limit);
 
@@ -245,7 +239,10 @@ export async function getTopCustomers(limit: number = 5): Promise<TopCustomer[]>
     })
     .from(customerOrderTable)
     .innerJoin(customerTable, eq(customerOrderTable.customerId, customerTable.id))
-    .innerJoin(customerOrderItemTable, eq(customerOrderItemTable.customerOrderId, customerOrderTable.id))
+    .innerJoin(
+      customerOrderItemTable,
+      eq(customerOrderItemTable.customerOrderId, customerOrderTable.id),
+    )
     .groupBy(customerOrderTable.customerId, customerTable.name)
     .orderBy(sql`SUM(${customerOrderItemTable.quantity}) DESC`)
     .limit(limit);

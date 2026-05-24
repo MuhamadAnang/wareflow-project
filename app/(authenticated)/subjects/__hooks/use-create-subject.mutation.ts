@@ -1,7 +1,9 @@
 import useAuthenticatedClient from "@/app/_hooks/use-authenticated-client";
 import { TCreateOrUpdateSubject } from "@/schemas/subject.schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export const useCreateSubjectMutation = () => {
   const api = useAuthenticatedClient();
@@ -20,8 +22,12 @@ export const useCreateSubjectMutation = () => {
       // Optional: bisa tambah toast success di sini nanti
     },
     onError: (error) => {
-      console.error("Create subject error:", error);
-      // Optional: toast error
+      if (isAxiosError(error)) {
+        const message =
+          error.response?.data?.message || "Failed to create subject. Please try again.";
+        toast.error(message);
+        return;
+      }
     },
   });
 };

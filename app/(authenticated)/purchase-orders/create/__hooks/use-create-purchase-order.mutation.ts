@@ -1,6 +1,7 @@
 import useAuthenticatedClient from "@/app/_hooks/use-authenticated-client";
 import { TCreatePurchaseOrder } from "@/schemas/purchase-order.schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -18,9 +19,11 @@ export const useCreatePurchaseOrderMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["purchase-orders"] });
       router.push("/purchase-orders");
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.message || "Failed to create purchase order";
-      toast.error(message);
+    onError: (error) => {
+      if (isAxiosError(error)) {
+        const message = error.response?.data?.message || "Failed to create purchase order";
+        toast.error(message);
+      }
     },
   });
 };

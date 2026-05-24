@@ -1,6 +1,10 @@
 import { handleException } from "@/common/exception/helper";
 import { parseQueryParams, validateSchema } from "@/lib/validation";
-import { CreateOrUpdateBookSchema, IndexBookQuerySchema } from "@/schemas/book.schema";
+import {
+  CreateOrUpdateBookSchema,
+  IndexBookQuerySchema,
+  TCreateOrUpdateBook,
+} from "@/schemas/book.schema";
 import { NextRequest } from "next/server";
 import {
   createBookService,
@@ -18,11 +22,7 @@ export const createBookController = async (req: NextRequest) => {
     const formData = await req.formData();
     const body: Record<string, FormDataEntryValue | number | null> = {};
 
-    console.log("✅ FormData diterima, jumlah field:", Array.from(formData.entries()).length);
-
     for (const [key, value] of formData.entries()) {
-      console.log(`Field: ${key} → tipe: ${value instanceof File ? "FILE" : typeof value}`);
-      
       if (value instanceof File) {
         body[key] = value;
       } else {
@@ -35,25 +35,18 @@ export const createBookController = async (req: NextRequest) => {
     if (body.grade) body.grade = Number(body.grade);
     if (body.percetakanId) body.percetakanId = Number(body.percetakanId);
     if (body.pages) body.pages = body.pages ? Number(body.pages) : null;
-    if (body.productionYear) body.productionYear = body.productionYear ? Number(body.productionYear) : null;
+    if (body.productionYear)
+      body.productionYear = body.productionYear ? Number(body.productionYear) : null;
 
-    console.log("Body setelah parsing:", {
-      code: body.code,
-      hasImage: body.image instanceof File,
-      imageName: body.image instanceof File ? body.image.name : undefined,
-    });
+    const { data } = validateSchema<TCreateOrUpdateBook>(CreateOrUpdateBookSchema, body);
 
-    validateSchema(CreateOrUpdateBookSchema, body);
-
-    const createdBook = await createBookService(body);
+    const createdBook = await createBookService(data);
 
     return responseFormatter.created({ data: createdBook, message: "Buku berhasil dibuat" });
   } catch (error) {
-    console.error("❌ Create Book Error:", error);
     return handleException(error);
   }
 };
-
 
 export const getBooksWithPaginationController = async (req: NextRequest) => {
   try {
@@ -109,9 +102,11 @@ export const updateBookController = async (id: number, req: NextRequest) => {
     const body: Record<string, FormDataEntryValue | number | null> = {};
     const contentType = req.headers.get("content-type") || "";
 
-    if (contentType.includes("multipart/form-data") || contentType.includes("application/x-www-form-urlencoded")) {
+    if (
+      contentType.includes("multipart/form-data") ||
+      contentType.includes("application/x-www-form-urlencoded")
+    ) {
       const formData = await req.formData();
-      console.log("🔄 Update FormData diterima");
 
       for (const [key, value] of formData.entries()) {
         if (value instanceof File) {
@@ -131,17 +126,18 @@ export const updateBookController = async (id: number, req: NextRequest) => {
     if (body.grade) body.grade = Number(body.grade);
     if (body.percetakanId) body.percetakanId = Number(body.percetakanId);
     if (body.pages) body.pages = body.pages ? Number(body.pages) : null;
-    if (body.productionYear) body.productionYear = body.productionYear ? Number(body.productionYear) : null;
+    if (body.productionYear)
+      body.productionYear = body.productionYear ? Number(body.productionYear) : null;
 
-    validateSchema(CreateOrUpdateBookSchema, body);
-    const updated = await updateBookService(id, body);
+    const { data } = validateSchema<TCreateOrUpdateBook>(CreateOrUpdateBookSchema, body);
+
+    const updated = await updateBookService(id, data);
 
     return responseFormatter.successWithData({
       data: updated,
       message: "Buku berhasil diperbarui",
     });
   } catch (error) {
-    console.error("❌ Update Book Error:", error);
     return handleException(error);
   }
 };

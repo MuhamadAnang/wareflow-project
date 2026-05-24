@@ -1,6 +1,13 @@
 "use client";
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/app/_components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/app/_components/ui/table";
 import { Badge } from "@/app/_components/ui/badge";
 import { Progress } from "@/app/_components/ui/progress";
 import { Trophy, Calendar } from "lucide-react";
@@ -14,18 +21,14 @@ interface PriorityTableProps {
 
 export const PriorityTable = ({ priorities, isLoading }: PriorityTableProps) => {
   if (isLoading) {
-    return (
-      <div className="text-center py-12 text-muted-foreground">
-        Memuat data prioritas...
-      </div>
-    );
+    return <div className="text-center py-12 text-muted-foreground">Memuat data prioritas...</div>;
   }
 
   if (priorities.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
-        Tidak ada order yang membutuhkan prioritas. 
-        Semua order sudah terkirim atau masih dalam status DRAFT.
+        Tidak ada order yang membutuhkan prioritas. Semua order sudah terkirim atau masih dalam
+        status DRAFT.
       </div>
     );
   }
@@ -37,8 +40,8 @@ export const PriorityTable = ({ priorities, isLoading }: PriorityTableProps) => 
     return "bg-blue-500";
   };
 
-  const getStatusBadge = (value: number, type: 'benefit' | 'cost') => {
-    if (type === 'benefit') {
+  const getStatusBadge = (value: number, type: "benefit" | "cost") => {
+    if (type === "benefit") {
       if (value >= 80) return <Badge className="bg-green-500">Baik</Badge>;
       if (value >= 50) return <Badge className="bg-yellow-500">Sedang</Badge>;
       return <Badge className="bg-red-500">Kurang</Badge>;
@@ -76,7 +79,9 @@ export const PriorityTable = ({ priorities, isLoading }: PriorityTableProps) => 
           {priorities.map((item) => (
             <TableRow key={item.id} className={item.rank === 1 ? "bg-yellow-50" : ""}>
               <TableCell>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${getRankColor(item.rank)}`}>
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${getRankColor(item.rank)}`}
+                >
                   {item.rank}
                 </div>
               </TableCell>
@@ -96,7 +101,7 @@ export const PriorityTable = ({ priorities, isLoading }: PriorityTableProps) => 
                 <div className="space-y-1 min-w-[120px]">
                   <div className="flex justify-between text-xs">
                     <span>{item.criteria.stockFulfillment.toFixed(1)}%</span>
-                    {getStatusBadge(item.criteria.stockFulfillment, 'benefit')}
+                    {getStatusBadge(item.criteria.stockFulfillment, "benefit")}
                   </div>
                   <Progress value={item.criteria.stockFulfillment} className="h-2" />
                 </div>
@@ -106,11 +111,17 @@ export const PriorityTable = ({ priorities, isLoading }: PriorityTableProps) => 
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{item.criteria.urgency.toFixed(1)}%</span>
                     {item.criteria.urgency >= 80 ? (
-                      <Badge variant="destructive" className="text-xs">Sangat Mendesak</Badge>
+                      <Badge variant="destructive" className="text-xs">
+                        Sangat Mendesak
+                      </Badge>
                     ) : item.criteria.urgency >= 50 ? (
-                      <Badge variant="default" className="text-xs">Mendesak</Badge>
+                      <Badge variant="default" className="text-xs">
+                        Mendesak
+                      </Badge>
                     ) : (
-                      <Badge variant="outline" className="text-xs">Normal</Badge>
+                      <Badge variant="outline" className="text-xs">
+                        Normal
+                      </Badge>
                     )}
                   </div>
                   <Progress value={item.criteria.urgency} className="h-2" />
@@ -129,7 +140,7 @@ export const PriorityTable = ({ priorities, isLoading }: PriorityTableProps) => 
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs">
                     <span>{item.criteria.returnRate.toFixed(1)}%</span>
-                    {getStatusBadge(item.criteria.returnRate, 'cost')}
+                    {getStatusBadge(item.criteria.returnRate, "cost")}
                   </div>
                   <Progress value={Math.min(100, item.criteria.returnRate)} className="h-2" />
                 </div>
@@ -141,7 +152,10 @@ export const PriorityTable = ({ priorities, isLoading }: PriorityTableProps) => 
                 </div>
               </TableCell>
               <TableCell className="text-right">
-                <Link href={`/customer-orders/${item.id}`} className="text-primary hover:underline text-sm">
+                <Link
+                  href={`/customer-orders/${item.id}`}
+                  className="text-primary hover:underline text-sm"
+                >
                   Lihat Detail →
                 </Link>
               </TableCell>

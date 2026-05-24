@@ -2,7 +2,7 @@
 
 import Page from "@/app/_components/page";
 import { Button } from "@/app/_components/ui/button";
-import { Eye, Plus,  } from "lucide-react";
+import { Eye, Plus } from "lucide-react";
 import Link from "next/link";
 import { useGetGoodsOutQuery } from "./__hooks/use-get-goods-out.query";
 import DataTable from "@/app/_components/data-table";

@@ -11,7 +11,7 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   prettier,
-  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", ".agents/**", ".husky/**"]),
+  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", ".agents/**", ".husky/**", "scripts/**"]),
 
   {
     files: ["**/*.ts", "**/*.tsx"],

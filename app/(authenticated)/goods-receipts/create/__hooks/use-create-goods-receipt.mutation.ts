@@ -5,6 +5,7 @@ import useAuthenticatedClient from "@/app/_hooks/use-authenticated-client";
 import { TCreateGoodsReceipt } from "@/schemas/goods-receipt.schema";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { isAxiosError } from "axios";
 
 export const useCreateGoodsReceiptMutation = () => {
   const api = useAuthenticatedClient();
@@ -13,7 +14,6 @@ export const useCreateGoodsReceiptMutation = () => {
 
   return useMutation({
     mutationFn: async (data: TCreateGoodsReceipt) => {
-      console.log("📤 Sending Goods Receipt payload:", data);
       const res = await api.post("/goods-receipts", data);
       return res.data;
     },
@@ -29,9 +29,10 @@ export const useCreateGoodsReceiptMutation = () => {
         router.push("/goods-receipts");
       }, 1200);
     },
-    onError: (error: any) => {
-      console.error("Create Goods Receipt error:", error);
-      toast.error(error?.response?.data?.message || "Gagal membuat Goods Receipt");
+    onError: (error) => {
+      if (isAxiosError(error)) {
+        toast.error(error?.response?.data?.message || "Gagal membuat Goods Receipt");
+      }
     },
   });
 };

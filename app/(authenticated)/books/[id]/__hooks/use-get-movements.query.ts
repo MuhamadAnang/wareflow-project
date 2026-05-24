@@ -1,7 +1,7 @@
 import useAuthenticatedClient from "@/app/_hooks/use-authenticated-client";
 import { useQuery } from "@tanstack/react-query";
 
-export type TStockMovement = {
+type TStockMovement = {
   id: number;
   bookId: number;
   type: "IN_PURCHASE" | "OUT_SALES" | "RETURN_CUSTOMER" | "RETURN_SUPPLIER" | "ADJUSTMENT";

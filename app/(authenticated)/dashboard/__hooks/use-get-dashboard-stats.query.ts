@@ -1,7 +1,7 @@
 import useAuthenticatedClient from "@/app/_hooks/use-authenticated-client";
 import { useQuery } from "@tanstack/react-query";
 
-export interface DashboardStats {
+interface DashboardStats {
   totalBooks: number;
   totalStock: number;
   lowStockItems: number;

@@ -20,8 +20,8 @@ export const useCreateGoodsOutMutation = () => {
       // Invalidate semua query yang terpengaruh pembuatan goods out
       queryClient.invalidateQueries({ queryKey: ["goods-out"] });
       queryClient.invalidateQueries({ queryKey: ["available-orders"] });
-      queryClient.invalidateQueries({ queryKey: ["order-items-for-shipment"] }); 
-      queryClient.invalidateQueries({ queryKey: ["customer-orders"] });          
+      queryClient.invalidateQueries({ queryKey: ["order-items-for-shipment"] });
+      queryClient.invalidateQueries({ queryKey: ["customer-orders"] });
     },
   });
 };

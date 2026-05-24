@@ -20,7 +20,7 @@ export const useBookForm = ({ defaultValues, onSubmit }: Params) => {
       pages: null,
       productionYear: null,
       percetakanId: 0,
-      ...defaultValues,        // override jika ada
+      ...defaultValues, // override jika ada
     } as TCreateOrUpdateBook,
 
     validators: {

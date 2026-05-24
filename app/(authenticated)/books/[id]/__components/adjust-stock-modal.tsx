@@ -61,7 +61,11 @@ export function AdjustStockModal({ bookId, open, onClose }: Props) {
             <Button variant="outline" onClick={onClose} className="flex-1">
               Batal
             </Button>
-            <Button onClick={handleSubmit} disabled={isPending || quantity === 0} className="flex-1">
+            <Button
+              onClick={handleSubmit}
+              disabled={isPending || quantity === 0}
+              className="flex-1"
+            >
               {isPending ? "Menyimpan..." : "Simpan Adjustment"}
             </Button>
           </div>

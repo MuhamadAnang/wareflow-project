@@ -39,12 +39,8 @@
           "name": "book_prices_book_id_books_id_fk",
           "tableFrom": "book_prices",
           "tableTo": "books",
-          "columnsFrom": [
-            "book_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["book_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -54,10 +50,7 @@
         "book_prices_book_id_start_date_unique": {
           "name": "book_prices_book_id_start_date_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "book_id",
-            "start_date"
-          ]
+          "columns": ["book_id", "start_date"]
         }
       },
       "policies": {},
@@ -177,12 +170,8 @@
           "name": "books_subject_id_subjects_id_fk",
           "tableFrom": "books",
           "tableTo": "subjects",
-          "columnsFrom": [
-            "subject_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["subject_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -190,12 +179,8 @@
           "name": "books_percetakan_id_percetakans_id_fk",
           "tableFrom": "books",
           "tableTo": "percetakans",
-          "columnsFrom": [
-            "percetakan_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["percetakan_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -205,9 +190,7 @@
         "books_code_unique": {
           "name": "books_code_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "code"
-          ]
+          "columns": ["code"]
         }
       },
       "policies": {},
@@ -255,12 +238,8 @@
           "name": "customer_order_items_customer_order_id_customer_orders_id_fk",
           "tableFrom": "customer_order_items",
           "tableTo": "customer_orders",
-          "columnsFrom": [
-            "customer_order_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_order_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -268,12 +247,8 @@
           "name": "customer_order_items_book_id_books_id_fk",
           "tableFrom": "customer_order_items",
           "tableTo": "books",
-          "columnsFrom": [
-            "book_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["book_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -283,10 +258,7 @@
         "customer_order_items_customer_order_id_book_id_unique": {
           "name": "customer_order_items_customer_order_id_book_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "customer_order_id",
-            "book_id"
-          ]
+          "columns": ["customer_order_id", "book_id"]
         }
       },
       "policies": {},
@@ -362,12 +334,8 @@
           "name": "customer_orders_customer_id_customers_id_fk",
           "tableFrom": "customer_orders",
           "tableTo": "customers",
-          "columnsFrom": [
-            "customer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -432,12 +400,8 @@
           "name": "customer_payments_customer_order_id_customer_orders_id_fk",
           "tableFrom": "customer_payments",
           "tableTo": "customer_orders",
-          "columnsFrom": [
-            "customer_order_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_order_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -483,12 +447,8 @@
           "name": "customer_return_items_customer_return_id_customer_returns_id_fk",
           "tableFrom": "customer_return_items",
           "tableTo": "customer_returns",
-          "columnsFrom": [
-            "customer_return_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_return_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -496,12 +456,8 @@
           "name": "customer_return_items_book_id_books_id_fk",
           "tableFrom": "customer_return_items",
           "tableTo": "books",
-          "columnsFrom": [
-            "book_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["book_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -554,12 +510,8 @@
           "name": "customer_returns_customer_id_customers_id_fk",
           "tableFrom": "customer_returns",
           "tableTo": "customers",
-          "columnsFrom": [
-            "customer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -675,12 +627,8 @@
           "name": "goods_out_items_goods_out_id_goods_out_id_fk",
           "tableFrom": "goods_out_items",
           "tableTo": "goods_out",
-          "columnsFrom": [
-            "goods_out_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["goods_out_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -688,12 +636,8 @@
           "name": "goods_out_items_book_id_books_id_fk",
           "tableFrom": "goods_out_items",
           "tableTo": "books",
-          "columnsFrom": [
-            "book_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["book_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -703,10 +647,7 @@
         "goods_out_items_goods_out_id_book_id_unique": {
           "name": "goods_out_items_goods_out_id_book_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "goods_out_id",
-            "book_id"
-          ]
+          "columns": ["goods_out_id", "book_id"]
         }
       },
       "policies": {},
@@ -755,12 +696,8 @@
           "name": "goods_out_customer_order_id_customer_orders_id_fk",
           "tableFrom": "goods_out",
           "tableTo": "customer_orders",
-          "columnsFrom": [
-            "customer_order_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_order_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -806,12 +743,8 @@
           "name": "goods_receipt_items_goods_receipt_id_goods_receipts_id_fk",
           "tableFrom": "goods_receipt_items",
           "tableTo": "goods_receipts",
-          "columnsFrom": [
-            "goods_receipt_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["goods_receipt_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -819,12 +752,8 @@
           "name": "goods_receipt_items_book_id_books_id_fk",
           "tableFrom": "goods_receipt_items",
           "tableTo": "books",
-          "columnsFrom": [
-            "book_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["book_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -834,10 +763,7 @@
         "goods_receipt_items_goods_receipt_id_book_id_unique": {
           "name": "goods_receipt_items_goods_receipt_id_book_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "goods_receipt_id",
-            "book_id"
-          ]
+          "columns": ["goods_receipt_id", "book_id"]
         }
       },
       "policies": {},
@@ -886,12 +812,8 @@
           "name": "goods_receipts_purchase_order_id_purchase_orders_id_fk",
           "tableFrom": "goods_receipts",
           "tableTo": "purchase_orders",
-          "columnsFrom": [
-            "purchase_order_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["purchase_order_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -994,12 +916,8 @@
           "name": "purchase_order_items_purchase_order_id_purchase_orders_id_fk",
           "tableFrom": "purchase_order_items",
           "tableTo": "purchase_orders",
-          "columnsFrom": [
-            "purchase_order_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["purchase_order_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1007,12 +925,8 @@
           "name": "purchase_order_items_book_id_books_id_fk",
           "tableFrom": "purchase_order_items",
           "tableTo": "books",
-          "columnsFrom": [
-            "book_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["book_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1022,10 +936,7 @@
         "purchase_order_items_purchase_order_id_book_id_unique": {
           "name": "purchase_order_items_purchase_order_id_book_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "purchase_order_id",
-            "book_id"
-          ]
+          "columns": ["purchase_order_id", "book_id"]
         }
       },
       "policies": {},
@@ -1087,12 +998,8 @@
           "name": "purchase_orders_supplier_id_suppliers_id_fk",
           "tableFrom": "purchase_orders",
           "tableTo": "suppliers",
-          "columnsFrom": [
-            "supplier_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["supplier_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1180,12 +1087,8 @@
           "name": "stock_movements_book_id_books_id_fk",
           "tableFrom": "stock_movements",
           "tableTo": "books",
-          "columnsFrom": [
-            "book_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["book_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1276,12 +1179,8 @@
           "name": "supplier_return_items_supplier_return_id_supplier_returns_id_fk",
           "tableFrom": "supplier_return_items",
           "tableTo": "supplier_returns",
-          "columnsFrom": [
-            "supplier_return_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["supplier_return_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1289,12 +1188,8 @@
           "name": "supplier_return_items_book_id_books_id_fk",
           "tableFrom": "supplier_return_items",
           "tableTo": "books",
-          "columnsFrom": [
-            "book_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["book_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1347,12 +1242,8 @@
           "name": "supplier_returns_supplier_id_suppliers_id_fk",
           "tableFrom": "supplier_returns",
           "tableTo": "suppliers",
-          "columnsFrom": [
-            "supplier_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["supplier_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1425,63 +1316,32 @@
     "public.book_level": {
       "name": "book_level",
       "schema": "public",
-      "values": [
-        "SD",
-        "SMP",
-        "SMA",
-        "SMK",
-        "SMA/SMK"
-      ]
+      "values": ["SD", "SMP", "SMA", "SMK", "SMA/SMK"]
     },
     "public.curriculum": {
       "name": "curriculum",
       "schema": "public",
-      "values": [
-        "KURIKULUM_MERDEKA",
-        "K13",
-        "KTSP",
-        "LAINNYA"
-      ]
+      "values": ["KURIKULUM_MERDEKA", "K13", "KTSP", "LAINNYA"]
     },
     "public.customer_order_status_enum": {
       "name": "customer_order_status_enum",
       "schema": "public",
-      "values": [
-        "DRAFT",
-        "CONFIRMED",
-        "PARTIALLY_SHIPPED",
-        "SHIPPED",
-        "CANCELLED"
-      ]
+      "values": ["DRAFT", "CONFIRMED", "PARTIALLY_SHIPPED", "SHIPPED", "CANCELLED"]
     },
     "public.customer_status_enum": {
       "name": "customer_status_enum",
       "schema": "public",
-      "values": [
-        "CONTRACT",
-        "NON-CONTRACT",
-        "MOU"
-      ]
+      "values": ["CONTRACT", "NON-CONTRACT", "MOU"]
     },
     "public.semester_enum": {
       "name": "semester_enum",
       "schema": "public",
-      "values": [
-        "GANJIL",
-        "GENAP",
-        "SETAHUN"
-      ]
+      "values": ["GANJIL", "GENAP", "SETAHUN"]
     },
     "public.stock_movement_type_enum": {
       "name": "stock_movement_type_enum",
       "schema": "public",
-      "values": [
-        "IN_PURCHASE",
-        "OUT_SALES",
-        "RETURN_CUSTOMER",
-        "RETURN_SUPPLIER",
-        "ADJUSTMENT"
-      ]
+      "values": ["IN_PURCHASE", "OUT_SALES", "RETURN_CUSTOMER", "RETURN_SUPPLIER", "ADJUSTMENT"]
     }
   },
   "schemas": {},

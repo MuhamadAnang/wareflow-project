@@ -9,7 +9,11 @@ import {
   updatePurchaseOrderService,
 } from "./purchase-order.service";
 import { parseQueryParams, validateSchema } from "@/lib/validation";
-import { CreatePurchaseOrderSchema, IndexPurchaseOrderQuerySchema, UpdatePurchaseOrderSchema } from "@/schemas/purchase-order.schema";
+import {
+  CreatePurchaseOrderSchema,
+  IndexPurchaseOrderQuerySchema,
+  UpdatePurchaseOrderSchema,
+} from "@/schemas/purchase-order.schema";
 import { TPurchaseOrderDetail, TPurchaseOrderWithSupplier } from "@/types/database";
 import { parseSortParams } from "@/lib/query-param";
 
@@ -80,21 +84,17 @@ export const deletePurchaseOrderController = async (id: number) => {
 
 export const updatePurchaseOrderController = async (id: number, req: NextRequest) => {
   try {
-    console.log(`🔄 Updating PO ID: ${id}`);
     const body = await req.json();
-    console.log("📦 Request body:", body);
-    
+
     validateSchema(UpdatePurchaseOrderSchema, body);
-    
+
     const updated = await updatePurchaseOrderService(id, body);
-    console.log("✅ Update successful, returning:", updated);
-    
+
     return responseFormatter.successWithData<TPurchaseOrderDetail>({
       data: updated,
       message: "Purchase order updated successfully",
     });
   } catch (error) {
-    console.error("❌ Update controller error:", error);
     return handleException(error);
   }
 };

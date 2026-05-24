@@ -1,5 +1,9 @@
 import { NotFoundException } from "@/common/exception/not-found.exception";
-import { TCreatePurchaseOrder, TUpdatePurchaseOrder, TIndexPurchaseOrderQuery } from "@/schemas/purchase-order.schema";
+import {
+  TCreatePurchaseOrder,
+  TUpdatePurchaseOrder,
+  TIndexPurchaseOrderQuery,
+} from "@/schemas/purchase-order.schema";
 import {
   createPurchaseOrderRepository,
   getPurchaseOrdersWithPaginationRepository,
@@ -26,7 +30,9 @@ export const createPurchaseOrderService = async (data: TCreatePurchaseOrder) => 
   return await createPurchaseOrderRepository(orderData, items);
 };
 
-export const getPurchaseOrdersWithPaginationService = async (queryParams: TIndexPurchaseOrderQuery) => {
+export const getPurchaseOrdersWithPaginationService = async (
+  queryParams: TIndexPurchaseOrderQuery,
+) => {
   const { data, total } = await getPurchaseOrdersWithPaginationRepository(queryParams);
 
   return paginationResponseMapper<TPurchaseOrderWithSupplier>(data, {
@@ -61,9 +67,9 @@ export const updatePurchaseOrderService = async (id: number, data: TUpdatePurcha
     note: data.note || null,
   };
   await updatePurchaseOrderHeaderRepository(id, updateData);
-  
+
   // Update items
-  const items = data.items.map((item) => ({
+  const items = data?.items?.map((item) => ({
     bookId: item.bookId,
     quantity: item.quantity,
   }));

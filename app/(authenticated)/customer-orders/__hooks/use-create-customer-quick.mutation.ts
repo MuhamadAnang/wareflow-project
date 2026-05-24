@@ -9,10 +9,6 @@ export const useCreateCustomerQuickMutation = () => {
   return useMutation({
     mutationFn: async (payload: TCreateOrUpdateCustomer) => {
       const response = await api.post("/customers", payload);
-      console.log("FULL RESPONSE:", JSON.stringify(response, null, 2));
-      console.log("response.data:", response.data);
-      console.log("response.data.data:", response.data?.data);
-      console.log("response.data.data.id:", response.data?.data?.id);
       return response;
     },
     onSuccess: () => {

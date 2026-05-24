@@ -20,6 +20,7 @@ import { Pencil, Plus } from "lucide-react";
 import { useGetStockMovementsQuery } from "./__hooks/use-get-movements.query";
 import { useState } from "react";
 import { AdjustStockModal } from "./__components/adjust-stock-modal";
+import Image from "next/image";
 
 export default function BookDetailPage() {
   const params = useParams();
@@ -31,8 +32,6 @@ export default function BookDetailPage() {
   const book = data?.data;
   const stockMovements = stockMovementsData ?? [];
   const [isAdjustModalOpen, setIsAdjustModalOpen] = useState(false);
-
-  const totalStock = stockMovements.reduce((acc, mov) => acc + mov.quantity, 0);
 
   return (
     <Page
@@ -70,7 +69,7 @@ export default function BookDetailPage() {
                 <TableCell>
                   {book?.image && (
                     <div className="flex justify-center my-6">
-                      <img
+                      <Image
                         src={book.image}
                         alt={book.name}
                         className="max-h-80 rounded-lg shadow-md object-contain"
@@ -81,7 +80,9 @@ export default function BookDetailPage() {
               </TableRow>
               <TableRow>
                 <TableCell className="font-medium bg-muted/50">Kelas & Level</TableCell>
-                <TableCell>{book?.grade} {book?.level}</TableCell>
+                <TableCell>
+                  {book?.grade} {book?.level}
+                </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell className="font-medium bg-muted/50">Kurikulum • Semester</TableCell>
@@ -135,26 +136,25 @@ export default function BookDetailPage() {
               </TableHeader>
               <TableBody>
                 {stockMovements.map((mov) => (
-
                   <TableRow key={mov.id}>
                     <TableCell>
                       {mov.createdAt
-                          ? convertUtcToLocalTime({
-                              utcDateStr: mov.createdAt instanceof Date ? mov.createdAt.toISOString() : mov.createdAt,
-                            })?.toLocaleString('id-ID', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
+                        ? convertUtcToLocalTime({
+                            utcDateStr:
+                              mov.createdAt instanceof Date
+                                ? mov.createdAt.toISOString()
+                                : mov.createdAt,
+                          })?.toLocaleString("id-ID", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
                           })
-                          : "-"
-                        }
+                        : "-"}
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        variant={mov.quantity > 0 ? "default" : "destructive"}
-                      >
+                      <Badge variant={mov.quantity > 0 ? "default" : "destructive"}>
                         {mov.type.replace(/_/g, " ")}
                       </Badge>
                     </TableCell>

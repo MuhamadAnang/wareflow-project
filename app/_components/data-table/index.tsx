@@ -79,7 +79,10 @@ const DataTable = <TData, TValue = unknown>(props: IDataTableProps<TData, TValue
   } = props;
   const normalizedSource = useMemo(() => {
     if (!source) {
-      return { data: [] as TData[], meta: undefined as TPaginationResponse<TData>["meta"] | undefined };
+      return {
+        data: [] as TData[],
+        meta: undefined as TPaginationResponse<TData>["meta"] | undefined,
+      };
     }
 
     if (Array.isArray(source)) {
@@ -102,7 +105,10 @@ const DataTable = <TData, TValue = unknown>(props: IDataTableProps<TData, TValue
       };
     }
 
-    return { data: [] as TData[], meta: undefined as TPaginationResponse<TData>["meta"] | undefined };
+    return {
+      data: [] as TData[],
+      meta: undefined as TPaginationResponse<TData>["meta"] | undefined,
+    };
   }, [source]);
 
   const { data = [], meta } = normalizedSource;

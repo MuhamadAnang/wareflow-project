@@ -21,12 +21,17 @@ export const StatsCard = ({
   icon: Icon,
   description,
   trend,
-  iconColor = "text-muted-foreground"
+  iconColor = "text-muted-foreground",
 }: StatsCardProps) => {
   // Format currency if value is number and title contains "Nilai"
-  const formattedValue = typeof value === "number" && title.toLowerCase().includes("nilai")
-    ? new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(value)
-    : value;
+  const formattedValue =
+    typeof value === "number" && title.toLowerCase().includes("nilai")
+      ? new Intl.NumberFormat("id-ID", {
+          style: "currency",
+          currency: "IDR",
+          minimumFractionDigits: 0,
+        }).format(value)
+      : value;
 
   return (
     <Card className="h-32">
@@ -36,9 +41,7 @@ export const StatsCard = ({
             <p className="text-sm font-medium text-muted-foreground">{title}</p>
             <p className="text-xl font-bold">{formattedValue}</p>
 
-            {description && (
-              <p className="text-xs text-muted-foreground">{description}</p>
-            )}
+            {description && <p className="text-xs text-muted-foreground">{description}</p>}
 
             {trend && (
               <p className={`text-xs ${trend.isPositive ? "text-green-600" : "text-red-600"}`}>

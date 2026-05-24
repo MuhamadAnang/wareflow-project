@@ -37,11 +37,19 @@ export default function UpdatePurchaseOrderPage() {
   const isLoading = poLoading || suppliersLoading || booksLoading;
 
   if (isLoading) {
-    return <Page title="Loading..." description="">Memuat data...</Page>;
+    return (
+      <Page title="Loading..." description="">
+        Memuat data...
+      </Page>
+    );
   }
 
   if (!po) {
-    return <Page title="Error" description="">Data tidak ditemukan</Page>;
+    return (
+      <Page title="Error" description="">
+        Data tidak ditemukan
+      </Page>
+    );
   }
 
   return (
@@ -74,9 +82,7 @@ function UpdateForm({
   const form = usePurchaseOrderForm({
     defaultValues: {
       supplierId: po.supplierId,
-      orderDate: po.orderDate
-        ? new Date(po.orderDate).toISOString().split("T")[0]
-        : "",
+      orderDate: po.orderDate ? new Date(po.orderDate).toISOString().split("T")[0] : "",
       note: po.note ?? "",
       items: po.items.map((item) => ({
         bookId: item.bookId,
@@ -91,9 +97,9 @@ function UpdateForm({
 
   return (
     <Page
-      // className=" mx-auto"
-      // title="Perbarui Informasi Belanja"
-      // description="Edit informasi Belanja Buku ke supplier, termasuk supplier, tanggal pesanan, catatan, dan item yang dipesan."
+    // className=" mx-auto"
+    // title="Perbarui Informasi Belanja"
+    // description="Edit informasi Belanja Buku ke supplier, termasuk supplier, tanggal pesanan, catatan, dan item yang dipesan."
     >
       <CreateOrUpdatePurchaseOrderForm
         form={form}

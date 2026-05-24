@@ -3,37 +3,23 @@
 import Page from "@/app/_components/page";
 import { useParams } from "next/navigation";
 import { useGetCustomerOrder } from "../__hooks/use-get-customer-order.query";
-import { useUpdateOrderStatusMutation } from "../__hooks/use-update-order-status.mutation";
 import { Table, TableBody, TableCell, TableRow } from "@/app/_components/ui/table";
 import { Card, CardContent } from "@/app/_components/ui/card";
 import { Badge } from "@/app/_components/ui/badge";
-import { Button } from "@/app/_components/ui/button";
 import { toTitleCase } from "@/lib/utils";
 
 export default function CustomerOrderDetailPage() {
   const params = useParams();
-  const { data, isLoading, refetch } = useGetCustomerOrder(Number(params.id));
-  const { mutateAsync: updateStatus } = useUpdateOrderStatusMutation(Number(params.id));
+  const { data, isLoading } = useGetCustomerOrder(Number(params.id));
 
   const order = data?.data;
 
-  const handleStatusChange = async (newStatus: string) => {
-    await updateStatus({ status: newStatus as any });
-    refetch();
-  };
-
-  const statusTransitions: Record<string, string[]> = {
-    DRAFT: ["CONFIRMED", "CANCELLED"],
-    CONFIRMED: ["SHIPPED", "CANCELLED"],
-    PARTIALLY_SHIPPED: ["SHIPPED", "CANCELLED"],
-    SHIPPED: [],
-    CANCELLED: [],
-  };
-
-  const availableActions = order ? statusTransitions[order.status] || [] : [];
-
   return (
-    <Page isLoading={isLoading} title="Customer Order Detail" description="View order details and update status.">
+    <Page
+      isLoading={isLoading}
+      title="Customer Order Detail"
+      description="View order details and update status."
+    >
       <Card className="shadow-none">
         <CardContent>
           <Table>
@@ -48,7 +34,9 @@ export default function CustomerOrderDetailPage() {
               </TableRow>
               <TableRow>
                 <TableCell className="bg-muted">Order Date</TableCell>
-                <TableCell>{order?.orderDate ? new Date(order.orderDate).toLocaleDateString() : "-"}</TableCell>
+                <TableCell>
+                  {order?.orderDate ? new Date(order.orderDate).toLocaleDateString() : "-"}
+                </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell className="bg-muted">Status</TableCell>
@@ -78,8 +66,8 @@ export default function CustomerOrderDetailPage() {
               {order?.items?.map((item) => {
                 const title = `${item.bookName}`;
                 const subtotal = Number(item.price) * item.quantity;
-                const shippedQty = (item as any).shippedQuantity || 0;
-                const remainingQty = (item as any).remainingQuantity || item.quantity;
+                const shippedQty = item.shippedQuantity || 0;
+                const remainingQty = item.remainingQuantity || item.quantity;
                 return (
                   <TableRow key={item.id}>
                     <TableCell>{item.bookCode}</TableCell>
@@ -94,7 +82,9 @@ export default function CustomerOrderDetailPage() {
               })}
               {!order?.items?.length && (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center">No items</TableCell>
+                  <TableCell colSpan={7} className="text-center">
+                    No items
+                  </TableCell>
                 </TableRow>
               )}
             </TableBody>

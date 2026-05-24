@@ -1,7 +1,14 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/_components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/app/_components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/app/_components/ui/table";
 import { Badge } from "@/app/_components/ui/badge";
 import { Clock, Calendar } from "lucide-react";
 import { RecentOrder } from "../__hooks/use-get-dashboard-stats.query";
@@ -80,7 +87,10 @@ export const RecentOrders = ({ orders, isLoading }: RecentOrdersProps) => {
               {orders.map((order) => (
                 <TableRow key={order.id} className={isUrgent(order.deadline) ? "bg-red-50" : ""}>
                   <TableCell>
-                    <Link href={`/customer-orders/${order.id}`} className="font-medium hover:underline">
+                    <Link
+                      href={`/customer-orders/${order.id}`}
+                      className="font-medium hover:underline"
+                    >
                       #{order.id}
                     </Link>
                   </TableCell>
@@ -90,7 +100,9 @@ export const RecentOrders = ({ orders, isLoading }: RecentOrdersProps) => {
                     {order.deadline ? (
                       <div className="flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
-                        <span className={isUrgent(order.deadline) ? "text-red-600 font-medium" : ""}>
+                        <span
+                          className={isUrgent(order.deadline) ? "text-red-600 font-medium" : ""}
+                        >
                           {formatDate(order.deadline)}
                         </span>
                       </div>

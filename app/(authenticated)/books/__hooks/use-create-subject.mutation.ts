@@ -1,5 +1,6 @@
 import useAuthenticatedClient from "@/app/_hooks/use-authenticated-client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 import { toast } from "sonner";
 
 export const useCreateSubjectMutation = () => {
@@ -14,8 +15,10 @@ export const useCreateSubjectMutation = () => {
       toast.success("Mata pelajaran baru berhasil ditambahkan");
       queryClient.invalidateQueries({ queryKey: ["subjects-short"] });
     },
-    onError: (err: any) => {
-      toast.error(err.response?.data?.message || "Gagal menambahkan mata pelajaran");
+    onError: (err) => {
+      if (isAxiosError(err)) {
+        toast.error(err.response?.data?.message || "Gagal menambahkan mata pelajaran");
+      }
     },
   });
 };
