@@ -395,15 +395,13 @@ async function seed() {
     );
 
     // Goods Out (Pengiriman Historis)
-    await db
-      .insert(schema.goodsOutTable)
-      .values(
-        histOrders.map((ho) => ({
-          customerOrderId: ho.id,
-          shippedDate: "2025-02-01",
-          note: "Pengiriman selesai historis",
-        })),
-      );
+    await db.insert(schema.goodsOutTable).values(
+      histOrders.map((ho) => ({
+        customerOrderId: ho.id,
+        shippedDate: "2025-02-01",
+        note: "Pengiriman selesai historis",
+      })),
+    );
 
     // ================= 6. HISTORICAL RETURNS (Logika Pengembalian Buku) =================
     // Return Rate = Total Retur / (Total Historis + Total Test) * 100
