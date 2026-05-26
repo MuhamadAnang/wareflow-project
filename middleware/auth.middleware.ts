@@ -3,6 +3,7 @@
 import { TMiddlewareResponse } from "@/lib/request";
 import { NextRequest, NextResponse } from "next/server";
 import { clerkAuthenticateRequestService } from "@/server/clerk/clerk.service";
+import { clerkClient } from "@clerk/nextjs/server";
 
 export type TAuthMiddlewareData = {
   clerkUserId: string;
@@ -28,6 +29,20 @@ export const authMiddleware = async (
       return {
         pass: false,
         response: NextResponse.json({ message: "Unauthorized" }, { status: 401 }),
+      };
+    }
+
+    const client = await clerkClient();
+    const user = await client.users.getUser(userId);
+    const isAllowed = user.publicMetadata?.isAllowed === true;
+
+    if (!isAllowed) {
+      return {
+        pass: false,
+        response: NextResponse.json(
+          { message: "Akun sedang menunggu persetujuan admin." },
+          { status: 403 },
+        ),
       };
     }
 
