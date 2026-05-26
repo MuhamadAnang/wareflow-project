@@ -7,6 +7,8 @@ import { ConflictException } from "./conflict.exception";
 export const handleException = (error: unknown) => {
   console.log("Error:", error);
 
+  console.log("Error instance of NotFoundException:", JSON.stringify(error, null, 2));
+
   if (error instanceof NotFoundException) {
     return responseFormatter.notFound(error.message);
   } else if (error instanceof ValidationException) {

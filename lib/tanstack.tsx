@@ -102,7 +102,7 @@ const handleGlobalError = (error: AxiosError) => {
       break;
 
     case 404:
-      toast.error(message || "The requested resource was not found.");
+      window.location.href = "/not-found";
       break;
 
     case 409:
