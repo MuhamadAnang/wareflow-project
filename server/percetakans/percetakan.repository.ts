@@ -15,7 +15,9 @@ const PERCETAKAN_COLUMNS: TColumnsDefinition<typeof percetakanTable> = {
   status: { filterable: true },
 };
 
-export const getPercetakansWithPaginationRepository = async (queryParams: TIndexPercetakanQuery) => {
+export const getPercetakansWithPaginationRepository = async (
+  queryParams: TIndexPercetakanQuery,
+) => {
   return await buildPaginatedQuery({
     table: percetakanTable,
     columns: PERCETAKAN_COLUMNS,
@@ -46,5 +48,9 @@ export const deletePercetakanByIdRepository = async (id: number) => {
 };
 
 export const updatePercetakanByIdRepository = async (id: number, updateData: TUpdatePercetakan) => {
-  return await db.update(percetakanTable).set(updateData).where(eq(percetakanTable.id, id)).returning();
+  return await db
+    .update(percetakanTable)
+    .set(updateData)
+    .where(eq(percetakanTable.id, id))
+    .returning();
 };

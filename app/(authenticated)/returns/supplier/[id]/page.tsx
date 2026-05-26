@@ -13,7 +13,11 @@ export default function SupplierReturnDetailPage() {
   const supplierReturn = data?.data;
 
   return (
-    <Page isLoading={isLoading} title="Detail Retur Supplier" description="Informasi lengkap retur ke supplier">
+    <Page
+      isLoading={isLoading}
+      title="Detail Retur Supplier"
+      description="Informasi lengkap retur ke supplier"
+    >
       <Card className="shadow-none">
         <CardContent className="p-6">
           {/* Header Info */}
@@ -27,7 +31,9 @@ export default function SupplierReturnDetailPage() {
               <Calendar className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Tanggal Retur:</span>
               <span className="font-medium">
-                {supplierReturn?.returnDate ? new Date(supplierReturn.returnDate).toLocaleDateString() : "-"}
+                {supplierReturn?.returnDate
+                  ? new Date(supplierReturn.returnDate).toLocaleDateString()
+                  : "-"}
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -69,7 +75,9 @@ export default function SupplierReturnDetailPage() {
                 ))}
                 {!supplierReturn?.items?.length && (
                   <TableRow>
-                    <TableCell colSpan={3} className="text-center">Tidak ada item</TableCell>
+                    <TableCell colSpan={3} className="text-center">
+                      Tidak ada item
+                    </TableCell>
                   </TableRow>
                 )}
               </TableBody>

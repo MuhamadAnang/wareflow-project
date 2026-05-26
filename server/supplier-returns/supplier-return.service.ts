@@ -9,7 +9,12 @@ import {
 } from "./supplier-return.repository";
 import { db } from "@/lib/db";
 import { eq } from "drizzle-orm";
-import { bookTable, stockMovementTable, supplierReturnItemTable, supplierReturnTable } from "@/drizzle/schema";
+import {
+  bookTable,
+  stockMovementTable,
+  supplierReturnItemTable,
+  supplierReturnTable,
+} from "@/drizzle/schema";
 import { getSupplierByIdService } from "../suppliers/supplier.service";
 
 export const createSupplierReturnService = async (data: TCreateSupplierReturn) => {
@@ -34,7 +39,9 @@ export const createSupplierReturnService = async (data: TCreateSupplierReturn) =
     }
 
     if (item.quantity > book[0].currentStock) {
-      throw new Error(`Quantity retur untuk buku ID ${item.bookId} melebihi stok yang tersedia (${book[0].currentStock})`);
+      throw new Error(
+        `Quantity retur untuk buku ID ${item.bookId} melebihi stok yang tersedia (${book[0].currentStock})`,
+      );
     }
   }
 

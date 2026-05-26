@@ -1,6 +1,7 @@
 import useAuthenticatedClient from "@/app/_hooks/use-authenticated-client";
 import { TCreateOrUpdateBook } from "@/schemas/book.schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -10,12 +11,12 @@ export const useCreateBookMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (payload: any) => {
+    mutationFn: async (payload: TCreateOrUpdateBook) => {
       const formData = new FormData();
 
       Object.entries(payload).forEach(([key, value]) => {
         if (value === null || value === undefined) return;
-        
+
         if (value instanceof File) {
           formData.append(key, value);
         } else {
@@ -34,8 +35,10 @@ export const useCreateBookMutation = () => {
       router.push("/books");
       queryClient.invalidateQueries({ queryKey: ["books"] });
     },
-    onError: (err: any) => {
-      toast.error(err.response?.data?.message || "Gagal membuat buku");
+    onError: (err) => {
+      if (isAxiosError(err)) {
+        toast.error(err.response?.data?.message || "Gagal membuat buku");
+      }
     },
   });
 };

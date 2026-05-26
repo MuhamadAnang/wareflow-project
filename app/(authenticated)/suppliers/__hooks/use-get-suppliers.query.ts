@@ -5,12 +5,12 @@ import { TPaginationResponse } from "@/types/meta";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetSuppliersQuery = (queryParams: TIndexSupplierQuery) => {
-    const api = useAuthenticatedClient();
+  const api = useAuthenticatedClient();
 
-    return useQuery({
-        queryKey: ["suppliers", queryParams],
-        queryFn: async (): Promise<TPaginationResponse<TSupplier>> => {
-            return await api.get("/suppliers", { params: queryParams });
-        },
-    })
+  return useQuery({
+    queryKey: ["suppliers", queryParams],
+    queryFn: async (): Promise<TPaginationResponse<TSupplier>> => {
+      return await api.get("/suppliers", { params: queryParams });
+    },
+  });
 };

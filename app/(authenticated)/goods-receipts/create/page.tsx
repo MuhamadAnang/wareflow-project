@@ -59,7 +59,7 @@ export default function CreateGoodsReceiptPage() {
       title="Catatan Buku Masuk"
       description="Terima barang dari Belanja Buku "
       className="mt-3 px-4"
-      style={{ height: 'calc(100vh - 100px)' }}
+      style={{ height: "calc(100vh - 100px)" }}
     >
       <div className="pb-20">
         <GoodsReceiptCreateForm

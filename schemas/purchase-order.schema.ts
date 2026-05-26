@@ -11,12 +11,16 @@ export const CreatePurchaseOrderSchema = z.object({
       z.object({
         bookId: z.number().int().positive(),
         quantity: z.number().int().positive("Quantity minimal 1"),
-      })
+      }),
     )
     .min(1, "Minimal harus ada 1 item"),
 });
 
 export type TCreatePurchaseOrder = z.infer<typeof CreatePurchaseOrderSchema>;
+
+export const UpdatePurchaseOrderSchema = CreatePurchaseOrderSchema.partial();
+
+export type TUpdatePurchaseOrder = z.infer<typeof UpdatePurchaseOrderSchema>;
 
 export const IndexPurchaseOrderQuerySchema = IndexQueryParams.extend({
   sort: createSortSchema(["supplierName", "orderDate"]),
@@ -24,6 +28,3 @@ export const IndexPurchaseOrderQuerySchema = IndexQueryParams.extend({
 });
 
 export type TIndexPurchaseOrderQuery = z.infer<typeof IndexPurchaseOrderQuerySchema>;
-
-export const UpdatePurchaseOrderSchema = CreatePurchaseOrderSchema;
-export type TUpdatePurchaseOrder = TCreatePurchaseOrder;

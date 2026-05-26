@@ -7,7 +7,7 @@ import { TIndexQueryParams } from "@/types/query-params";
 /**
  * Metadata untuk single column (regular atau computed)
  */
-export type TColumnDefinition<TTable extends PgTable> = {
+type TColumnDefinition<TTable extends PgTable> = {
   /** Bisa di-search (text search dengan ILIKE) */
   searchable?: boolean;
   /** Bisa di-filter (exact match) */
@@ -109,10 +109,7 @@ export const buildCountQuery = async <TTable extends PgTable>({
     columns,
   });
 
-  const whereClause = [
-    ...(baseConditions ?? []),
-    queryWhereClause,
-  ].filter(Boolean) as SQL[];
+  const whereClause = [...(baseConditions ?? []), queryWhereClause].filter(Boolean) as SQL[];
 
   const result = await db
     .select({
@@ -139,10 +136,7 @@ export const buildPaginatedQuery = async <TTable extends PgTable>({
     columns,
   });
 
-  const whereClause = [
-    ...(baseConditions ?? []),
-    queryWhereClause,
-  ].filter(Boolean) as SQL[];
+  const whereClause = [...(baseConditions ?? []), queryWhereClause].filter(Boolean) as SQL[];
 
   const query = db
     .select()

@@ -2,7 +2,20 @@
 
 import Link from "next/link";
 import { Button } from "../_components/ui/button";
-import { ArrowRight, BarChart3, CheckCircle2, Package, Shield, Star, TrendingUp, Truck, Undo2, Users, Warehouse, Zap } from "lucide-react";
+import {
+  ArrowRight,
+  BarChart3,
+  CheckCircle2,
+  Package,
+  Shield,
+  Star,
+  TrendingUp,
+  Truck,
+  Undo2,
+  Users,
+  Warehouse,
+  Zap,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import Logo from "../_components/logo";
 
@@ -21,32 +34,38 @@ export default function Page() {
     {
       icon: Warehouse,
       title: "Manajemen Gudang Lengkap",
-      description: "Kelola stok, penerimaan barang, dan pengiriman dalam satu platform terintegrasi.",
+      description:
+        "Kelola stok, penerimaan barang, dan pengiriman dalam satu platform terintegrasi.",
     },
     {
       icon: TrendingUp,
       title: "Prioritas Distribusi Cerdas",
-      description: "Sistem pendukung keputusan dengan metode MCDM-TOPSIS untuk menentukan prioritas pengiriman.",
+      description:
+        "Sistem pendukung keputusan dengan metode MCDM-TOPSIS untuk menentukan prioritas pengiriman.",
     },
     {
       icon: BarChart3,
       title: "Dashboard Real-Time",
-      description: "Pantau stok, order, dan performa distribusi secara langsung dengan visualisasi data.",
+      description:
+        "Pantau stok, order, dan performa distribusi secara langsung dengan visualisasi data.",
     },
     {
       icon: Shield,
       title: "Akurasi Data Terjamin",
-      description: "Minimalkan kesalahan pencatatan dengan sistem digital yang terstruktur dan aman.",
+      description:
+        "Minimalkan kesalahan pencatatan dengan sistem digital yang terstruktur dan aman.",
     },
     {
       icon: Truck,
       title: "Manajemen Distribusi",
-      description: "Kelola pengiriman barang dengan status yang terpantau dari gudang ke pelanggan.",
+      description:
+        "Kelola pengiriman barang dengan status yang terpantau dari gudang ke pelanggan.",
     },
     {
       icon: Undo2,
       title: "Manajemen Retur",
-      description: "Tangani retur dari customer maupun ke supplier dengan sistem yang terintegrasi.",
+      description:
+        "Tangani retur dari customer maupun ke supplier dengan sistem yang terintegrasi.",
     },
   ];
 
@@ -68,18 +87,16 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-indigo-50">
       {/* Navbar */}
-      <nav className={`fixed top-0 z-50 w-full transition-all duration-300 ${scrolled ? "bg-white shadow-md py-3" : "bg-transparent py-5"
-        }`}>
+      <nav
+        className={`fixed top-0 z-50 w-full transition-all duration-300 ${
+          scrolled ? "bg-white shadow-md py-3" : "bg-transparent py-5"
+        }`}
+      >
         <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <Logo className="h-15 w-45" />
           </div>
           <div className="flex gap-3">
-            <Link href="/waitlist">
-              <Button variant="outline" size="sm" className="hidden md:inline-flex">
-                Daftar Waitlist
-              </Button>
-            </Link>
             <Link href="/sign-in">
               <Button size="sm" className="bg-green-600 hover:bg-green-700">
                 Masuk
@@ -106,8 +123,9 @@ export default function Page() {
             </h1>
 
             <p className="text-lg md:text-xl text-slate-600 mb-8 max-w-2xl mx-auto lg:mx-0">
-              BookFlow adalah platform manajemen gudang terintegrasi dengan sistem pendukung keputusan
-              berbasis MCDM-TOPSIS untuk menentukan prioritas distribusi buku secara objektif dan terukur.
+              BookFlow adalah platform manajemen gudang terintegrasi dengan sistem pendukung
+              keputusan berbasis MCDM-TOPSIS untuk menentukan prioritas distribusi buku secara
+              objektif dan terukur.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -162,12 +180,12 @@ export default function Page() {
               Lebih dari Sekadar Warehouse Management
             </h2>
             <p className="text-slate-600 max-w-2xl mx-auto">
-              BookFlow menggabungkan manajemen gudang dengan sistem pendukung keputusan
-              untuk prioritas pengiriman yang lebih cerdas
+              BookFlow menggabungkan manajemen gudang dengan sistem pendukung keputusan untuk
+              prioritas pengiriman yang lebih cerdas
             </p>
           </div>
         </div>
-        
+
         {/* Stats Section */}
         <section className="py-16 bg-white border-y border-gray-100">
           <div className="container mx-auto px-4 md:px-6">
@@ -175,7 +193,8 @@ export default function Page() {
               {stats.map((stat, idx) => (
                 <div key={idx} className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-green-600">
-                    {stat.value}{stat.suffix}
+                    {stat.value}
+                    {stat.suffix}
                   </div>
                   <div className="text-gray-600 mt-2">{stat.label}</div>
                 </div>
@@ -188,9 +207,7 @@ export default function Page() {
         <section className="py-20 bg-gray-50">
           <div className="container mx-auto px-4 md:px-6">
             <div className="text-center max-w-2xl mx-auto mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold">
-                Fitur Unggulan BookFlow
-              </h2>
+              <h2 className="text-3xl md:text-4xl font-bold">Fitur Unggulan BookFlow</h2>
               <p className="text-gray-600 mt-4">
                 Solusi lengkap untuk mengelola gudang dan distribusi buku Anda
               </p>
@@ -216,9 +233,7 @@ export default function Page() {
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4 md:px-6">
             <div className="text-center max-w-2xl mx-auto mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold">
-                Bagaimana BookFlow Bekerja?
-              </h2>
+              <h2 className="text-3xl md:text-4xl font-bold">Bagaimana BookFlow Bekerja?</h2>
               <p className="text-gray-600 mt-4">
                 Proses sederhana untuk meningkatkan efisiensi distribusi buku
               </p>
@@ -228,22 +243,26 @@ export default function Page() {
                 {
                   step: "01",
                   title: "Input Data",
-                  description: "Input data stok buku, pesanan customer, dan informasi retur ke dalam sistem.",
+                  description:
+                    "Input data stok buku, pesanan customer, dan informasi retur ke dalam sistem.",
                 },
                 {
                   step: "02",
                   title: "Analisis Kriteria",
-                  description: "Sistem menganalisis 4 kriteria : stok, urgensi, status kontrak, dan retur.",
+                  description:
+                    "Sistem menganalisis 4 kriteria : stok, urgensi, status kontrak, dan retur.",
                 },
                 {
                   step: "03",
                   title: "Perhitungan MCDM",
-                  description: "Metode TOPSIS memproses data dengan bobot AHP untuk menentukan prioritas.",
+                  description:
+                    "Metode TOPSIS memproses data dengan bobot AHP untuk menentukan prioritas.",
                 },
                 {
                   step: "04",
                   title: "Prioritas Distribusi",
-                  description: "Sistem menampilkan urutan prioritas pengiriman yang objektif dan terukur.",
+                  description:
+                    "Sistem menampilkan urutan prioritas pengiriman yang objektif dan terukur.",
                 },
               ].map((item, idx) => (
                 <div key={idx} className="text-center">
@@ -288,8 +307,8 @@ export default function Page() {
                     <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
                   </div>
                   <p className="text-lg italic">
-                    BookFlow membantu kami mengelola stok lebih akurat dan menentukan
-                    prioritas pengiriman dengan lebih objektif. Operasional gudang jadi lebih efisien!
+                    BookFlow membantu kami mengelola stok lebih akurat dan menentukan prioritas
+                    pengiriman dengan lebih objektif. Operasional gudang jadi lebih efisien!
                   </p>
                   <div className="mt-4 flex items-center gap-3">
                     <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -313,8 +332,8 @@ export default function Page() {
               Siap Mengelola Distribusi Buku Lebih Baik?
             </h2>
             <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
-              Bergabunglah dengan BookFlow dan rasakan kemudahan mengelola gudang
-              dengan sistem pendukung keputusan yang cerdas.
+              Bergabunglah dengan BookFlow dan rasakan kemudahan mengelola gudang dengan sistem
+              pendukung keputusan yang cerdas.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
               <Link href="/sign-in">
@@ -332,10 +351,11 @@ export default function Page() {
             <div className="grid md:grid-cols-4 gap-8">
               <div>
                 <div className="flex items-center gap-2 mb-4">
-            <Logo className="h-15 w-45 " />
+                  <Logo className="h-15 w-45 " />
                 </div>
                 <p className="text-sm">
-                  Warehouse Management System terintegrasi dengan MCDM untuk menentukan prioritas distribusi buku.
+                  Warehouse Management System terintegrasi dengan MCDM untuk menentukan prioritas
+                  distribusi buku.
                 </p>
               </div>
               <div>
@@ -371,6 +391,5 @@ export default function Page() {
         </footer>
       </main>
     </div>
-
   );
 }

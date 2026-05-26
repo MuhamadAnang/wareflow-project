@@ -34,7 +34,10 @@ export const getSuppliersCountRepository = async (queryParams: TIndexSupplierQue
 };
 
 export const getSupplierByIdRepository = async (id: number) => {
-  return await db.select().from(supplierTable).where(and(eq(supplierTable.id, id), isNull(supplierTable.deletedAt)));
+  return await db
+    .select()
+    .from(supplierTable)
+    .where(and(eq(supplierTable.id, id), isNull(supplierTable.deletedAt)));
 };
 
 export const updateSupplierByIdRepository = async (id: number, data: TUpdateSupplier) => {

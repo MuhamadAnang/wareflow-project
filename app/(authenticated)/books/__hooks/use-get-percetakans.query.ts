@@ -12,9 +12,8 @@ export const useGetPercetakansQuery = () => {
           params: { page: 1, pageSize: 100 },
         });
         return res.data.data as { id: number; name: string }[];
-      } catch (error) {
-        console.warn("Gagal mengambil data percetakan, menggunakan data kosong");
-        return [];   // ← Penting! Kembalikan array kosong, jangan undefined
+      } catch {
+        return [];
       }
     },
     retry: 1,

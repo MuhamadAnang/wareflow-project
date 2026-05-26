@@ -7,5 +7,5 @@ export default function Page() {
     <main className="w-dvw h-dvh flex justify-center items-center">
       <SignIn />
     </main>
-  )
+  );
 }

@@ -14,7 +14,7 @@ export const GET = async (req: NextRequest, { params }: Params) => {
   return handleAuthenticatedRequest({
     request: req,
     callback: async () => {
-      const { id } = await params; 
+      const { id } = await params;
       const parsedId = parseId(id);
       return getCustomerReturnByIdController(parsedId);
     },

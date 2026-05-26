@@ -1,7 +1,11 @@
-import { supplierReturnTable, supplierReturnItemTable, supplierTable, bookTable } from "@/drizzle/schema";
+import {
+  supplierReturnTable,
+  supplierReturnItemTable,
+  supplierTable,
+  bookTable,
+} from "@/drizzle/schema";
 import { db } from "@/lib/db";
 import { TIndexSupplierReturnQuery } from "@/schemas/supplier-return.schema";
-import { TNewSupplierReturn, TNewSupplierReturnItem } from "@/types/database";
 import { and, asc, desc, eq, ilike, sql, type SQL } from "drizzle-orm";
 
 interface SupplierReturnItem {
@@ -50,26 +54,6 @@ const buildSupplierReturnWhereConditions = ({
   return conditions.length ? and(...conditions) : undefined;
 };
 
-// ==================== CREATE ====================
-
-export const createSupplierReturnRepository = async (
-  returnData: TNewSupplierReturn,
-  items: TNewSupplierReturnItem[]
-) => {
-  return await db.transaction(async (tx) => {
-    const [supplierReturn] = await tx.insert(supplierReturnTable).values(returnData).returning();
-    if (!supplierReturn) throw new Error("Failed to create supplier return");
-
-    const returnItems = items.map((item) => ({
-      ...item,
-      supplierReturnId: supplierReturn.id,
-    }));
-    await tx.insert(supplierReturnItemTable).values(returnItems);
-    
-    return supplierReturn;
-  });
-};
-
 // ==================== GET BY ID ====================
 
 export const getSupplierReturnByIdRepository = async (id: number) => {
@@ -102,7 +86,10 @@ export const getSupplierReturnByIdRepository = async (id: number) => {
     })
     .from(supplierReturnTable)
     .innerJoin(supplierTable, eq(supplierReturnTable.supplierId, supplierTable.id))
-    .leftJoin(supplierReturnItemTable, eq(supplierReturnItemTable.supplierReturnId, supplierReturnTable.id))
+    .leftJoin(
+      supplierReturnItemTable,
+      eq(supplierReturnItemTable.supplierReturnId, supplierReturnTable.id),
+    )
     .leftJoin(bookTable, eq(supplierReturnItemTable.bookId, bookTable.id))
     .where(eq(supplierReturnTable.id, id))
     .groupBy(supplierReturnTable.id, supplierTable.id);
@@ -140,7 +127,10 @@ export const getSupplierReturnListRepository = async (queryParams: TIndexSupplie
     })
     .from(supplierReturnTable)
     .innerJoin(supplierTable, eq(supplierReturnTable.supplierId, supplierTable.id))
-    .leftJoin(supplierReturnItemTable, eq(supplierReturnItemTable.supplierReturnId, supplierReturnTable.id))
+    .leftJoin(
+      supplierReturnItemTable,
+      eq(supplierReturnItemTable.supplierReturnId, supplierReturnTable.id),
+    )
     .where(whereClause)
     .groupBy(supplierReturnTable.id, supplierTable.name);
 
@@ -151,7 +141,11 @@ export const getSupplierReturnListRepository = async (queryParams: TIndexSupplie
 
     if (sortKey === "returnDate") {
       return await baseQuery
-        .orderBy(sortDir === "asc" ? asc(supplierReturnTable.returnDate) : desc(supplierReturnTable.returnDate))
+        .orderBy(
+          sortDir === "asc"
+            ? asc(supplierReturnTable.returnDate)
+            : desc(supplierReturnTable.returnDate),
+        )
         .limit(pageSize)
         .offset(offset);
     }

@@ -5,7 +5,6 @@ import { SidebarTrigger } from "@/app/_components/ui/sidebar";
 import { SignOutButton } from "@clerk/nextjs";
 
 const Header = () => {
-
   return (
     <header className="w-full h-16 bg-sidebar border-b flex justify-between items-center p-4">
       <SidebarTrigger className="md:hidden" />

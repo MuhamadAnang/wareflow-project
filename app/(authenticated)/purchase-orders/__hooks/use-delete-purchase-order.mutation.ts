@@ -1,5 +1,6 @@
 import useAuthenticatedClient from "@/app/_hooks/use-authenticated-client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 import { toast } from "sonner";
 
 export const useDeletePurchaseOrderMutation = () => {
@@ -15,9 +16,11 @@ export const useDeletePurchaseOrderMutation = () => {
       toast.success("Purchase Order deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["purchase-orders"] });
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.message || "Failed to delete purchase order";
-      toast.error(message);
+    onError: (error) => {
+      if (isAxiosError(error)) {
+        const message = error.response?.data?.message || "Failed to delete purchase order";
+        toast.error(message);
+      }
     },
   });
 };

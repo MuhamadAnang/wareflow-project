@@ -1,8 +1,7 @@
 import { z } from "zod";
 import { customerOrderStatusEnum } from "@/drizzle/schema";
 
-
-export const CustomerOrderItemSchema = z.object({
+const CustomerOrderItemSchema = z.object({
   bookId: z.number().int().positive({ message: "Pilih buku terlebih dahulu" }),
   quantity: z.number().int().positive({ message: "Jumlah harus lebih besar dari 0" }),
   price: z.number().positive({ message: "Harga harus lebih besar dari 0" }),
@@ -11,11 +10,9 @@ export const CustomerOrderItemSchema = z.object({
 export const CreateCustomerOrderFormSchema = z.object({
   customerId: z.number().int().positive({ message: "Pilih customer terlebih dahulu" }),
   orderDate: z.string().min(1, "Tanggal order harus diisi"),
-  deadline: z.coerce.date().optional().nullable(),  // ← TAMBAHKAN
+  deadline: z.coerce.date().optional().nullable(), // ← TAMBAHKAN
   note: z.string().max(500).optional().nullable(),
-  items: z
-    .array(CustomerOrderItemSchema)
-    .min(1, "Minimal satu item"),
+  items: z.array(CustomerOrderItemSchema).min(1, "Minimal satu item"),
 });
 
 export const UpdateCustomerOrderStatusSchema = z.object({
@@ -36,4 +33,3 @@ export const IndexCustomerOrderQuerySchema = z.object({
 export type TCreateCustomerOrder = z.infer<typeof CreateCustomerOrderFormSchema>;
 export type TUpdateCustomerOrderStatus = z.infer<typeof UpdateCustomerOrderStatusSchema>;
 export type TIndexCustomerOrderQuery = z.infer<typeof IndexCustomerOrderQuerySchema>;
-export type TCustomerOrderItemInput = z.infer<typeof CustomerOrderItemSchema>;

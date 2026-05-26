@@ -1,199 +1,195 @@
 interface TopsisInput {
-    alternatives: Array<{
-        id: number;
-        customerName: string;
-        criteria: {
-            stockFulfillment: number;
-            urgency: number;
-            contractStatus: number;
-            returnRate: number;
-        };
-        orderDetails?: unknown;
-    }>;
-    weights: number[];
+  alternatives: Array<{
+    id: number;
+    customerName: string;
+    criteria: {
+      stockFulfillment: number;
+      urgency: number;
+      contractStatus: number;
+      returnRate: number;
+    };
+    orderDetails?: unknown;
+  }>;
+  weights: number[];
 }
 
 interface TopsisResult {
-    id: number;
-    customerName: string;
-    score: number;
-    rank: number;
-    orderDetails?: unknown;
+  id: number;
+  customerName: string;
+  score: number;
+  rank: number;
+  orderDetails?: unknown;
 }
 // server/priority/topsis.service.ts
 export class TopsisService {
-    private weights: number[];
-    private criteriaTypes: ('benefit' | 'cost')[];
+  private weights: number[];
+  private criteriaTypes: ("benefit" | "cost")[];
 
-    constructor(weights: number[] = ([0.56, 0.26, 0.12, 0.06])) {
-        this.weights = weights;
-        this.criteriaTypes = ['benefit', 'benefit', 'benefit', 'cost'];
+  constructor(weights: number[] = [0.56, 0.26, 0.12, 0.06]) {
+    this.weights = weights;
+    this.criteriaTypes = ["benefit", "benefit", "benefit", "cost"];
+  }
+  /**
+   * Normalisasi matriks (Euclidean normalization)
+   */
+  private normalizeMatrix(matrix: number[][]): number[][] {
+    const normalized: number[][] = [];
+    const numCols = matrix[0].length;
+
+    for (let j = 0; j < numCols; j++) {
+      let sumSquares = 0;
+      for (let i = 0; i < matrix.length; i++) {
+        sumSquares += Math.pow(matrix[i][j], 2);
+      }
+      const dominator = Math.sqrt(sumSquares);
+
+      if (dominator === 0) continue; // Hindari pembagian dengan nol
+
+      for (let i = 0; i < matrix.length; i++) {
+        if (!normalized[i]) normalized[i] = [];
+        normalized[i][j] = matrix[i][j] / dominator;
+      }
     }
-    /**
-    * Normalisasi matriks (Euclidean normalization)
-    */
-    private normalizeMatrix(matrix: number[][]): number[][] {
-        const normalized: number[][] = [];
-        const numCols = matrix[0].length;
+    return normalized;
+  }
 
-        for (let j = 0; j < numCols; j++) {
-            let sumSquares = 0;
-            for (let i = 0; i < matrix.length; i++) {
-                sumSquares += Math.pow(matrix[i][j], 2);
-            }
-            const dominator = Math.sqrt(sumSquares);
+  /**
+   * Matriks ternormalisasi terbobot
+   */
 
-            if (dominator === 0) continue; // Hindari pembagian dengan nol
-
-            for (let i = 0; i < matrix.length; i++) {
-                if (!normalized[i]) normalized[i] = [];
-                normalized[i][j] = matrix[i][j] / dominator;
-            }
-        }
-        return normalized;
+  private weightedNormalizedMatrix(normalizeMatrix: number[][]): number[][] {
+    const weighted: number[][] = [];
+    for (let i = 0; i < normalizeMatrix.length; i++) {
+      weighted[i] = [];
+      for (let j = 0; j < normalizeMatrix[i].length; j++) {
+        weighted[i][j] = normalizeMatrix[i][j] * this.weights[j];
+      }
     }
+    return weighted;
+  }
 
-    /**
-     * Matriks ternormalisasi terbobot
-     */
+  /**
+   * Solusi ideal positif dan negatif
+   */
+  private calculateIdealSolutions(weightedMatrix: number[][]): {
+    idealPositive: number[];
+    idealNegative: number[];
+  } {
+    const numCols = weightedMatrix[0].length;
+    const idealPositive: number[] = [];
+    const idealNegative: number[] = [];
 
-    private weightedNormalizedMatrix(normalizeMatrix: number[][]): number[][] {
-        const weighted: number[][] = [];
-        for (let i = 0; i < normalizeMatrix.length; i++) {
-            weighted[i] = [];
-            for (let j = 0; j < normalizeMatrix[i].length; j++) {
-                weighted[i][j] = normalizeMatrix[i][j] * this.weights[j];
-            }
-        }
-        return weighted;
-    }
+    for (let j = 0; j < numCols; j++) {
+      const columnValues = weightedMatrix.map((row) => row[j]);
 
-    /**
-     * Solusi ideal positif dan negatif     
-     */
-    private calculateIdealSolutions(weightedMatrix: number[][]): {
-        idealPositive: number[];
-        idealNegative: number[];
-    } {
-        const numCols = weightedMatrix[0].length;
-        const idealPositive: number[] = [];
-        const idealNegative: number[] = [];
-
-        for (let j = 0; j < numCols; j++) {
-            const columnValues = weightedMatrix.map(row => row[j]);
-
-            if (this.criteriaTypes[j] === 'benefit') {
-                idealPositive[j] = Math.max(...columnValues);
-                idealNegative[j] = Math.min(...columnValues);
-            } else {
-                idealPositive[j] = Math.min(...columnValues);
-                idealNegative[j] = Math.max(...columnValues);
-            }
-
-        }
-
-        return { idealPositive, idealNegative };
+      if (this.criteriaTypes[j] === "benefit") {
+        idealPositive[j] = Math.max(...columnValues);
+        idealNegative[j] = Math.min(...columnValues);
+      } else {
+        idealPositive[j] = Math.min(...columnValues);
+        idealNegative[j] = Math.max(...columnValues);
+      }
     }
 
-    /**
-     * Jarak ke solusi ideal positif dan negatif
-     */
-    private calculateDistances(
-        weightedMatrix: number[][],
-        idealPositive: number[],
-        idealNegative: number[]
-    ): {
-        distPositive: number[];
-        distNegative: number[];
-    } {
-        const distPositive: number[] = [];
-        const distNegative: number[] = [];
+    return { idealPositive, idealNegative };
+  }
 
-        for (let i = 0; i < weightedMatrix.length; i++) {
-            let sumPositive = 0;
-            let sumNegative = 0;
+  /**
+   * Jarak ke solusi ideal positif dan negatif
+   */
+  private calculateDistances(
+    weightedMatrix: number[][],
+    idealPositive: number[],
+    idealNegative: number[],
+  ): {
+    distPositive: number[];
+    distNegative: number[];
+  } {
+    const distPositive: number[] = [];
+    const distNegative: number[] = [];
 
-            for (let j = 0; j < weightedMatrix[i].length; j++) {
-                sumPositive += Math.pow(weightedMatrix[i][j] - idealPositive[j], 2);
-                sumNegative += Math.pow(weightedMatrix[i][j] - idealNegative[j], 2);
-            }
+    for (let i = 0; i < weightedMatrix.length; i++) {
+      let sumPositive = 0;
+      let sumNegative = 0;
 
-            distPositive[i] = Math.sqrt(sumPositive);
-            distNegative[i] = Math.sqrt(sumNegative);
-        }
+      for (let j = 0; j < weightedMatrix[i].length; j++) {
+        sumPositive += Math.pow(weightedMatrix[i][j] - idealPositive[j], 2);
+        sumNegative += Math.pow(weightedMatrix[i][j] - idealNegative[j], 2);
+      }
 
-        return { distPositive, distNegative };
+      distPositive[i] = Math.sqrt(sumPositive);
+      distNegative[i] = Math.sqrt(sumNegative);
     }
 
-    /**
+    return { distPositive, distNegative };
+  }
+
+  /**
    * Skor preferensi (kedekatan relatif terhadap solusi ideal)
    */
-    private calculateScores(
-        distPositive: number[],
-        distNegative: number[]
-    ): number[] {
-        const scores: number[] = [];
+  private calculateScores(distPositive: number[], distNegative: number[]): number[] {
+    const scores: number[] = [];
 
-        for (let i = 0; i < distPositive.length; i++) {
-            const sum = distPositive[i] + distNegative[i];
-            scores[i] = sum === 0 ? 0 : distNegative[i] / sum;
-        }
-
-        return scores;
+    for (let i = 0; i < distPositive.length; i++) {
+      const sum = distPositive[i] + distNegative[i];
+      scores[i] = sum === 0 ? 0 : distNegative[i] / sum;
     }
 
-    /**
-     * Main method untuk menghitung TOPSIS
-     */
-    calculate(input: TopsisInput): TopsisResult[] {
-        const { alternatives } = input;
+    return scores;
+  }
 
-        if (alternatives.length === 0) {
-            return [];
-        }
+  /**
+   * Main method untuk menghitung TOPSIS
+   */
+  calculate(input: TopsisInput): TopsisResult[] {
+    const { alternatives } = input;
 
-        // 1. Buat matriks keputusan
-        const decisionMatrix: number[][] = alternatives.map(alt => [
-            alt.criteria.stockFulfillment,
-            alt.criteria.urgency,
-            alt.criteria.contractStatus,
-            alt.criteria.returnRate,
-        ]);
-
-        // 2. Normalisasi matriks
-        const normalizedMatrix = this.normalizeMatrix(decisionMatrix);
-
-        // 3. Matriks ternormalisasi terbobot
-        const weightedMatrix = this.weightedNormalizedMatrix(normalizedMatrix);
-
-        // 4. Solusi ideal
-        const { idealPositive, idealNegative } = this.calculateIdealSolutions(weightedMatrix);
-
-        // 5. Jarak ke solusi ideal
-        const { distPositive, distNegative } = this.calculateDistances(
-            weightedMatrix,
-            idealPositive,
-            idealNegative
-        );
-
-        // 6. Skor preferensi
-        const scores = this.calculateScores(distPositive, distNegative);
-
-        // 7. Combine results
-        const results: TopsisResult[] = alternatives.map((alt, idx) => ({
-            id: alt.id,
-            customerName: alt.customerName,
-            score: scores[idx],
-            rank: 0,
-            orderDetails: alt.orderDetails,
-        }));
-
-        // Sort berdasarkan score (descending) dan beri ranking
-        results.sort((a, b) => b.score - a.score);
-        results.forEach((result, idx) => {
-            result.rank = idx + 1;
-        });
-
-        return results;
+    if (alternatives.length === 0) {
+      return [];
     }
+
+    // 1. Buat matriks keputusan
+    const decisionMatrix: number[][] = alternatives.map((alt) => [
+      alt.criteria.stockFulfillment,
+      alt.criteria.urgency,
+      alt.criteria.contractStatus,
+      alt.criteria.returnRate,
+    ]);
+
+    // 2. Normalisasi matriks
+    const normalizedMatrix = this.normalizeMatrix(decisionMatrix);
+
+    // 3. Matriks ternormalisasi terbobot
+    const weightedMatrix = this.weightedNormalizedMatrix(normalizedMatrix);
+
+    // 4. Solusi ideal
+    const { idealPositive, idealNegative } = this.calculateIdealSolutions(weightedMatrix);
+
+    // 5. Jarak ke solusi ideal
+    const { distPositive, distNegative } = this.calculateDistances(
+      weightedMatrix,
+      idealPositive,
+      idealNegative,
+    );
+
+    // 6. Skor preferensi
+    const scores = this.calculateScores(distPositive, distNegative);
+
+    // 7. Combine results
+    const results: TopsisResult[] = alternatives.map((alt, idx) => ({
+      id: alt.id,
+      customerName: alt.customerName,
+      score: scores[idx],
+      rank: 0,
+      orderDetails: alt.orderDetails,
+    }));
+
+    // Sort berdasarkan score (descending) dan beri ranking
+    results.sort((a, b) => b.score - a.score);
+    results.forEach((result, idx) => {
+      result.rank = idx + 1;
+    });
+
+    return results;
+  }
 }

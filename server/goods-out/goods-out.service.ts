@@ -8,7 +8,10 @@ import {
   getGoodsOutListRepository,
   getGoodsOutByOrderIdRepository,
 } from "./goods-out.repository";
-import { getCustomerOrderByIdService, updateCustomerOrderStatusService } from "../customer-orders/customer-order.service";
+import {
+  getCustomerOrderByIdService,
+  updateCustomerOrderStatusService,
+} from "../customer-orders/customer-order.service";
 import { processStockMovement } from "../stock-movements/stock-movement.service";
 import { bookTable, goodsOutItemTable, goodsOutTable } from "@/drizzle/schema";
 import { db } from "@/lib/db";
@@ -17,22 +20,21 @@ import { BadRequestException } from "@/common/exception/bad-request.exception";
 
 // ==================== CREATE ====================
 
-
 export const createGoodsOutService = async (data: TCreateGoodsOut) => {
   const { customerOrderId, shippedDate, note, items } = data;
-
-  console.log("Creating goods out for order:", customerOrderId);
 
   // 1. Validasi order
   const order = await getCustomerOrderByIdService(customerOrderId);
   if (!order) {
     throw new NotFoundException(`Customer order with ID ${customerOrderId} not found`);
   }
-  
+
   // 2. Validasi status
   const allowedStatuses = ["CONFIRMED", "PARTIALLY_SHIPPED"];
   if (!allowedStatuses.includes(order.status)) {
-    throw new Error(`Order status must be CONFIRMED or PARTIALLY_SHIPPED. Current: ${order.status}`);
+    throw new Error(
+      `Order status must be CONFIRMED or PARTIALLY_SHIPPED. Current: ${order.status}`,
+    );
   }
 
   // 3. Hitung sisa quantity
@@ -44,12 +46,12 @@ export const createGoodsOutService = async (data: TCreateGoodsOut) => {
       shippedMap.set(item.bookId, current + item.quantity);
     }
   }
-  
+
   for (const item of items) {
-    const ordered = order.items.find(i => i.bookId === item.bookId)?.quantity || 0;
+    const ordered = order.items.find((i) => i.bookId === item.bookId)?.quantity || 0;
     const shipped = shippedMap.get(item.bookId) || 0;
     const remaining = ordered - shipped;
-    
+
     if (item.quantity > remaining) {
       throw new Error(`Quantity for book ID ${item.bookId} exceeds remaining (${remaining})`);
     }
@@ -97,23 +99,24 @@ export const createGoodsOutService = async (data: TCreateGoodsOut) => {
       .values(goodsOutData)
       .returning();
 
-    await tx.insert(goodsOutItemTable).values(
-      goodsOutItems.map(item => ({ ...item, goodsOutId: goodsOut.id }))
-    );
-
-    console.log("Goods out created with ID:", goodsOut.id);
+    await tx
+      .insert(goodsOutItemTable)
+      .values(goodsOutItems.map((item) => ({ ...item, goodsOutId: goodsOut.id })));
 
     // 5. 🚀 Create stock movements dengan tx yang sama
     for (const item of items) {
       try {
-        await processStockMovement({
-          bookId: item.bookId,
-          type: "OUT_SALES",
-          referenceType: "goods_out",
-          referenceId: goodsOut.id,
-          quantity: item.quantity,
-          note: `Pengiriman untuk customer order #${customerOrderId}`,
-        }, tx); // 👈 PASS TX
+        await processStockMovement(
+          {
+            bookId: item.bookId,
+            type: "OUT_SALES",
+            referenceType: "goods_out",
+            referenceId: goodsOut.id,
+            quantity: item.quantity,
+            note: `Pengiriman untuk customer order #${customerOrderId}`,
+          },
+          tx,
+        ); // 👈 PASS TX
       } catch (error) {
         if (error instanceof Error && error.message.includes("Stok tidak mencukupi")) {
           throw new BadRequestException(error.message);
@@ -122,7 +125,6 @@ export const createGoodsOutService = async (data: TCreateGoodsOut) => {
         throw error;
       }
     }
-    console.log("Stock movements created");
 
     // 6. Update total shipped & status order
     for (const item of items) {
@@ -136,7 +138,7 @@ export const createGoodsOutService = async (data: TCreateGoodsOut) => {
     for (const orderItem of order.items) {
       const shipped = shippedMap.get(orderItem.bookId) || 0;
       const remaining = orderItem.quantity - shipped;
-      
+
       if (remaining > 0) allCompleted = false;
       if (shipped > 0) anyShipped = true;
     }

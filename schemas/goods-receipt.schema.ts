@@ -6,12 +6,14 @@ export const CreateGoodsReceiptSchema = z.object({
   purchaseOrderId: z.number().int().positive("Purchase Order wajib dipilih"),
   receivedDate: z.string().min(1, "Tanggal terima wajib diisi"),
   note: z.string().optional(),
-  items: z.array(
-    z.object({
-      bookId: z.number().int().positive(),
-      quantity: z.number().int().positive("Quantity minimal 1"),
-    })
-  ).min(1, "Minimal harus ada 1 item"),
+  items: z
+    .array(
+      z.object({
+        bookId: z.number().int().positive(),
+        quantity: z.number().int().positive("Quantity minimal 1"),
+      }),
+    )
+    .min(1, "Minimal harus ada 1 item"),
 });
 
 export type TCreateGoodsReceipt = z.infer<typeof CreateGoodsReceiptSchema>;
@@ -20,12 +22,14 @@ export type TCreateGoodsReceipt = z.infer<typeof CreateGoodsReceiptSchema>;
 export const UpdateGoodsReceiptSchema = z.object({
   receivedDate: z.string().min(1, "Tanggal terima wajib diisi"),
   note: z.string().optional(),
-  items: z.array(
-    z.object({
-      bookId: z.number().int().positive(),
-      quantity: z.number().int().positive("Quantity minimal 1"),
-    })
-  ).min(1, "Minimal harus ada 1 item"),
+  items: z
+    .array(
+      z.object({
+        bookId: z.number().int().positive(),
+        quantity: z.number().int().positive("Quantity minimal 1"),
+      }),
+    )
+    .min(1, "Minimal harus ada 1 item"),
 });
 
 export type TUpdateGoodsReceipt = z.infer<typeof UpdateGoodsReceiptSchema>;

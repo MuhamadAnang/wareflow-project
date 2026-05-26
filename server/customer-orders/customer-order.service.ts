@@ -1,7 +1,12 @@
 import { NotFoundException } from "@/common/exception/not-found.exception";
 import { paginationResponseMapper } from "@/lib/pagination";
 import { TCreateCustomerOrder, TIndexCustomerOrderQuery } from "@/schemas/customer-order.schema";
-import { TCustomerOrderDetail, TCustomerOrderListItem, TNewCustomerOrder, TNewCustomerOrderItem } from "@/types/database";
+import {
+  TCustomerOrderDetail,
+  TCustomerOrderListItem,
+  TNewCustomerOrder,
+  TNewCustomerOrderItem,
+} from "@/types/database";
 import {
   createCustomerOrderRepository,
   deleteCustomerOrderRepository,
@@ -16,9 +21,13 @@ import { customerOrderItemTable, customerOrderTable, customerTable } from "@/dri
 import { eq, sql } from "drizzle-orm";
 
 export const createCustomerOrderService = async (data: TCreateCustomerOrder) => {
-  const { customerId, orderDate, deadline, note, items } = data;  // ← tambah deadline
+  const { customerId, orderDate, deadline, note, items } = data; // ← tambah deadline
 
-  const normalizedDeadline = deadline ? (deadline instanceof Date ? deadline.toISOString().split("T")[0] : String(deadline)) : null;
+  const normalizedDeadline = deadline
+    ? deadline instanceof Date
+      ? deadline.toISOString().split("T")[0]
+      : String(deadline)
+    : null;
 
   const orderData: TNewCustomerOrder = {
     customerId,
@@ -38,7 +47,9 @@ export const createCustomerOrderService = async (data: TCreateCustomerOrder) => 
   return order;
 };
 
-export const getCustomerOrdersWithPaginationService = async (queryParams: TIndexCustomerOrderQuery) => {
+export const getCustomerOrdersWithPaginationService = async (
+  queryParams: TIndexCustomerOrderQuery,
+) => {
   const [entries, total] = await Promise.all([
     getCustomerOrdersWithPaginationRepository(queryParams),
     getCustomerOrdersCountRepository(queryParams),
@@ -62,16 +73,15 @@ export const getCustomerOrdersWithPaginationService = async (queryParams: TIndex
   });
 };
 
-
 export const getCustomerOrderByIdService = async (id: number): Promise<TCustomerOrderDetail> => {
   const order = await getCustomerOrderByIdRepository(id);
   if (!order) {
     throw new NotFoundException(`Customer order with ID ${id} not found`);
   }
-  
+
   // Ambil semua goods out untuk order ini
   const goodsOutList = await getGoodsOutByOrderIdRepository(id);
-  
+
   // Hitung total yang sudah dikirim per book
   const shippedMap = new Map<number, number>();
   for (const goodsOut of goodsOutList) {
@@ -80,14 +90,14 @@ export const getCustomerOrderByIdService = async (id: number): Promise<TCustomer
       shippedMap.set(item.bookId, current + item.quantity);
     }
   }
-  
+
   // Tambahkan shippedQuantity ke setiap item
   const itemsWithShipped = order.items.map((item) => ({
-  ...item,
-  shippedQuantity: shippedMap.get(item.bookId) || 0,
-  remainingQuantity: item.quantity - (shippedMap.get(item.bookId) || 0),
-}));
-  
+    ...item,
+    shippedQuantity: shippedMap.get(item.bookId) || 0,
+    remainingQuantity: item.quantity - (shippedMap.get(item.bookId) || 0),
+  }));
+
   return {
     ...order,
     items: itemsWithShipped,
@@ -125,12 +135,8 @@ export const updateCustomerOrderStatusService = async (id: number, status: strin
   if (!updated || updated.length === 0) {
     throw new NotFoundException(`Order ${id} not found or update failed`);
   }
-  
-  return updated[0];
-};
 
-export const cancelCustomerOrderService = async (id: number) => {
-  return await updateCustomerOrderStatusService(id, "CANCELLED");
+  return updated[0];
 };
 
 export const deleteCustomerOrderService = async (id: number) => {
@@ -153,18 +159,16 @@ export const getAvailableOrdersService = async () => {
     })
     .from(customerOrderTable)
     .innerJoin(customerTable, eq(customerOrderTable.customerId, customerTable.id))
-    .where(
-      sql`${customerOrderTable.status} IN ('CONFIRMED', 'PARTIALLY_SHIPPED')`
-    )
+    .where(sql`${customerOrderTable.status} IN ('CONFIRMED', 'PARTIALLY_SHIPPED')`)
     .orderBy(sql`${customerOrderTable.createdAt} DESC`);
-  
+
   // Filter: hanya order yang masih memiliki sisa quantity
   const availableOrders = [];
-  
+
   for (const order of orders) {
     // Ambil semua goods out untuk order ini
     const goodsOutList = await getGoodsOutByOrderIdRepository(order.id);
-    
+
     // Hitung total yang sudah dikirim per book
     const shippedMap = new Map<number, number>();
     for (const goodsOut of goodsOutList) {
@@ -173,7 +177,7 @@ export const getAvailableOrdersService = async () => {
         shippedMap.set(item.bookId, current + item.quantity);
       }
     }
-    
+
     // Ambil items dari order (perlu query terpisah)
     const orderItems = await db
       .select({
@@ -182,7 +186,7 @@ export const getAvailableOrdersService = async () => {
       })
       .from(customerOrderItemTable)
       .where(eq(customerOrderItemTable.customerOrderId, order.id));
-    
+
     // Cek apakah masih ada sisa yang belum dikirim
     let hasRemaining = false;
     for (const item of orderItems) {
@@ -193,11 +197,11 @@ export const getAvailableOrdersService = async () => {
         break;
       }
     }
-    
+
     if (hasRemaining) {
       availableOrders.push(order);
     }
   }
-  
+
   return availableOrders;
 };

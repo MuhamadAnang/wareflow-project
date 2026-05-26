@@ -18,7 +18,7 @@ export type TCreateOrUpdateSubject = z.infer<typeof CreateOrUpdateSubjectSchema>
 
 // Untuk list + filter + pagination
 export const IndexSubjectQuerySchema = IndexQueryParams.extend({
-    sort: createSortSchema(["name"]),
+  sort: createSortSchema(["name"]),
   // bisa ditambah filter lain nanti jika perlu, misal: active: z.boolean().optional()
 });
 

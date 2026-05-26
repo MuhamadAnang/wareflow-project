@@ -57,7 +57,10 @@ export const StockAlertList = ({ items, isLoading }: StockAlertListProps) => {
                 <div key={item.id} className="space-y-2">
                   <div className="flex justify-between items-center">
                     <div>
-                      <Link href={`/books/${item.id}`} className="font-medium hover:underline text-sm">
+                      <Link
+                        href={`/books/${item.id}`}
+                        className="font-medium hover:underline text-sm"
+                      >
                         {item.code}
                       </Link>
                       <p className="text-xs text-muted-foreground">{item.name}</p>
@@ -66,9 +69,7 @@ export const StockAlertList = ({ items, isLoading }: StockAlertListProps) => {
                       )}
                     </div>
                     <div className="text-right">
-                      <Badge className={stockLevel.color}>
-                        {stockLevel.label}
-                      </Badge>
+                      <Badge className={stockLevel.color}>{stockLevel.label}</Badge>
                       <p className="text-sm font-bold mt-1">{item.currentStock} pcs</p>
                     </div>
                   </div>
@@ -78,7 +79,10 @@ export const StockAlertList = ({ items, isLoading }: StockAlertListProps) => {
             })}
             {items.length > 0 && (
               <div className="pt-2">
-                <Link href="/books?stockStatus=low" className="text-xs text-primary hover:underline">
+                <Link
+                  href="/books?stockStatus=low"
+                  className="text-xs text-primary hover:underline"
+                >
                   Lihat semua buku dengan stok menipis →
                 </Link>
               </div>

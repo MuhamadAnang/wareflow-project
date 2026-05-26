@@ -1,6 +1,9 @@
 import { handleException } from "@/common/exception/helper";
 import { parseQueryParams, validateSchema } from "@/lib/validation";
-import { CreateOrUpdatePercetakanSchema, IndexPercetakanQuerySchema } from "@/schemas/percetakan.schema";
+import {
+  CreateOrUpdatePercetakanSchema,
+  IndexPercetakanQuerySchema,
+} from "@/schemas/percetakan.schema";
 import { NextRequest } from "next/server";
 import {
   createPercetakanService,
@@ -21,7 +24,7 @@ export const createPercetakanController = async (req: NextRequest) => {
 
     return responseFormatter.created({
       data: newPercetakan[0], // mengembalikan data percetakan
-      message: "percetakan created successfully"
+      message: "percetakan created successfully",
     });
   } catch (error) {
     return handleException(error);

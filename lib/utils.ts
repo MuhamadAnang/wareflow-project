@@ -13,8 +13,12 @@ interface IConvertUtcToLocalTimeParams {
   format?: string;
 }
 
-export function convertUtcToLocalTime(params: IConvertUtcToLocalTimeParams & { format: string }): string;
-export function convertUtcToLocalTime(params: IConvertUtcToLocalTimeParams & { format?: undefined }): Date;
+export function convertUtcToLocalTime(
+  params: IConvertUtcToLocalTimeParams & { format: string },
+): string;
+export function convertUtcToLocalTime(
+  params: IConvertUtcToLocalTimeParams & { format?: undefined },
+): Date;
 export function convertUtcToLocalTime(params: IConvertUtcToLocalTimeParams): string | Date {
   const { utcDateStr, format } = params;
 
@@ -43,10 +47,3 @@ export function formatCustomerStatus(status: string) {
       return toTitleCase(status);
   }
 }
-
-export const truncateText = (text: string, maxLength: number) => {
-  if (text.length <= maxLength) {
-    return text;
-  }
-  return text.slice(0, maxLength) + "...";
-};

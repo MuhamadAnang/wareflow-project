@@ -21,7 +21,7 @@ export const getPriorityDistributionController = async (request: NextRequest) =>
   try {
     const orderIds = parseOrderIds(request);
     const priorities = await calculateDistributionPriority(orderIds);
-    
+
     return responseFormatter.successWithData({
       data: {
         priorities,
@@ -32,7 +32,6 @@ export const getPriorityDistributionController = async (request: NextRequest) =>
       message: "Prioritas distribusi berhasil dihitung",
     });
   } catch (error) {
-    console.error("Error in getPriorityDistributionController:", error);
     return handleException(error);
   }
 };
@@ -40,13 +39,12 @@ export const getPriorityDistributionController = async (request: NextRequest) =>
 export const getPendingOrdersController = async (_request: NextRequest) => {
   try {
     const pendingOrders = await getPendingOrdersForPriority();
-    
+
     return responseFormatter.successWithData({
       data: pendingOrders,
       message: "Daftar order pending berhasil diambil",
     });
   } catch (error) {
-    console.error("Error in getPendingOrdersController:", error);
     return handleException(error);
   }
 };

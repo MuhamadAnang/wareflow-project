@@ -1,12 +1,7 @@
 "use client";
 
 import { Button } from "@/app/_components/ui/button";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/app/_components/ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/app/_components/ui/field";
 import { Input } from "@/app/_components/ui/input";
 import { useSubjectForm } from "../__hooks/use-subject-form";
 
@@ -16,7 +11,11 @@ interface Props {
   buttonText?: string;
 }
 
-export const CreateOrUpdateForm = ({ form, isPending, buttonText = "Simpan Mata Pelajaran" }: Props) => {
+export const CreateOrUpdateForm = ({
+  form,
+  isPending,
+  buttonText = "Simpan Mata Pelajaran",
+}: Props) => {
   return (
     <form
       onSubmit={(e) => {

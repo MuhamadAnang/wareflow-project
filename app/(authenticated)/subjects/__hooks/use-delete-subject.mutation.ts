@@ -1,5 +1,7 @@
 import useAuthenticatedClient from "@/app/_hooks/use-authenticated-client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
+import { toast } from "sonner";
 
 export const useDeleteSubjectMutation = () => {
   const api = useAuthenticatedClient();
@@ -15,8 +17,12 @@ export const useDeleteSubjectMutation = () => {
       // Optional: toast "Berhasil dihapus"
     },
     onError: (error) => {
-      console.error("Delete subject error:", error);
-      // Optional: toast error
+      if (isAxiosError(error)) {
+        const message =
+          error.response?.data?.message || "Failed to delete subject. Please try again.";
+        toast.error(message);
+        return;
+      }
     },
   });
 };

@@ -5,7 +5,6 @@ import { useSupplierForm } from "../__hooks/use-supplier-form";
 import { CreateOrUpdateForm } from "../__components/create-or-update.form";
 import { useCreateSupplierMutation } from "./__hooks/use-create-supplier.mutation";
 
-
 export default function CreateSupplierPage() {
   const { mutateAsync, isPending } = useCreateSupplierMutation();
 

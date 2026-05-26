@@ -27,24 +27,24 @@ function UpdateSubjectForm({
 }
 export default function UpdateSubjectPage() {
   const params = useParams();
-    const { data, isLoading } = useGetSubject(Number(params.id));
-  
-    return (
-      <Page
-        className="max-w-xl w-full mx-auto mt-3"
-        isLoading={isLoading}
-        title="Perbarui Mata Pelajaran"
-        description="Isi formulir di bawah ini untuk memperbarui informasi subjek."
-      >
-        {data?.data && (
-          <UpdateSubjectForm
-            key={data.data.id}
-            subjectId={Number(params.id)}
-            defaultValues={{
-              name: data.data.name,
-            }}
-          />
-        )}
-      </Page>
-    );
-  }
+  const { data, isLoading } = useGetSubject(Number(params.id));
+
+  return (
+    <Page
+      className="max-w-xl w-full mx-auto mt-3"
+      isLoading={isLoading}
+      title="Perbarui Mata Pelajaran"
+      description="Isi formulir di bawah ini untuk memperbarui informasi subjek."
+    >
+      {data?.data && (
+        <UpdateSubjectForm
+          key={data.data.id}
+          subjectId={Number(params.id)}
+          defaultValues={{
+            name: data.data.name,
+          }}
+        />
+      )}
+    </Page>
+  );
+}

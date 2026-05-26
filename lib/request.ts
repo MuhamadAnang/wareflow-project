@@ -6,12 +6,12 @@ interface IMiddlewareResponseBase {
   response: NextResponse;
 }
 
-export interface IMiddlewareResponseWithData<T> extends IMiddlewareResponseBase {
+interface IMiddlewareResponseWithData<T> extends IMiddlewareResponseBase {
   pass: true;
   data: T;
 }
 
-export interface IMiddlewareResponseWithoutData extends IMiddlewareResponseBase {
+interface IMiddlewareResponseWithoutData extends IMiddlewareResponseBase {
   pass: false;
 }
 

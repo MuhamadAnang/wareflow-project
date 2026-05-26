@@ -53,7 +53,6 @@ export const CreateOrUpdatePurchaseOrderForm = ({
       className="flex border-t border-border -mx-6 -mb-6 mt-6"
       style={{ minHeight: "calc(100vh - 160px)" }}
     >
-
       {/* ════════════════════════════════════════════════════════════
           SIDEBAR KIRI — info order + submit
       ════════════════════════════════════════════════════════════ */}
@@ -78,9 +77,7 @@ export const CreateOrUpdatePurchaseOrderForm = ({
                 {isEdit ? "Perbarui data Belanja" : "Buat Belanja Baru"}
               </h2>
               <p className="text-xs text-muted-foreground mt-0.5">
-                {isEdit
-                  ? "Edit informasi belanja"
-                  : "Pesanan pembelian ke supplier"}
+                {isEdit ? "Edit informasi belanja" : "Pesanan pembelian ke supplier"}
               </p>
             </div>
           </div>
@@ -88,16 +85,12 @@ export const CreateOrUpdatePurchaseOrderForm = ({
 
         {/* Fields — flex-1 mendorong summary & button ke bawah */}
         <div className="flex flex-col gap-5 px-6 py-5 flex-1">
-
           {/* Supplier */}
           <form.Field name="supplierId">
             {(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid;
+              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
               const selectValue =
-                field.state.value && field.state.value > 0
-                  ? field.state.value.toString()
-                  : "";
+                field.state.value && field.state.value > 0 ? field.state.value.toString() : "";
               return (
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-1.5">
@@ -106,10 +99,7 @@ export const CreateOrUpdatePurchaseOrderForm = ({
                       Supplier *
                     </FieldLabel>
                   </div>
-                  <Select
-                    value={selectValue}
-                    onValueChange={(v) => field.handleChange(Number(v))}
-                  >
+                  <Select value={selectValue} onValueChange={(v) => field.handleChange(Number(v))}>
                     <SelectTrigger
                       aria-invalid={isInvalid}
                       className={isInvalid ? "border-destructive" : ""}
@@ -124,9 +114,7 @@ export const CreateOrUpdatePurchaseOrderForm = ({
                       ))}
                     </SelectContent>
                   </Select>
-                  {isInvalid && (
-                    <FieldError errors={field.state.meta.errors} />
-                  )}
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </div>
               );
             }}
@@ -135,8 +123,7 @@ export const CreateOrUpdatePurchaseOrderForm = ({
           {/* Tanggal Order */}
           <form.Field name="orderDate">
             {(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid;
+              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
               return (
                 <div className="space-y-1.5">
                   <FieldLabel className="text-xs font-medium uppercase tracking-wide text-muted-foreground block">
@@ -149,9 +136,7 @@ export const CreateOrUpdatePurchaseOrderForm = ({
                     aria-invalid={isInvalid}
                     className={isInvalid ? "border-destructive" : ""}
                   />
-                  {isInvalid && (
-                    <FieldError errors={field.state.meta.errors} />
-                  )}
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </div>
               );
             }}
@@ -171,7 +156,7 @@ export const CreateOrUpdatePurchaseOrderForm = ({
                   value={field.state.value ?? ""}
                   onChange={(e) => field.handleChange(e.target.value)}
                   placeholder="Catatan tambahan (opsional)..."
-                  className="resize-none text-sm min-h-[80px]"
+                  className="resize-none text-sm min-h-20"
                 />
               </div>
             )}
@@ -184,26 +169,20 @@ export const CreateOrUpdatePurchaseOrderForm = ({
               const validItems = items.filter((item) => item.bookId > 0);
               const totalQty = items.reduce(
                 (acc: number, item) => acc + (Number(item.quantity) || 0),
-                0
+                0,
               );
               return (
                 <div className="mt-auto pt-4">
                   <div className="rounded-xl border border-border bg-muted/30 divide-y divide-border">
                     <div className="flex items-center justify-between px-4 py-3">
-                      <span className="text-xs text-muted-foreground">
-                        Total item valid
-                      </span>
+                      <span className="text-xs text-muted-foreground">Total item valid</span>
                       <span className="text-sm font-medium tabular-nums">
                         {validItems.length} item
                       </span>
                     </div>
                     <div className="flex items-center justify-between px-4 py-3">
-                      <span className="text-xs text-muted-foreground">
-                        Total quantity
-                      </span>
-                      <span className="text-sm font-medium tabular-nums">
-                        {totalQty}
-                      </span>
+                      <span className="text-xs text-muted-foreground">Total quantity</span>
+                      <span className="text-sm font-medium tabular-nums">{totalQty}</span>
                     </div>
                   </div>
                 </div>
@@ -214,17 +193,8 @@ export const CreateOrUpdatePurchaseOrderForm = ({
 
         {/* Tombol submit — dipaku di bawah sidebar */}
         <div className="px-6 py-5 border-t border-border bg-background">
-          <Button
-            type="submit"
-            className="w-full"
-            size="default"
-            isLoading={isPending}
-          >
-            {isPending
-              ? "Menyimpan..."
-              : isEdit
-              ? "Perbarui "
-              : "Tambah Belanja"}
+          <Button type="submit" className="w-full" size="default" isLoading={isPending}>
+            {isPending ? "Menyimpan..." : isEdit ? "Perbarui " : "Tambah Belanja"}
           </Button>
         </div>
       </aside>
@@ -235,8 +205,7 @@ export const CreateOrUpdatePurchaseOrderForm = ({
       <main className="flex-1 min-w-0 bg-muted/20 p-8 overflow-y-auto">
         <form.Field name="items">
           {(itemsField) => {
-            const isInvalid =
-              itemsField.state.meta.isTouched && !itemsField.state.meta.isValid;
+            const isInvalid = itemsField.state.meta.isTouched && !itemsField.state.meta.isValid;
             const count = itemsField.state.value.length;
 
             return (
@@ -258,9 +227,7 @@ export const CreateOrUpdatePurchaseOrderForm = ({
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() =>
-                      itemsField.pushValue({ bookId: 0, quantity: 1 })
-                    }
+                    onClick={() => itemsField.pushValue({ bookId: 0, quantity: 1 })}
                     className="gap-1.5"
                   >
                     <Plus className="h-3.5 w-3.5" />
@@ -275,11 +242,9 @@ export const CreateOrUpdatePurchaseOrderForm = ({
                       <div className="h-12 w-12 rounded-xl bg-muted flex items-center justify-center mb-3">
                         <Package className="h-6 w-6 text-muted-foreground" />
                       </div>
-                      <p className="text-sm font-medium text-muted-foreground">
-                        Belum ada barang
-                      </p>
+                      <p className="text-sm font-medium text-muted-foreground">Belum ada barang</p>
                       <p className="text-xs text-muted-foreground/60 mt-1">
-                        Klik "Tambah Item" untuk mulai menambahkan buku
+                        Klik {"Tambah Baru"} untuk mulai menambahkan buku
                       </p>
                     </div>
                   ) : (
@@ -302,15 +267,10 @@ export const CreateOrUpdatePurchaseOrderForm = ({
                         {(itemsField.state.value as PurchaseOrderItemField[]).map(
                           (item, index: number) => {
                             const bookSelectValue =
-                              item.bookId && item.bookId > 0
-                                ? item.bookId.toString()
-                                : "";
+                              item.bookId && item.bookId > 0 ? item.bookId.toString() : "";
 
                             return (
-                              <tr
-                                key={index}
-                                className="group hover:bg-muted/20 transition-colors"
-                              >
+                              <tr key={index} className="group hover:bg-muted/20 transition-colors">
                                 {/* Nomor urut */}
                                 <td className="px-4 py-3">
                                   <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground">
@@ -323,13 +283,10 @@ export const CreateOrUpdatePurchaseOrderForm = ({
                                   <Select
                                     value={bookSelectValue}
                                     onValueChange={(v) => {
-                                      const currentItems =
-                                        itemsField.state.value as PurchaseOrderItemField[];
-                                      const newItems = currentItems.map(
-                                        (it, i: number) =>
-                                          i === index
-                                            ? { ...it, bookId: Number(v) }
-                                            : it
+                                      const currentItems = itemsField.state
+                                        .value as PurchaseOrderItemField[];
+                                      const newItems = currentItems.map((it, i: number) =>
+                                        i === index ? { ...it, bookId: Number(v) } : it,
                                       );
                                       itemsField.setValue(newItems);
                                     }}
@@ -339,10 +296,7 @@ export const CreateOrUpdatePurchaseOrderForm = ({
                                     </SelectTrigger>
                                     <SelectContent>
                                       {books.map((b) => (
-                                        <SelectItem
-                                          key={b.id}
-                                          value={b.id.toString()}
-                                        >
+                                        <SelectItem key={b.id} value={b.id.toString()}>
                                           {b.displayTitle}
                                         </SelectItem>
                                       ))}
@@ -357,16 +311,15 @@ export const CreateOrUpdatePurchaseOrderForm = ({
                                     min={1}
                                     value={item.quantity ?? 1}
                                     onChange={(e) => {
-                                      const currentItems =
-                                        itemsField.state.value as PurchaseOrderItemField[];
-                                      const newItems = currentItems.map(
-                                        (it, i: number) =>
-                                          i === index
-                                            ? {
-                                                ...it,
-                                                quantity: Number(e.target.value),
-                                              }
-                                            : it
+                                      const currentItems = itemsField.state
+                                        .value as PurchaseOrderItemField[];
+                                      const newItems = currentItems.map((it, i: number) =>
+                                        i === index
+                                          ? {
+                                              ...it,
+                                              quantity: Number(e.target.value),
+                                            }
+                                          : it,
                                       );
                                       itemsField.setValue(newItems);
                                     }}
@@ -382,16 +335,14 @@ export const CreateOrUpdatePurchaseOrderForm = ({
                                     size="icon"
                                     className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-all"
                                     onClick={() => {
-                                      const currentItems =
-                                        itemsField.state.value as PurchaseOrderItemField[];
+                                      const currentItems = itemsField.state
+                                        .value as PurchaseOrderItemField[];
                                       const newItems = currentItems.filter(
-                                          (_item, i: number) => i !== index
-                                        );
+                                        (_item, i: number) => i !== index,
+                                      );
                                       itemsField.setValue(newItems);
                                     }}
-                                    disabled={
-                                      itemsField.state.value.length === 1
-                                    }
+                                    disabled={itemsField.state.value.length === 1}
                                     title="Hapus item"
                                   >
                                     <Trash2 className="h-3.5 w-3.5" />
@@ -399,7 +350,7 @@ export const CreateOrUpdatePurchaseOrderForm = ({
                                 </td>
                               </tr>
                             );
-                          }
+                          },
                         )}
                       </tbody>
 

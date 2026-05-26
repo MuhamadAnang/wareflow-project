@@ -22,8 +22,8 @@ export default function Page({
   ...props
 }: PropsWithChildren<Props>) {
   return (
-    <div 
-      className={`w-full flex-1 flex flex-col gap-4 p-4 overflow-auto ${className || ""}`} 
+    <div
+      className={`w-full flex-1 flex flex-col gap-4 p-4 overflow-auto ${className || ""}`}
       {...props}
     >
       {isLoading ? (
@@ -41,9 +41,7 @@ export default function Page({
             </div>
             {headerAction && headerAction}
           </header>
-          <div className="flex-1">
-            {children}
-          </div>
+          <div className="flex-1">{children}</div>
         </>
       )}
     </div>

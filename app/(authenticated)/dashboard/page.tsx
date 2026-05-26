@@ -9,16 +9,11 @@ import { TopCustomers } from "./__components/top-customers";
 import { PriorityPreview } from "./__components/priority-preview";
 import { useBreadcrumb } from "@/app/_contexts/breadcrumb.context";
 import { useEffect } from "react";
-import {
-  Package,
-  Warehouse,
-  Users,
-  Clock,
-} from "lucide-react";
+import { Package, Warehouse, Users, Clock } from "lucide-react";
 
 export default function DashboardPage() {
   const { setBreadcrumbs } = useBreadcrumb();
-  const { data, isLoading, refetch } = useGetDashboardStats();
+  const { data, isLoading } = useGetDashboardStats();
   const dashboardData = data?.data;
 
   useEffect(() => {
@@ -48,7 +43,7 @@ export default function DashboardPage() {
           description="Total eksemplar di gudang"
           iconColor="text-green-500"
         />
-        
+
         <StatsCard
           title="Total Customer"
           value={stats?.totalCustomers || 0}
@@ -56,7 +51,7 @@ export default function DashboardPage() {
           description="Customer aktif"
           iconColor="text-purple-500"
         />
-        
+
         <StatsCard
           title="Order Pending"
           value={stats?.pendingOrders || 0}

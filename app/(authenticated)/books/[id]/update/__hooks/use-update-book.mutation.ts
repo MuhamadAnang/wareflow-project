@@ -1,5 +1,7 @@
 import useAuthenticatedClient from "@/app/_hooks/use-authenticated-client";
+import { TCreateOrUpdateBook } from "@/schemas/book.schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -9,20 +11,14 @@ export const useUpdateBookMutation = (id: number) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (payload: any) => {
+    mutationFn: async (payload: TCreateOrUpdateBook) => {
       const formData = new FormData();
 
       Object.entries(payload).forEach(([key, value]) => {
         if (value === null || value === undefined) return;
 
         // Deteksi File lebih robust — hindari instanceof yang bisa gagal lintas konteks
-        const isFile =
-          value instanceof File ||
-          (typeof value === "object" &&
-            value !== null &&
-            typeof (value as any).name === "string" &&
-            typeof (value as any).size === "number" &&
-            typeof (value as any).arrayBuffer === "function");
+        const isFile = value instanceof File;
 
         if (isFile) {
           formData.append(key, value as File);
@@ -48,8 +44,10 @@ export const useUpdateBookMutation = (id: number) => {
       queryClient.invalidateQueries({ queryKey: ["books"] });
       router.push(`/books/${id}`);
     },
-    onError: (err: any) => {
-      toast.error(err.response?.data?.message || "Gagal memperbarui buku");
+    onError: (err) => {
+      if (isAxiosError(err)) {
+        toast.error(err.response?.data?.message || "Gagal memperbarui buku");
+      }
     },
   });
 };

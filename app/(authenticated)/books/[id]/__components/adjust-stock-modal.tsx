@@ -44,7 +44,7 @@ export function AdjustStockModal({ bookId, open, onClose }: Props) {
               placeholder="+10 atau -5"
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Positif = tambah stok, Negatif = kurangi stok
+              Masukkan jumlah stok saat ini
             </p>
           </div>
 
@@ -61,7 +61,11 @@ export function AdjustStockModal({ bookId, open, onClose }: Props) {
             <Button variant="outline" onClick={onClose} className="flex-1">
               Batal
             </Button>
-            <Button onClick={handleSubmit} disabled={isPending || quantity === 0} className="flex-1">
+            <Button
+              onClick={handleSubmit}
+              disabled={isPending || quantity === 0}
+              className="flex-1"
+            >
               {isPending ? "Menyimpan..." : "Simpan Adjustment"}
             </Button>
           </div>

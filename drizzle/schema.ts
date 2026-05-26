@@ -19,46 +19,31 @@ import {
 
 // drizzle/schema.ts (bagian enum)
 export const customerStatusEnum = pgEnum("customer_status_enum", [
-  "CONTRACT",      // Kontrak resmi (bobot 5)
-  "NON-CONTRACT",  // Pelanggan biasa tanpa hubungan kontrak/langganan (bobot 1)
-  "MOU",           // Langganan (bobot 3)
+  "CONTRACT", // Kontrak resmi (bobot 5)
+  "NON-CONTRACT", // Pelanggan biasa tanpa hubungan kontrak/langganan (bobot 1)
+  "MOU", // Langganan (bobot 3)
 ]);
 
-export const semesterEnum = pgEnum("semester_enum", [
-  "GANJIL", 
-  "GENAP", 
-  "SETAHUN"
-]);
+export const semesterEnum = pgEnum("semester_enum", ["GANJIL", "GENAP", "SETAHUN"]);
 
-export const bookLevelEnum = pgEnum("book_level", [
-  "SD", 
-  "SMP", 
-  "SMA", 
-  "SMK", 
-  "SMA/SMK"
-]);
+export const bookLevelEnum = pgEnum("book_level", ["SD", "SMP", "SMA", "SMK", "SMA/SMK"]);
 
-export const curriculumEnum = pgEnum("curriculum", [
-  "KURIKULUM_MERDEKA", 
-  "K13", 
-  "KTSP", 
-  "LAINNYA"
-]);
+export const curriculumEnum = pgEnum("curriculum", ["KURIKULUM_MERDEKA", "K13", "KTSP", "LAINNYA"]);
 
 export const customerOrderStatusEnum = pgEnum("customer_order_status_enum", [
-  "DRAFT",              // Draft, belum final
-  "CONFIRMED",          // Dikonfirmasi, siap diproses
-  "PARTIALLY_SHIPPED",  // Sebagian sudah dikirim
-  "SHIPPED",            // Sudah dikirim semua
-  "CANCELLED",          // Dibatalkan
+  "DRAFT", // Draft, belum final
+  "CONFIRMED", // Dikonfirmasi, siap diproses
+  "PARTIALLY_SHIPPED", // Sebagian sudah dikirim
+  "SHIPPED", // Sudah dikirim semua
+  "CANCELLED", // Dibatalkan
 ]);
 
 export const stockMovementTypeEnum = pgEnum("stock_movement_type_enum", [
-  "IN_PURCHASE",       // Barang masuk dari pembelian
-  "OUT_SALES",         // Barang keluar untuk penjualan
-  "RETURN_CUSTOMER",   // Retur dari pelanggan
-  "RETURN_SUPPLIER",   // Retur ke supplier
-  "ADJUSTMENT",        // Penyesuaian stok
+  "IN_PURCHASE", // Barang masuk dari pembelian
+  "OUT_SALES", // Barang keluar untuk penjualan
+  "RETURN_CUSTOMER", // Retur dari pelanggan
+  "RETURN_SUPPLIER", // Retur ke supplier
+  "ADJUSTMENT", // Penyesuaian stok
 ]);
 
 /* =========================
@@ -81,15 +66,20 @@ export const customerTable = pgTable("customers", {
    SUBJECTS
 ========================= */
 
-export const subjectTable = pgTable("subjects", {
-  id: serial("id").primaryKey(),
-  name: varchar("name", { length: 100 }).notNull(),
-  deletedAt: timestamp("deleted_at", { withTimezone: true }),
-}, (table) => ({
-  // Opsi 2: Unique constraint case-insensitive (rekomendasi)
-  uniqueNameCaseInsensitive: uniqueIndex("unique_name_case_insensitive_idx")
-    .on(sql`LOWER(${table.name})`),
-}));
+export const subjectTable = pgTable(
+  "subjects",
+  {
+    id: serial("id").primaryKey(),
+    name: varchar("name", { length: 100 }).notNull(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
+  },
+  (table) => ({
+    // Opsi 2: Unique constraint case-insensitive (rekomendasi)
+    uniqueNameCaseInsensitive: uniqueIndex("unique_name_case_insensitive_idx").on(
+      sql`LOWER(${table.name})`,
+    ),
+  }),
+);
 
 /* =========================
    SUPPLIERS
@@ -127,7 +117,9 @@ export const bookTable = pgTable("books", {
   id: serial("id").primaryKey(),
   code: varchar("code", { length: 50 }).notNull().unique(),
   name: varchar("name", { length: 300 }).notNull(),
-  subjectId: integer("subject_id").notNull().references(() => subjectTable.id),
+  subjectId: integer("subject_id")
+    .notNull()
+    .references(() => subjectTable.id),
   grade: integer("grade").notNull(),
   level: bookLevelEnum("level").notNull(),
   curriculum: curriculumEnum("curriculum").notNull(),
@@ -174,12 +166,8 @@ export const purchaseOrderTable = pgTable("purchase_orders", {
     .references(() => supplierTable.id),
   orderDate: date("order_date").notNull(),
   note: varchar("note", { length: 500 }),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
 });
 
@@ -201,7 +189,7 @@ export const purchaseOrderItemTable = pgTable(
   },
   (table) => ({
     uniqueItem: unique().on(table.purchaseOrderId, table.bookId),
-  })
+  }),
 );
 
 /* =========================

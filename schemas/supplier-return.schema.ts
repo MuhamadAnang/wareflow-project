@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const SupplierReturnItemSchema = z.object({
+const SupplierReturnItemSchema = z.object({
   bookId: z.number().int().positive(),
   quantity: z.number().int().positive("Quantity harus lebih dari 0"),
 });

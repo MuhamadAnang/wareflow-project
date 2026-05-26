@@ -18,7 +18,10 @@ import {
 export const createSupplierReturnController = async (req: NextRequest) => {
   try {
     const body = await req.json();
-    const validatedBody = validateSchema<TCreateSupplierReturn>(CreateSupplierReturnSchema, body).data;
+    const validatedBody = validateSchema<TCreateSupplierReturn>(
+      CreateSupplierReturnSchema,
+      body,
+    ).data;
     const supplierReturn = await createSupplierReturnService(validatedBody);
     return responseFormatter.created({
       data: supplierReturn,
@@ -52,7 +55,7 @@ export const getSupplierReturnListController = async (request: NextRequest) => {
 
     const queryParams = result.data;
     const { data, meta } = await getSupplierReturnListService(queryParams);
-    
+
     return responseFormatter.successWithPagination<TSupplierReturnListItem>({
       data,
       meta,

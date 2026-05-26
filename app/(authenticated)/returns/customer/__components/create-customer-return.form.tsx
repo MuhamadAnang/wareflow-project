@@ -40,7 +40,7 @@ export const CreateCustomerReturnForm = ({ onSubmit, isPending }: Props) => {
   const { data: booksData } = useGetReturnableBooksQuery(selectedCustomerId);
   const customers = getApiList<TCustomer>(customersData);
   const books = getApiList<TBookListItem>(booksData);
-  
+
   const [returnDate, setReturnDate] = useState(new Date().toISOString().split("T")[0]);
   const [reason, setReason] = useState("");
   const [items, setItems] = useState<ReturnItem[]>([]);
@@ -107,8 +107,8 @@ export const CreateCustomerReturnForm = ({ onSubmit, isPending }: Props) => {
           quantity: item.quantity,
         })),
       });
-    } catch (error) {
-      console.error("Submit error:", error);
+    } catch {
+      toast.error("Gagal membuat retur customer");
     } finally {
       setSubmitting(false);
     }
@@ -140,11 +140,7 @@ export const CreateCustomerReturnForm = ({ onSubmit, isPending }: Props) => {
         {/* Tanggal Retur */}
         <div>
           <Label>Tanggal Retur *</Label>
-          <Input
-            type="date"
-            value={returnDate}
-            onChange={(e) => setReturnDate(e.target.value)}
-          />
+          <Input type="date" value={returnDate} onChange={(e) => setReturnDate(e.target.value)} />
         </div>
 
         {/* Alasan */}
@@ -185,7 +181,8 @@ export const CreateCustomerReturnForm = ({ onSubmit, isPending }: Props) => {
                           <SelectContent>
                             {books.map((book) => (
                               <SelectItem key={book.id} value={book.id.toString()}>
-                                {book.code} - {book.displayTitle || book.name} (Stok: {book.currentStock})
+                                {book.code} - {book.displayTitle || book.name} (Stok:{" "}
+                                {book.currentStock})
                               </SelectItem>
                             ))}
                           </SelectContent>

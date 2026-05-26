@@ -2,7 +2,11 @@ import { handleException } from "@/common/exception/helper";
 import { parseQueryParams, validateSchema } from "@/lib/validation";
 import { parseSortParams } from "@/lib/query-param";
 import { responseFormatter } from "@/lib/response-formatter";
-import { CreateGoodsOutSchema, IndexGoodsOutQuerySchema, TCreateGoodsOut } from "@/schemas/goods-out.schema";
+import {
+  CreateGoodsOutSchema,
+  IndexGoodsOutQuerySchema,
+  TCreateGoodsOut,
+} from "@/schemas/goods-out.schema";
 import { TGoodsOutDetail, TGoodsOutListItem } from "@/types/database";
 import { NextRequest } from "next/server";
 import {
@@ -48,7 +52,7 @@ export const getGoodsOutListController = async (request: NextRequest) => {
 
     const queryParams = result.data;
     const { data, meta } = await getGoodsOutListService(queryParams);
-    
+
     return responseFormatter.successWithPagination<TGoodsOutListItem>({
       data,
       meta,

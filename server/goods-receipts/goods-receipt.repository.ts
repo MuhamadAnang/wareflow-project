@@ -1,5 +1,10 @@
 import { db } from "@/lib/db";
-import { goodsReceiptTable, goodsReceiptItemTable, purchaseOrderTable, supplierTable } from "@/drizzle/schema";
+import {
+  goodsReceiptTable,
+  goodsReceiptItemTable,
+  purchaseOrderTable,
+  supplierTable,
+} from "@/drizzle/schema";
 import { asc, desc, eq, ilike, or, sql, type SQL } from "drizzle-orm";
 import { TIndexGoodsReceiptQuery } from "@/schemas/goods-receipt.schema";
 import {
@@ -14,7 +19,7 @@ import { bookTable, subjectTable } from "@/drizzle/schema";
 type OnReceiptCreatedCallback = (
   tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
   receipt: typeof goodsReceiptTable.$inferSelect,
-  items: Array<{ bookId: number; quantity: number }>
+  items: Array<{ bookId: number; quantity: number }>,
 ) => Promise<void>;
 
 type GoodsReceiptHeaderUpdate = Omit<Partial<TNewGoodsReceipt>, "receivedDate"> & {
@@ -36,20 +41,19 @@ const toDateOnlyString = (date: string | Date) => {
 const buildGoodsReceiptSearchCondition = (search?: string): SQL | undefined => {
   if (!search) return undefined;
 
-  return or(
-    ilike(supplierTable.name, `%${search}%`),
-    ilike(goodsReceiptTable.note, `%${search}%`),
-  );
+  return or(ilike(supplierTable.name, `%${search}%`), ilike(goodsReceiptTable.note, `%${search}%`));
 };
 
-const normalizeGoodsReceiptUpdate = (data: GoodsReceiptHeaderUpdate): Partial<TNewGoodsReceipt> => ({
+const normalizeGoodsReceiptUpdate = (
+  data: GoodsReceiptHeaderUpdate,
+): Partial<TNewGoodsReceipt> => ({
   ...data,
   receivedDate: data.receivedDate ? toDateOnlyString(data.receivedDate) : undefined,
 });
 
 export const createGoodsReceiptRepository = async (
   data: TCreateGoodsReceipt,
-  onCreated?: OnReceiptCreatedCallback
+  onCreated?: OnReceiptCreatedCallback,
 ) => {
   return await db.transaction(async (tx) => {
     // 1. Insert header
@@ -68,7 +72,7 @@ export const createGoodsReceiptRepository = async (
       bookId: item.bookId,
       quantity: item.quantity,
     }));
-    
+
     await tx.insert(goodsReceiptItemTable).values(itemsToInsert);
 
     // 3. Panggil callback dengan tx
@@ -80,23 +84,9 @@ export const createGoodsReceiptRepository = async (
   });
 };
 
-export const getGoodsReceiptsRepository = async () => {
-  return db
-    .select({
-      id: goodsReceiptTable.id,
-      purchaseOrderId: goodsReceiptTable.purchaseOrderId,
-      receivedDate: goodsReceiptTable.receivedDate,
-      note: goodsReceiptTable.note,
-      createdAt: goodsReceiptTable.createdAt,
-      supplierName: supplierTable.name,
-    })
-    .from(goodsReceiptTable)
-    .leftJoin(purchaseOrderTable, eq(goodsReceiptTable.purchaseOrderId, purchaseOrderTable.id))
-    .leftJoin(supplierTable, eq(purchaseOrderTable.supplierId, supplierTable.id))
-    .orderBy(desc(goodsReceiptTable.createdAt));
-};
-
-export const getGoodsReceiptsWithPaginationRepository = async (queryParams: TIndexGoodsReceiptQuery) => {
+export const getGoodsReceiptsWithPaginationRepository = async (
+  queryParams: TIndexGoodsReceiptQuery,
+) => {
   const { page = 1, pageSize = 20, search, sort } = queryParams;
   const whereClause = buildGoodsReceiptSearchCondition(search);
 
@@ -120,13 +110,17 @@ export const getGoodsReceiptsWithPaginationRepository = async (queryParams: TInd
   const data =
     activeSort?.key === "supplierName"
       ? await query
-          .orderBy(activeSort.direction === "asc" ? asc(supplierTable.name) : desc(supplierTable.name))
+          .orderBy(
+            activeSort.direction === "asc" ? asc(supplierTable.name) : desc(supplierTable.name),
+          )
           .offset(offset)
           .limit(pageSize)
       : activeSort?.key === "receivedDate"
         ? await query
             .orderBy(
-              activeSort.direction === "asc" ? asc(goodsReceiptTable.receivedDate) : desc(goodsReceiptTable.receivedDate),
+              activeSort.direction === "asc"
+                ? asc(goodsReceiptTable.receivedDate)
+                : desc(goodsReceiptTable.receivedDate),
             )
             .offset(offset)
             .limit(pageSize)
@@ -144,8 +138,9 @@ export const getGoodsReceiptsWithPaginationRepository = async (queryParams: TInd
   return { data, total };
 };
 
-
-export const getGoodsReceiptByIdRepository = async (id: number): Promise<TGoodsReceiptDetail | null> => {
+export const getGoodsReceiptByIdRepository = async (
+  id: number,
+): Promise<TGoodsReceiptDetail | null> => {
   const receiptResult = await db
     .select({
       id: goodsReceiptTable.id,
@@ -172,14 +167,14 @@ export const getGoodsReceiptByIdRepository = async (id: number): Promise<TGoodsR
       quantity: goodsReceiptItemTable.quantity,
       bookCode: bookTable.code,
       subjectName: subjectTable.name,
-      grade: bookTable.grade,           // ✅ langsung dari bookTable
-      level: bookTable.level,           // ✅ langsung dari bookTable
+      grade: bookTable.grade, // ✅ langsung dari bookTable
+      level: bookTable.level, // ✅ langsung dari bookTable
       curriculum: bookTable.curriculum, // ✅ langsung dari bookTable
-      semester: bookTable.semester,     // ✅ tambah semester
+      semester: bookTable.semester, // ✅ tambah semester
     })
     .from(goodsReceiptItemTable)
-    .innerJoin(bookTable, eq(goodsReceiptItemTable.bookId, bookTable.id))       // ✅ satu join
-    .innerJoin(subjectTable, eq(bookTable.subjectId, subjectTable.id))          // ✅ subject dari bookTable
+    .innerJoin(bookTable, eq(goodsReceiptItemTable.bookId, bookTable.id)) // ✅ satu join
+    .innerJoin(subjectTable, eq(bookTable.subjectId, subjectTable.id)) // ✅ subject dari bookTable
     .where(eq(goodsReceiptItemTable.goodsReceiptId, id));
 
   const items = itemsRaw.map((item) => ({
@@ -197,29 +192,26 @@ export const getGoodsReceiptByIdRepository = async (id: number): Promise<TGoodsR
 export const deleteGoodsReceiptByIdRepository = async (id: number) => {
   return await db.transaction(async (tx) => {
     await tx.delete(goodsReceiptItemTable).where(eq(goodsReceiptItemTable.goodsReceiptId, id));
-    const deleted = await tx.delete(goodsReceiptTable).where(eq(goodsReceiptTable.id, id)).returning();
+    const deleted = await tx
+      .delete(goodsReceiptTable)
+      .where(eq(goodsReceiptTable.id, id))
+      .returning();
     return deleted[0];
   });
 };
 
-export const updateGoodsReceiptByIdRepository = async (id: number, updateData: GoodsReceiptHeaderUpdate) => {
-  return await db
-    .update(goodsReceiptTable)
-    .set(normalizeGoodsReceiptUpdate(updateData))
-    .where(eq(goodsReceiptTable.id, id))
-    .returning();
-};
-
 export const replaceGoodsReceiptItemsRepository = async (
   goodsReceiptId: number,
-  items: Omit<TNewGoodsReceiptItem, "goodsReceiptId">[]
+  items: Omit<TNewGoodsReceiptItem, "goodsReceiptId">[],
 ) => {
   await db.transaction(async (tx) => {
     // Hapus semua item lama
-    await tx.delete(goodsReceiptItemTable).where(eq(goodsReceiptItemTable.goodsReceiptId, goodsReceiptId));
+    await tx
+      .delete(goodsReceiptItemTable)
+      .where(eq(goodsReceiptItemTable.goodsReceiptId, goodsReceiptId));
     // Insert item baru
     if (items.length) {
-      const newItems = items.map(item => ({
+      const newItems = items.map((item) => ({
         goodsReceiptId,
         bookId: item.bookId,
         quantity: item.quantity,
@@ -231,7 +223,7 @@ export const replaceGoodsReceiptItemsRepository = async (
 
 export const updateGoodsReceiptHeaderRepository = async (
   id: number,
-  updateData: GoodsReceiptHeaderUpdate
+  updateData: GoodsReceiptHeaderUpdate,
 ) => {
   return await db
     .update(goodsReceiptTable)

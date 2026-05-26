@@ -38,22 +38,24 @@ export const CreateCustomerDialog = ({ onCustomerCreated }: Props) => {
     onSubmit: async (values) => {
       const response = await mutateAsync(values);
       const newCustomerId = response?.data?.data?.id ?? null;
-  
+
       if (!newCustomerId) {
         toast.error("Gagal mendapatkan ID customer dari server");
         return;
       }
-  
+
       // Guard: pastikan hanya dipanggil sekali
       if (hasCalledCallback.current) return;
       hasCalledCallback.current = true;
-  
+
       setOpen(false);
       onCustomerCreated(newCustomerId);
       toast.success("Customer berhasil ibuat");
-      
+
       // Reset flag setelah dialog tutup
-      setTimeout(() => { hasCalledCallback.current = false; }, 500);
+      setTimeout(() => {
+        hasCalledCallback.current = false;
+      }, 500);
     },
   });
 

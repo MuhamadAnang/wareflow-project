@@ -1,19 +1,25 @@
 import { db } from "@/lib/db";
-import { 
-  purchaseOrderTable, 
-  purchaseOrderItemTable, 
-  supplierTable, 
-  bookTable, 
-  subjectTable 
+import {
+  purchaseOrderTable,
+  purchaseOrderItemTable,
+  supplierTable,
+  bookTable,
+  subjectTable,
 } from "@/drizzle/schema";
 import { eq, desc, isNull, and, sql, ilike, asc, or } from "drizzle-orm";
-import { TNewPurchaseOrder, TNewPurchaseOrderItem, TUpdatePurchaseOrder, TPurchaseOrderWithSupplier, TPurchaseOrderDetail } from "@/types/database";
+import {
+  TNewPurchaseOrder,
+  TNewPurchaseOrderItem,
+  TUpdatePurchaseOrder,
+  TPurchaseOrderWithSupplier,
+  TPurchaseOrderDetail,
+} from "@/types/database";
 import { TIndexPurchaseOrderQuery } from "@/schemas/purchase-order.schema";
 
 // Create PO with items in transaction
 export const createPurchaseOrderRepository = async (
   orderData: TNewPurchaseOrder,
-  items: Omit<TNewPurchaseOrderItem, "purchaseOrderId">[]
+  items: Omit<TNewPurchaseOrderItem, "purchaseOrderId">[],
 ) => {
   return db.transaction(async (tx) => {
     const [newOrder] = await tx.insert(purchaseOrderTable).values(orderData).returning();
@@ -33,7 +39,7 @@ export const createPurchaseOrderRepository = async (
 
 // Get paginated list with supplier name and search/sort
 export const getPurchaseOrdersWithPaginationRepository = async (
-  queryParams: TIndexPurchaseOrderQuery
+  queryParams: TIndexPurchaseOrderQuery,
 ): Promise<{ data: TPurchaseOrderWithSupplier[]; total: number }> => {
   const { page = 1, pageSize = 20, search, sort, supplierId } = queryParams;
 
@@ -59,10 +65,7 @@ export const getPurchaseOrdersWithPaginationRepository = async (
 
   if (search) {
     query = query.where(
-      or(
-        ilike(supplierTable.name, `%${search}%`),
-        ilike(purchaseOrderTable.note, `%${search}%`)
-      )
+      or(ilike(supplierTable.name, `%${search}%`), ilike(purchaseOrderTable.note, `%${search}%`)),
     );
   }
 
@@ -88,10 +91,7 @@ export const getPurchaseOrdersWithPaginationRepository = async (
   if (supplierId) countQuery = countQuery.where(eq(purchaseOrderTable.supplierId, supplierId));
   if (search) {
     countQuery = countQuery.where(
-      or(
-        ilike(supplierTable.name, `%${search}%`),
-        ilike(purchaseOrderTable.note, `%${search}%`)
-      )
+      or(ilike(supplierTable.name, `%${search}%`), ilike(purchaseOrderTable.note, `%${search}%`)),
     );
   }
 
@@ -105,7 +105,9 @@ export const getPurchaseOrdersWithPaginationRepository = async (
 };
 
 // Get single PO by ID with items and book details
-export const getPurchaseOrderByIdRepository = async (id: number): Promise<TPurchaseOrderDetail | null> => {
+export const getPurchaseOrderByIdRepository = async (
+  id: number,
+): Promise<TPurchaseOrderDetail | null> => {
   // Get header with supplier name
   const orderResult = await db
     .select({
@@ -138,11 +140,11 @@ export const getPurchaseOrderByIdRepository = async (id: number): Promise<TPurch
       grade: bookTable.grade,
       level: bookTable.level,
       curriculum: bookTable.curriculum,
-      semester: bookTable.semester,     
+      semester: bookTable.semester,
     })
     .from(purchaseOrderItemTable)
     .innerJoin(bookTable, eq(purchaseOrderItemTable.bookId, bookTable.id)) // ✅ satu join saja
-    .innerJoin(subjectTable, eq(bookTable.subjectId, subjectTable.id))     // ✅ langsung dari bookTable
+    .innerJoin(subjectTable, eq(bookTable.subjectId, subjectTable.id)) // ✅ langsung dari bookTable
     .where(eq(purchaseOrderItemTable.purchaseOrderId, id));
 
   // Format bookName di JavaScript (sama persis dengan yang dipakai di Book Titles)
@@ -173,7 +175,7 @@ export const deletePurchaseOrderByIdRepository = async (id: number) => {
 // Update PO header only
 export const updatePurchaseOrderHeaderRepository = async (
   id: number,
-  updateData: TUpdatePurchaseOrder
+  updateData: TUpdatePurchaseOrder,
 ) => {
   return await db
     .update(purchaseOrderTable)
@@ -185,12 +187,14 @@ export const updatePurchaseOrderHeaderRepository = async (
 // Replace items for a PO
 export const replacePurchaseOrderItemsRepository = async (
   purchaseOrderId: number,
-  items: Omit<TNewPurchaseOrderItem, "purchaseOrderId">[]
+  items?: Omit<TNewPurchaseOrderItem, "purchaseOrderId">[],
 ) => {
   await db.transaction(async (tx) => {
-    await tx.delete(purchaseOrderItemTable).where(eq(purchaseOrderItemTable.purchaseOrderId, purchaseOrderId));
-    if (items.length) {
-      const newItems = items.map(item => ({
+    await tx
+      .delete(purchaseOrderItemTable)
+      .where(eq(purchaseOrderItemTable.purchaseOrderId, purchaseOrderId));
+    if (items?.length) {
+      const newItems = items.map((item) => ({
         purchaseOrderId,
         bookId: item.bookId,
         quantity: item.quantity,

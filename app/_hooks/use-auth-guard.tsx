@@ -5,36 +5,34 @@ import { useEffect } from "react";
 type GuardType = "public" | "protected";
 
 export function useAuthGuard(type: GuardType = "protected") {
-    const { isSignedIn, sessionClaims, signOut, isLoaded } = useAuth();
-    const router = useRouter();
+  const { isSignedIn, sessionClaims, signOut, isLoaded } = useAuth();
+  const router = useRouter();
 
-    const isAllowed = sessionClaims?.metadata?.isAllowed || false;
+  const isAllowed = sessionClaims?.metadata?.isAllowed || false;
 
-    useEffect(() => {
-        if (type === "protected") {
-            if (!isSignedIn && isLoaded) {
-                console.log("Masuk sini");
-                router.replace("/sign-in");
-                return;
-            }
+  useEffect(() => {
+    if (type === "protected") {
+      if (!isSignedIn && isLoaded) {
+        router.replace("/sign-in");
+        return;
+      }
 
-            if (!isAllowed && isLoaded) {
-                console.log("Masuk sini juga");
-                signOut();
-                return;
-            }
-        }
+      if (!isAllowed && isLoaded) {
+        signOut();
+        return;
+      }
+    }
 
-        if (type === "public") {
-            if (isSignedIn && isAllowed) {
-                router.replace("/dashboard");
-            }
-        }
-    }, [isSignedIn, isAllowed, type, router, signOut, isLoaded]);
+    if (type === "public") {
+      if (isSignedIn && isAllowed) {
+        router.replace("/dashboard");
+      }
+    }
+  }, [isSignedIn, isAllowed, type, router, signOut, isLoaded]);
 
-    return {
-        isSignedIn,
-        isAllowed,
-        isLoading: isSignedIn === undefined,
-    };
+  return {
+    isSignedIn,
+    isAllowed,
+    isLoading: isSignedIn === undefined,
+  };
 }

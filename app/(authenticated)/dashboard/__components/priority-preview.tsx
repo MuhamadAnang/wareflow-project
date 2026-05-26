@@ -49,11 +49,16 @@ export const PriorityPreview = ({ priorities, isLoading }: PriorityPreviewProps)
             {priorities.map((priority) => (
               <div key={priority.id} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${getRankColor(priority.rank)}`}>
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${getRankColor(priority.rank)}`}
+                  >
                     {priority.rank}
                   </div>
                   <div>
-                    <Link href={`/customer-orders/${priority.id}`} className="font-medium hover:underline">
+                    <Link
+                      href={`/customer-orders/${priority.id}`}
+                      className="font-medium hover:underline"
+                    >
                       {priority.customerName}
                     </Link>
                     <p className="text-xs text-muted-foreground">Order #{priority.id}</p>
@@ -66,7 +71,10 @@ export const PriorityPreview = ({ priorities, isLoading }: PriorityPreviewProps)
             ))}
             {priorities.length > 0 && (
               <div className="pt-2 text-right">
-                <Link href="/priority-distribution" className="text-xs text-primary hover:underline">
+                <Link
+                  href="/priority-distribution"
+                  className="text-xs text-primary hover:underline"
+                >
                   Lihat semua prioritas →
                 </Link>
               </div>
@@ -76,4 +84,4 @@ export const PriorityPreview = ({ priorities, isLoading }: PriorityPreviewProps)
       </CardContent>
     </Card>
   );
-};  
+};

@@ -24,4 +24,3 @@ export const setupAuthInterceptor = (getToken: () => Promise<string | null>) => 
 
   isInterceptorSetup = true;
 };
-

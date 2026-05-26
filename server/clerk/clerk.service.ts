@@ -5,13 +5,13 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest } from "next/server";
 
 export const clerkService = {
-    authenticateRequest: async (req: NextRequest) => {
-        const client = await clerkClient();
+  authenticateRequest: async (req: NextRequest) => {
+    const client = await clerkClient();
 
-        const { toAuth } = await client.authenticateRequest(req, {
-            jwtKey: env.CLERK_JWT_KEY,
-        });
+    const { toAuth } = await client.authenticateRequest(req, {
+      jwtKey: env.CLERK_JWT_KEY,
+    });
 
-        return toAuth();
-    },
+    return toAuth();
+  },
 };

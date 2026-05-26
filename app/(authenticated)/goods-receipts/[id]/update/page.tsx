@@ -55,11 +55,19 @@ export default function UpdateGoodsReceiptPage() {
   };
 
   if (isLoading) {
-    return <Page title="Loading..." description="">Loading...</Page>;
+    return (
+      <Page title="Loading..." description="">
+        Loading...
+      </Page>
+    );
   }
 
   if (!receipt) {
-    return <Page title="Error" description="">Data tidak ditemukan</Page>;
+    return (
+      <Page title="Error" description="">
+        Data tidak ditemukan
+      </Page>
+    );
   }
 
   return (

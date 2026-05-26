@@ -13,7 +13,6 @@ import {
   getCustomerOrderByIdService,
   getCustomerOrdersWithPaginationService,
   updateCustomerOrderStatusService,
-  cancelCustomerOrderService,
   getAvailableOrdersService,
 } from "./customer-order.service";
 import { responseFormatter } from "@/lib/response-formatter";
@@ -23,9 +22,15 @@ import { TCustomerOrderDetail, TCustomerOrderListItem } from "@/types/database";
 export const createCustomerOrderController = async (req: NextRequest) => {
   try {
     const body = await req.json();
-    const validatedBody = validateSchema<TCreateCustomerOrder>(CreateCustomerOrderFormSchema, body).data;
+    const validatedBody = validateSchema<TCreateCustomerOrder>(
+      CreateCustomerOrderFormSchema,
+      body,
+    ).data;
     const order = await createCustomerOrderService(validatedBody);
-    return responseFormatter.created({ data: order, message: "Customer order created successfully" });
+    return responseFormatter.created({
+      data: order,
+      message: "Customer order created successfully",
+    });
   } catch (error) {
     return handleException(error);
   }
@@ -82,28 +87,13 @@ export const getCustomerOrderByIdController = async (id: number) => {
 export const updateCustomerOrderStatusController = async (id: number, req: NextRequest) => {
   try {
     const body = await req.json();
-    console.log("Update status request body:", body);
-    
     validateSchema(UpdateCustomerOrderStatusSchema, body);
-    
+
     const updated = await updateCustomerOrderStatusService(id, body.status);
-    
+
     return responseFormatter.successWithData({
       data: updated,
       message: "Customer order status updated successfully",
-    });
-  } catch (error) {
-    console.error("Error in updateCustomerOrderStatusController:", error);
-    return handleException(error);
-  }
-};
-
-export const cancelCustomerOrderController = async (id: number) => {
-  try {
-    const cancelled = await cancelCustomerOrderService(id);
-    return responseFormatter.successWithData({
-      data: cancelled,
-      message: "Customer order cancelled successfully",
     });
   } catch (error) {
     return handleException(error);
@@ -119,7 +109,7 @@ export const deleteCustomerOrderController = async (id: number) => {
   }
 };
 
-export const getAvailableOrdersController = async (request: NextRequest) => {
+export const getAvailableOrdersController = async () => {
   try {
     const orders = await getAvailableOrdersService();
     return responseFormatter.successWithData({

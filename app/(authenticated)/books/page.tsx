@@ -25,10 +25,10 @@ export default function BooksPage() {
 
   const columns: ColumnDef<TBookListItem>[] = [
     { accessorKey: "code", header: "Kode Buku" },
-    { 
-      accessorKey: "name", 
+    {
+      accessorKey: "name",
       header: "Nama Buku",
-      cell: ({ row }) => row.original.name || row.original.displayTitle 
+      cell: ({ row }) => row.original.name || row.original.displayTitle,
     },
     {
       accessorKey: "pages",
@@ -40,10 +40,10 @@ export default function BooksPage() {
       header: "Tahun Terbit",
       cell: ({ row }) => row.original.productionYear ?? "-",
     },
-    { 
-      accessorKey: "currentStock", 
+    {
+      accessorKey: "currentStock",
       header: "Stok Saat Ini",
-      cell: ({ row }) => <strong>{row.original.currentStock ?? 0}</strong>
+      cell: ({ row }) => <strong>{row.original.currentStock ?? 0}</strong>,
     },
     {
       id: "actions",
@@ -53,14 +53,22 @@ export default function BooksPage() {
         return (
           <div className="flex gap-2">
             <Link href={`/books/${id}`}>
-              <Button variant="outline" size="icon"><Eye className="h-4 w-4" /></Button>
+              <Button variant="outline" size="icon">
+                <Eye className="h-4 w-4" />
+              </Button>
             </Link>
             <Link href={`/books/${id}/update`}>
-              <Button variant="outline" size="icon"><Pencil className="h-4 w-4" /></Button>
+              <Button variant="outline" size="icon">
+                <Pencil className="h-4 w-4" />
+              </Button>
             </Link>
-            <Button variant="outline" size="icon" className="text-destructive"
+            <Button
+              variant="outline"
+              size="icon"
+              className="text-destructive"
               onClick={() => confirm("Hapus buku ini?") && deleteBook(id)}
-              disabled={isDeleting}>
+              disabled={isDeleting}
+            >
               <Trash className="h-4 w-4" />
             </Button>
           </div>
@@ -75,7 +83,9 @@ export default function BooksPage() {
       description="Kelola identitas buku lengkap"
       headerAction={
         <Link href="/books/create">
-          <Button><Plus className="mr-2 h-4 w-4" /> Tambah Buku Baru</Button>
+          <Button>
+            <Plus className="mr-2 h-4 w-4" /> Tambah Buku Baru
+          </Button>
         </Link>
       }
     >

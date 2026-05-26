@@ -68,14 +68,13 @@ export const CreateGoodsOutForm = ({ onSubmit, isPending }: Props) => {
   useEffect(() => {
     if (orderDetail?.data) {
       const order = orderDetail.data;
-      
+
       // Validasi: pastikan order.items ada dan merupakan array
       if (!order.items || !Array.isArray(order.items)) {
-        console.warn("Order items is not an array:", order.items);
         setItems([]);
         return;
       }
-      
+
       // Struktur baru: bookCode dan bookName sudah langsung di item
       const mappedItems: ShipmentItem[] = order.items.map((item: ShipmentOrderItem) => {
         const remainingQuantity = item.remainingQuantity ?? item.quantity;
@@ -92,7 +91,7 @@ export const CreateGoodsOutForm = ({ onSubmit, isPending }: Props) => {
           toShip: maxShippable,
         };
       });
-      
+
       setItems(mappedItems);
     }
   }, [orderDetail]);
@@ -156,9 +155,7 @@ export const CreateGoodsOutForm = ({ onSubmit, isPending }: Props) => {
       setShippedDate(new Date().toISOString().split("T")[0]);
       toast.success("Pengiriman berhasil dibuat");
     } catch (error) {
-      console.error("Submit error:", error);
-      const message =
-        (error as ApiError).response?.data?.message || "Gagal membuat pengiriman";
+      const message = (error as ApiError).response?.data?.message || "Gagal membuat pengiriman";
       toast.error(message);
     } finally {
       setSubmitting(false);
@@ -171,10 +168,7 @@ export const CreateGoodsOutForm = ({ onSubmit, isPending }: Props) => {
         {/* Pilih Order */}
         <div>
           <Label>Customer Order *</Label>
-          <Select
-            onValueChange={handleOrderChange}
-            value={selectedOrderId?.toString() ?? ""}
-          >
+          <Select onValueChange={handleOrderChange} value={selectedOrderId?.toString() ?? ""}>
             <SelectTrigger>
               <SelectValue placeholder="Pilih order yang akan dikirim" />
             </SelectTrigger>
@@ -192,11 +186,7 @@ export const CreateGoodsOutForm = ({ onSubmit, isPending }: Props) => {
         {/* Tanggal Kirim */}
         <div>
           <Label>Tanggal Kirim *</Label>
-          <Input
-            type="date"
-            value={shippedDate}
-            onChange={(e) => setShippedDate(e.target.value)}
-          />
+          <Input type="date" value={shippedDate} onChange={(e) => setShippedDate(e.target.value)} />
         </div>
 
         {/* Catatan */}

@@ -1,12 +1,3 @@
 {
-  "ignore": [
-    "app/_components/ui/**",
-    ".next/**",
-    "node_modules/**",
-    "public/**",
-    "tests/**",
-    "lib/db/migrations/**",
-    ".husky/**",
-    ".agents/**"
-  ]
+  "ignore": ["app/_components/ui/**", ".husky/**", ".agents/**"]
 }

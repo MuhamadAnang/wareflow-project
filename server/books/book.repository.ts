@@ -34,7 +34,17 @@ export async function createBookRepository(data: TNewBook) {
 }
 
 export async function getBooksWithPaginationRepository(params: TIndexBookQuery) {
-  const { page = 1, pageSize = 20, search, subjectId, grade, level, curriculum, semester, percetakanId } = params;
+  const {
+    page = 1,
+    pageSize = 20,
+    search,
+    subjectId,
+    grade,
+    level,
+    curriculum,
+    semester,
+    percetakanId,
+  } = params;
   const offset = (page - 1) * pageSize;
 
   const baseWhere = [isNull(bookTable.deletedAt)];
@@ -52,7 +62,7 @@ export async function getBooksWithPaginationRepository(params: TIndexBookQuery) 
     searchWhere = or(
       ilike(bookTable.code, like),
       ilike(bookTable.name, like),
-      ilike(displayTitleSql, like)
+      ilike(displayTitleSql, like),
     );
   }
 
@@ -95,7 +105,7 @@ export async function getBookByIdRepository(id: number) {
     .select({
       ...bookColumns,
       subjectName: subjectTable.name,
- 
+
       percetakanName: percetakanTable.name,
       displayTitle: displayTitleExpr,
     })

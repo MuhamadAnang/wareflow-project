@@ -20,7 +20,7 @@ export function CreateSubjectModal({ open, onClose, onSuccess }: Props) {
     if (!name.trim()) return;
 
     const result = await mutateAsync({ name: name.trim() });
-    onSuccess(result.data.id);   // asumsi backend return { data: { id, name } }
+    onSuccess(result.data.id); // asumsi backend return { data: { id, name } }
     setName("");
   };
 
@@ -42,11 +42,7 @@ export function CreateSubjectModal({ open, onClose, onSuccess }: Props) {
             <Button variant="outline" onClick={onClose} className="flex-1">
               Batal
             </Button>
-            <Button 
-              onClick={handleSubmit} 
-              disabled={isPending || !name.trim()}
-              className="flex-1"
-            >
+            <Button onClick={handleSubmit} disabled={isPending || !name.trim()} className="flex-1">
               {isPending ? "Menyimpan..." : "Simpan"}
             </Button>
           </div>

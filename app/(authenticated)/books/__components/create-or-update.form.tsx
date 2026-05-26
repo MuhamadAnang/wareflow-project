@@ -1,20 +1,22 @@
 "use client";
 
 import { Button } from "@/app/_components/ui/button";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/app/_components/ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/app/_components/ui/field";
 import { Input } from "@/app/_components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/_components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/app/_components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/app/_components/ui/radio-group";
 import { semesterEnum, bookLevelEnum, curriculumEnum } from "@/drizzle/schema";
 import { useBookForm } from "../__hooks/use-book-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import { CreateSubjectModal } from "./create-subject-modal";
+import Image from "next/image";
 
 interface Props {
   form: ReturnType<typeof useBookForm>;
@@ -24,10 +26,40 @@ interface Props {
   onSubjectCreated?: (newSubjectId: number) => void;
 }
 
+const BookCoverPreview = ({ src }: { src: string | null }) => {
+  if (!src) return null;
+
+  return (
+    <div className="mb-4">
+      <Image
+        src={src}
+        alt="Preview Cover"
+        width={160}
+        height={208}
+        unoptimized={src.startsWith("blob:")}
+        className="h-52 w-40 rounded-lg border object-cover shadow-sm"
+      />
+    </div>
+  );
+};
+
 export const BookForm = ({ form, isPending, subjects, percetakans, onSubjectCreated }: Props) => {
   const [showSubjectModal, setShowSubjectModal] = useState(false);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!imagePreviewUrl) return undefined;
+
+    return () => URL.revokeObjectURL(imagePreviewUrl);
+  }, [imagePreviewUrl]);
+
   return (
-    <form onSubmit={(e) => { e.preventDefault(); form.handleSubmit(e); }}>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        form.handleSubmit(e);
+      }}
+    >
       <FieldGroup>
         {/* Kode Buku */}
         <form.Field name="code">
@@ -109,7 +141,7 @@ export const BookForm = ({ form, isPending, subjects, percetakans, onSubjectCrea
               <Select
                 value={field.state.value}
                 onValueChange={(val) =>
-                  field.handleChange(val as typeof bookLevelEnum.enumValues[number])
+                  field.handleChange(val as (typeof bookLevelEnum.enumValues)[number])
                 }
               >
                 <SelectTrigger>
@@ -117,7 +149,9 @@ export const BookForm = ({ form, isPending, subjects, percetakans, onSubjectCrea
                 </SelectTrigger>
                 <SelectContent>
                   {bookLevelEnum.enumValues.map((lvl) => (
-                    <SelectItem key={lvl} value={lvl}>{lvl}</SelectItem>
+                    <SelectItem key={lvl} value={lvl}>
+                      {lvl}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -134,7 +168,7 @@ export const BookForm = ({ form, isPending, subjects, percetakans, onSubjectCrea
               <Select
                 value={field.state.value}
                 onValueChange={(val) =>
-                  field.handleChange(val as typeof curriculumEnum.enumValues[number])
+                  field.handleChange(val as (typeof curriculumEnum.enumValues)[number])
                 }
               >
                 <SelectTrigger>
@@ -161,7 +195,7 @@ export const BookForm = ({ form, isPending, subjects, percetakans, onSubjectCrea
               <RadioGroup
                 value={field.state.value}
                 onValueChange={(val) =>
-                  field.handleChange(val as typeof semesterEnum.enumValues[number])
+                  field.handleChange(val as (typeof semesterEnum.enumValues)[number])
                 }
                 className="flex gap-4"
               >
@@ -233,30 +267,16 @@ export const BookForm = ({ form, isPending, subjects, percetakans, onSubjectCrea
         {/* Upload Gambar */}
         <form.Field name="image">
           {(field) => {
-            // Preview state harus di luar Field callback
-            // Tapi karena ini di dalam Field, kita pakai cara alternatif yang aman
             const currentValue = field.state.value;
+            const currentImageSrc =
+              imagePreviewUrl ||
+              (typeof currentValue === "string" && currentValue !== "" ? currentValue : null);
 
             return (
               <Field>
                 <FieldLabel>Gambar Cover Buku</FieldLabel>
 
-                {/* Preview */}
-                {currentValue && !(currentValue instanceof File && !currentValue.size) && (
-                  <div className="mb-4">
-                    <img
-                      src={
-                        currentValue instanceof File
-                          ? URL.createObjectURL(currentValue)
-                          : typeof currentValue === "string" && currentValue !== ""
-                            ? currentValue
-                            : undefined
-                      }
-                      alt="Preview Cover"
-                      className="w-40 h-52 object-cover rounded-lg border shadow-sm"
-                    />
-                  </div>
-                )}
+                <BookCoverPreview src={currentImageSrc} />
 
                 <Input
                   type="file"
@@ -265,13 +285,13 @@ export const BookForm = ({ form, isPending, subjects, percetakans, onSubjectCrea
                     const file = e.target.files?.[0];
                     if (!file) return;
 
-                    field.handleChange(file);   // Kirim File object ke form
+                    const objectUrl = URL.createObjectURL(file);
+                    setImagePreviewUrl(objectUrl);
+                    field.handleChange(file); // Kirim File object ke form
                   }}
                 />
 
-                <p className="text-xs text-muted-foreground mt-1">
-                  JPG, PNG, WebP • Maksimal 2MB
-                </p>
+                <p className="text-xs text-muted-foreground mt-1">JPG, PNG, WebP • Maksimal 2MB</p>
                 <FieldError errors={field.state.meta.errors} />
               </Field>
             );

@@ -1,5 +1,8 @@
 import { handleAuthenticatedRequest } from "@/lib/request";
-import { createSubjectController, getSubjectsWithPaginationController } from "@/server/subjects/subject.controller";
+import {
+  createSubjectController,
+  getSubjectsWithPaginationController,
+} from "@/server/subjects/subject.controller";
 import { NextRequest } from "next/server";
 
 export const POST = async (req: NextRequest) => {

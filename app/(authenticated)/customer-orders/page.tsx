@@ -57,7 +57,6 @@ function CustomerOrderActionsCell({
         </Button>
       </Link>
 
-
       <Button
         variant="outline"
         size="icon"
@@ -68,7 +67,7 @@ function CustomerOrderActionsCell({
       </Button>
       {canConfirm && (
         <Button
-        className="bg-primary text-white"
+          className="bg-primary text-white"
           variant="outline"
           size="sm"
           onClick={() => onStatusChange(order.id, "CONFIRMED")}
@@ -80,7 +79,7 @@ function CustomerOrderActionsCell({
 
       {canCancel && (
         <Button
-        className="bg-red-600 text-white"
+          className="bg-red-600 text-white"
           variant="outline"
           size="sm"
           onClick={() => onStatusChange(order.id, "CANCELLED")}
@@ -131,7 +130,8 @@ export default function CustomerOrdersPage() {
       header: "Status",
       cell: ({ row }) => {
         const status = row.original.status;
-        const variant = status === "CANCELLED" ? "destructive" : status === "DRAFT" ? "secondary" : "default";
+        const variant =
+          status === "CANCELLED" ? "destructive" : status === "DRAFT" ? "secondary" : "default";
         return <Badge variant={variant}>{toTitleCase(status)}</Badge>;
       },
     },
@@ -197,7 +197,10 @@ export default function CustomerOrdersPage() {
             type: "Select",
             name: "status",
             label: "Status",
-            options: customerOrderStatusEnum.enumValues.map((v) => ({ label: toTitleCase(v), value: v })),
+            options: customerOrderStatusEnum.enumValues.map((v) => ({
+              label: toTitleCase(v),
+              value: v,
+            })),
             value: filters.status,
           },
         ]}

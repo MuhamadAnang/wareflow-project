@@ -11,8 +11,7 @@ export default function CreateCustomerOrderPage() {
   const form = useCreateOrderForm({
     handleSubmit: async (data) => {
       await mutateAsync(data);
-    }
-
+    },
   });
 
   return (

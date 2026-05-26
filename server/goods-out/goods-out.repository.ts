@@ -1,7 +1,13 @@
-import { goodsOutTable, goodsOutItemTable, customerOrderTable, customerTable, bookTable, subjectTable } from "@/drizzle/schema";
+import {
+  goodsOutTable,
+  goodsOutItemTable,
+  customerOrderTable,
+  customerTable,
+  bookTable,
+  subjectTable,
+} from "@/drizzle/schema";
 import { db } from "@/lib/db";
 import { TIndexGoodsOutQuery } from "@/schemas/goods-out.schema";
-import { TNewGoodsOut, TNewGoodsOutItem } from "@/types/database";
 import { and, asc, desc, eq, ilike, sql, type SQL } from "drizzle-orm";
 
 const toDateOnlyString = (date: Date) => {
@@ -37,26 +43,6 @@ const buildGoodsOutWhereConditions = ({
   }
 
   return conditions.length ? and(...conditions) : undefined;
-};
-
-// ==================== CREATE ====================
-
-export const createGoodsOutRepository = async (
-  goodsOutData: TNewGoodsOut,
-  items: TNewGoodsOutItem[]
-) => {
-  return await db.transaction(async (tx) => {
-    const [goodsOut] = await tx.insert(goodsOutTable).values(goodsOutData).returning();
-    if (!goodsOut) throw new Error("Failed to create goods out");
-
-    const goodsOutItems = items.map((item) => ({
-      ...item,
-      goodsOutId: goodsOut.id,
-    }));
-    await tx.insert(goodsOutItemTable).values(goodsOutItems);
-
-    return goodsOut;
-  });
 };
 
 // ==================== GET BY ID ====================
@@ -167,7 +153,12 @@ export const getGoodsOutListRepository = async (queryParams: TIndexGoodsOutQuery
     .innerJoin(customerTable, eq(customerOrderTable.customerId, customerTable.id))
     .leftJoin(goodsOutItemTable, eq(goodsOutItemTable.goodsOutId, goodsOutTable.id))
     .where(whereClause)
-    .groupBy(goodsOutTable.id, customerTable.name, customerTable.address, customerTable.institution);
+    .groupBy(
+      goodsOutTable.id,
+      customerTable.name,
+      customerTable.address,
+      customerTable.institution,
+    );
 
   const offset = (page - 1) * pageSize;
 
@@ -177,16 +168,15 @@ export const getGoodsOutListRepository = async (queryParams: TIndexGoodsOutQuery
 
     if (sortKey === "shippedDate") {
       return await baseQuery
-        .orderBy(sortDir === "asc" ? asc(goodsOutTable.shippedDate) : desc(goodsOutTable.shippedDate))
+        .orderBy(
+          sortDir === "asc" ? asc(goodsOutTable.shippedDate) : desc(goodsOutTable.shippedDate),
+        )
         .limit(pageSize)
         .offset(offset);
     }
   }
 
-  return await baseQuery
-    .orderBy(desc(goodsOutTable.createdAt))
-    .limit(pageSize)
-    .offset(offset);
+  return await baseQuery.orderBy(desc(goodsOutTable.createdAt)).limit(pageSize).offset(offset);
 };
 
 export const getGoodsOutCountRepository = async (queryParams: TIndexGoodsOutQuery) => {

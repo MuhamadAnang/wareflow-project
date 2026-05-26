@@ -6,7 +6,10 @@ interface UseGoodsReceiptCreateFormParams {
   onSubmit: (values: TCreateGoodsReceipt) => Promise<void>;
 }
 
-export const useGoodsReceiptCreateForm = ({ defaultValues, onSubmit }: UseGoodsReceiptCreateFormParams) => {
+export const useGoodsReceiptCreateForm = ({
+  defaultValues,
+  onSubmit,
+}: UseGoodsReceiptCreateFormParams) => {
   return useForm({
     defaultValues: {
       purchaseOrderId: defaultValues.purchaseOrderId ?? 0,
@@ -20,7 +23,7 @@ export const useGoodsReceiptCreateForm = ({ defaultValues, onSubmit }: UseGoodsR
     },
     onSubmit: async ({ value }) => {
       // Filter items dengan quantity > 0 (atau >= 1 sesuai validasi)
-      const validItems = value.items.filter(item => item.quantity > 0);
+      const validItems = value.items.filter((item) => item.quantity > 0);
       if (validItems.length === 0) {
         throw new Error("Minimal satu item dengan quantity > 0");
       }
