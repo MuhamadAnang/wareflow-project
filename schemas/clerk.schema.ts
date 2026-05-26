@@ -1,6 +1,6 @@
 import z from "zod";
 
-const ClerkUserActionEnum = z.enum(["approve", "reject", "suspend", "unsuspend"]);
+const ClerkUserActionEnum = z.enum(["approve", "reject"]);
 
 export const ActionApprovalUserSchema = z.object({
   action: ClerkUserActionEnum,
