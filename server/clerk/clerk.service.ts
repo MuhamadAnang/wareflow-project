@@ -9,7 +9,6 @@ import { TActionApprovalUser, TCreateOrUpdateClerkUserSchema } from "@/schemas/c
 import { BadRequestException } from "@/common/exception/bad-request.exception";
 import { NotFoundException } from "@/common/exception/not-found.exception";
 
-
 export const clerkAuthenticateRequestService = async (req: NextRequest) => {
   const client = await clerkClient();
 
@@ -26,18 +25,17 @@ export const getClerkUsersService = async (queryParams: TIndexQueryParams) => {
   const page = Number(queryParams.page) || 1;
   const pageSize = Number(queryParams.pageSize) || 10;
 
-  const { data, totalCount } =
-    await client.users.getUserList({
-      limit: pageSize,
-      offset: (page - 1) * pageSize,
-    });
+  const { data, totalCount } = await client.users.getUserList({
+    limit: pageSize,
+    offset: (page - 1) * pageSize,
+  });
 
   return paginationResponseMapper(data, {
     currentPage: page,
     pageSize: pageSize,
     totalItems: totalCount,
-  })
-}
+  });
+};
 
 export const getClerkUserByIdService = async (id: string) => {
   const client = await clerkClient();
@@ -45,8 +43,7 @@ export const getClerkUserByIdService = async (id: string) => {
   const user = await client.users.getUser(id);
 
   return user;
-}
-
+};
 
 export const approveOrRejectClerkUserService = async (id: string, payload: TActionApprovalUser) => {
   const client = await clerkClient();
@@ -82,11 +79,9 @@ export const approveOrRejectClerkUserService = async (id: string, payload: TActi
       },
     });
   }
-}
+};
 
-export const createClerkUserService = async (
-  payload: TCreateOrUpdateClerkUserSchema
-) => {
+export const createClerkUserService = async (payload: TCreateOrUpdateClerkUserSchema) => {
   const client = await clerkClient();
 
   const existingUsers = await client.users.getUserList({
@@ -110,46 +105,36 @@ export const createClerkUserService = async (
     skipPasswordRequirement: true,
     skipPasswordChecks: true,
 
-    legalAcceptedAt: new Date()
+    legalAcceptedAt: new Date(),
   });
 
   const email = user.emailAddresses[0];
 
-  await client.emailAddresses.updateEmailAddress(
-    email.id,
-    {
-      verified: true,
-      primary: true,
-    }
-  );
+  await client.emailAddresses.updateEmailAddress(email.id, {
+    verified: true,
+    primary: true,
+  });
 
   return await client.users.getUser(user.id);
 };
 
 export const updateClerkUserService = async (
   id: string,
-  payload: TCreateOrUpdateClerkUserSchema
+  payload: TCreateOrUpdateClerkUserSchema,
 ) => {
   const client = await clerkClient();
 
   const user = await client.users.getUser(id);
 
-  const currentEmail = user.emailAddresses.find(
-    (e) => e.id === user.primaryEmailAddressId
-  );
+  const currentEmail = user.emailAddresses.find((e) => e.id === user.primaryEmailAddressId);
 
-  if (
-    payload.emailAddress &&
-    payload.emailAddress !== currentEmail?.emailAddress
-  ) {
+  if (payload.emailAddress && payload.emailAddress !== currentEmail?.emailAddress) {
     const existingUsers = await client.users.getUserList({
       emailAddress: [payload.emailAddress],
       limit: 1,
     });
 
-    const emailUsedByAnotherUser =
-      existingUsers.data.length > 0 &&
-      existingUsers.data[0].id !== id;
+    const emailUsedByAnotherUser = existingUsers.data.length > 0 && existingUsers.data[0].id !== id;
 
     if (emailUsedByAnotherUser) {
       throw new BadRequestException("Email sudah digunakan oleh pengguna lain.");
@@ -161,28 +146,19 @@ export const updateClerkUserService = async (
     lastName: payload.lastName,
   });
 
-  if (
-    payload.emailAddress &&
-    payload.emailAddress !== currentEmail?.emailAddress
-  ) {
-    const newEmail =
-      await client.emailAddresses.createEmailAddress({
-        userId: id,
-        emailAddress: payload.emailAddress,
-      });
+  if (payload.emailAddress && payload.emailAddress !== currentEmail?.emailAddress) {
+    const newEmail = await client.emailAddresses.createEmailAddress({
+      userId: id,
+      emailAddress: payload.emailAddress,
+    });
 
-    await client.emailAddresses.updateEmailAddress(
-      newEmail.id,
-      {
-        verified: true,
-        primary: true,
-      }
-    );
+    await client.emailAddresses.updateEmailAddress(newEmail.id, {
+      verified: true,
+      primary: true,
+    });
 
     if (currentEmail) {
-      await client.emailAddresses.deleteEmailAddress(
-        currentEmail.id
-      );
+      await client.emailAddresses.deleteEmailAddress(currentEmail.id);
     }
   }
 
@@ -195,8 +171,8 @@ export const deleteClerkUserService = async (id: string) => {
   const user = await client.users.getUser(id);
 
   if (!user) {
-    throw new NotFoundException("Pengguna tidak ditemukan.")
+    throw new NotFoundException("Pengguna tidak ditemukan.");
   }
 
-  return await client.users.deleteUser(id)
-}
+  return await client.users.deleteUser(id);
+};

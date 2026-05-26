@@ -5,13 +5,17 @@ import { useActionApprovalUser } from "../_hooks/use-mutations";
 import { Button } from "@/app/_components/ui/button";
 
 export const UnsuspendButton = () => {
-    const { id } = useParams<{ id: string }>();
+  const { id } = useParams<{ id: string }>();
 
-    const { mutateAsync, isPending } = useActionApprovalUser();
+  const { mutateAsync, isPending } = useActionApprovalUser();
 
-    return (
-        <Button onClick={() => mutateAsync({ id, payload: { action: "unsuspend" } })} disabled={isPending} isLoading={isPending}>
-            Buka Blokir
-        </Button>
-    )
-}
+  return (
+    <Button
+      onClick={() => mutateAsync({ id, payload: { action: "unsuspend" } })}
+      disabled={isPending}
+      isLoading={isPending}
+    >
+      Buka Blokir
+    </Button>
+  );
+};
