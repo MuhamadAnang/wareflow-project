@@ -1,8 +1,7 @@
-// app/(authenticated)/books/__hooks/use-get-books.query.ts
 import useAuthenticatedClient from "@/app/_hooks/use-authenticated-client";
 import { TIndexBookQuery } from "@/schemas/book.schema";
 import { TBookListItem } from "@/types/database";
-import { TApiSuccessResponseWithPagination } from "@/types/response";
+import { TPaginationResponse } from "@/types/meta";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetBooksQuery = (queryParams: Partial<TIndexBookQuery> = {}) => {
@@ -23,9 +22,8 @@ export const useGetBooksQuery = (queryParams: Partial<TIndexBookQuery> = {}) => 
 
   return useQuery({
     queryKey: ["books", safeParams],
-    queryFn: async (): Promise<TApiSuccessResponseWithPagination<TBookListItem>> => {
-      const response = await api.get("/books", { params: safeParams });
-      return response.data;
+    queryFn: async (): Promise<TPaginationResponse<TBookListItem>> => {
+      return await api.get("/books", { params: safeParams });
     },
   });
 };
