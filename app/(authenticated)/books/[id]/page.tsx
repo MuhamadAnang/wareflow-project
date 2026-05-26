@@ -72,7 +72,9 @@ export default function BookDetailPage() {
                       <Image
                         src={book.image}
                         alt={book.name}
-                        className="max-h-80 rounded-lg shadow-md object-contain"
+                        width={320}
+                        height={416}
+                        className="max-h-80 w-auto rounded-lg object-contain shadow-md"
                       />
                     </div>
                   )}

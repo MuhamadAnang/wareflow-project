@@ -9,6 +9,55 @@ import { useGetPercetakansQuery } from "../../__hooks/use-get-percetakans.query"
 import { useBookForm } from "../../__hooks/use-book-form";
 import { bookLevelEnum, curriculumEnum, semesterEnum } from "@/drizzle/schema";
 import { BookForm } from "../../__components/create-or-update.form";
+import type { TBookListItem } from "@/types/database";
+
+interface UpdateBookFormProps {
+  book: TBookListItem;
+  subjects: { id: number; name: string }[];
+  percetakans: { id: number; name: string }[];
+  isLoading: boolean;
+}
+
+function UpdateBookForm({ book, subjects, percetakans, isLoading }: UpdateBookFormProps) {
+  const { mutateAsync: updateBook, isPending: isUpdating } = useUpdateBookMutation(book.id);
+
+  const form = useBookForm({
+    defaultValues: {
+      code: book.code,
+      subjectId: book.subjectId,
+      grade: book.grade,
+      level: book.level as (typeof bookLevelEnum.enumValues)[number],
+      curriculum: book.curriculum as (typeof curriculumEnum.enumValues)[number],
+      semester: book.semester as (typeof semesterEnum.enumValues)[number],
+      pages: book.pages,
+      productionYear: book.productionYear,
+      percetakanId: book.percetakanId,
+      image: book.image || "",
+    },
+    onSubmit: async (values) => {
+      await updateBook(values);
+    },
+  });
+
+  return (
+    <Page
+      className="max-w-3xl mx-auto mt-3"
+      title="Edit Buku"
+      description="Perbarui informasi identitas buku."
+      isLoading={isLoading || isUpdating}
+    >
+      <BookForm
+        form={form}
+        isPending={isUpdating}
+        subjects={subjects}
+        percetakans={percetakans}
+        onSubjectCreated={(newId) => {
+          form.setFieldValue("subjectId", newId);
+        }}
+      />
+    </Page>
+  );
+}
 
 export default function UpdateBookPage() {
   const params = useParams();
@@ -18,31 +67,10 @@ export default function UpdateBookPage() {
   const { data: subjectsData, isLoading: loadingSubjects } = useGetSubjectsQuery();
   const { data: percetakansData, isLoading: loadingPercetakans } = useGetPercetakansQuery();
 
-  const { mutateAsync: updateBook, isPending: isUpdating } = useUpdateBookMutation(bookId);
-
   const book = bookData?.data;
   const subjects = subjectsData ?? [];
   const percetakans = percetakansData ?? [];
-
-  const form = useBookForm({
-    defaultValues: {
-      code: book?.code || "",
-      subjectId: book?.subjectId ?? 0,
-      grade: book?.grade ?? 0,
-      level: (book?.level as (typeof bookLevelEnum.enumValues)[number]) ?? undefined,
-      curriculum: (book?.curriculum as (typeof curriculumEnum.enumValues)[number]) ?? undefined,
-      semester: (book?.semester as (typeof semesterEnum.enumValues)[number]) ?? "GANJIL",
-      pages: book?.pages ?? null,
-      productionYear: book?.productionYear ?? null,
-      percetakanId: book?.percetakanId || 0,
-      image: book?.image || "",
-    },
-    onSubmit: async (values) => {
-      await updateBook(values);
-    },
-  });
-
-  const isFormLoading = loadingBook || loadingSubjects || loadingPercetakans || isUpdating;
+  const isFormLoading = loadingSubjects || loadingPercetakans;
 
   if (loadingBook || !book) {
     return (
@@ -53,22 +81,12 @@ export default function UpdateBookPage() {
   }
 
   return (
-    <Page
-      className="max-w-3xl mx-auto mt-3"
-      title="Edit Buku"
-      description="Perbarui informasi identitas buku."
+    <UpdateBookForm
+      key={book.id}
+      book={book}
+      subjects={subjects}
+      percetakans={percetakans}
       isLoading={isFormLoading}
-    >
-      <BookForm
-        key={book.id} // ← ini yang penting, force re-mount saat data siap
-        form={form}
-        isPending={isUpdating}
-        subjects={subjects}
-        percetakans={percetakans}
-        onSubjectCreated={(newId) => {
-          form.setFieldValue("subjectId", newId);
-        }}
-      />
-    </Page>
+    />
   );
 }

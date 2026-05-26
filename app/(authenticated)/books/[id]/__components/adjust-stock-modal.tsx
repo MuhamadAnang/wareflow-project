@@ -44,7 +44,7 @@ export function AdjustStockModal({ bookId, open, onClose }: Props) {
               placeholder="+10 atau -5"
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Positif = tambah stok, Negatif = kurangi stok
+              Masukkan jumlah stok saat ini
             </p>
           </div>
 
