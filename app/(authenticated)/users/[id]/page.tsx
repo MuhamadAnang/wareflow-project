@@ -8,8 +8,6 @@ import { Badge } from "@/app/_components/ui/badge";
 import { format, fromUnixTime } from "date-fns";
 import { ApproveButton } from "./_components/approve.button";
 import { RejectButton } from "./_components/reject.button";
-import { SuspendButton } from "./_components/suspend.button";
-import { UnsuspendButton } from "./_components/unsuspend.button";
 
 export default function UserPage() {
   const { id } = useParams<{ id: string }>();
@@ -35,14 +33,12 @@ export default function UserPage() {
       description="Lihat detail informasi pengguna di sini."
       headerAction={
         <div className="flex gap-3">
-          {!isNewUser && !isBanned && <SuspendButton />}
           {isNewUser && (
             <>
               <RejectButton />
               <ApproveButton />
             </>
           )}
-          {isBanned && <UnsuspendButton />}
         </div>
       }
     >

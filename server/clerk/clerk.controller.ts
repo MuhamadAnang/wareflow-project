@@ -79,12 +79,6 @@ export const approveOrRejectClerkUserController = async (request: NextRequest, i
       case "reject":
         message = "User rejected successfully";
         break;
-      case "suspend":
-        message = "User suspended successfully";
-        break;
-      case "unsuspend":
-        message = "User unsuspended successfully";
-        break;
     }
 
     return responseFormatter.successWithData({

@@ -62,22 +62,6 @@ export const approveOrRejectClerkUserService = async (id: string, payload: TActi
         isAllowed: false,
       },
     });
-  } else if (action === "suspend") {
-    await client.users.banUser(id);
-
-    return await client.users.updateUser(id, {
-      publicMetadata: {
-        isAllowed: false,
-      },
-    });
-  } else if (action === "unsuspend") {
-    await client.users.unbanUser(id);
-
-    return await client.users.updateUser(id, {
-      publicMetadata: {
-        isAllowed: true,
-      },
-    });
   }
 };
 
