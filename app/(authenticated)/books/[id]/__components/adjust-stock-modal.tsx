@@ -43,9 +43,7 @@ export function AdjustStockModal({ bookId, open, onClose }: Props) {
               onChange={(e) => setQuantity(Number(e.target.value))}
               placeholder="+10 atau -5"
             />
-            <p className="text-xs text-muted-foreground mt-1">
-              Masukkan jumlah stok saat ini
-            </p>
+            <p className="text-xs text-muted-foreground mt-1">Masukkan jumlah stok saat ini</p>
           </div>
 
           <div>
