@@ -12,7 +12,7 @@ export default function AuthenticatedLayout({ children }: { children: React.Reac
         <div className="w-full h-screen flex flex-col">
           <main className="w-full flex h-full overflow-hidden">
             <AuthenticatedSidebar />
-            <div className="flex flex-col w-full">
+            <div className="flex flex-col w-full overflow-scroll">
               <Header />
               {children}
             </div>
