@@ -20,6 +20,7 @@ import {
   bookLevelEnum,
   curriculumEnum,
 } from "@/drizzle/schema";
+import type { User } from "@clerk/nextjs/server";
 
 // ==================== CUSTOMER TYPES ====================
 
@@ -266,3 +267,5 @@ export type TSupplierReturnDetail = TSupplierReturn & {
     };
   })[];
 };
+
+export type TClerkUser = User;

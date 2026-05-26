@@ -11,6 +11,7 @@ import {
   ShoppingCart,
   Truck,
   Undo2,
+  UserCheck,
   Users,
 } from "lucide-react";
 import { Route as RouteNext } from "next";
@@ -49,6 +50,7 @@ export const MENU_GROUPS: MenuGroup[] = [
       { label: "Supplier", href: "/suppliers", icon: <Building /> },
       { label: "Mata Pelajaran", href: "/subjects", icon: <BookType /> },
       { label: "Daftar Buku", href: "/books", icon: <Album /> },
+      { label: "Pengguna", href: "/users", icon: <UserCheck /> },
     ],
   },
   {

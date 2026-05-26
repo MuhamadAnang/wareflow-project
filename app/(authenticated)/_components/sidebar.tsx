@@ -39,7 +39,7 @@ export default function AuthenticatedSidebar() {
   }, [pathname]);
 
   return (
-    <Sidebar containerClassName="z-999 relative bg-transparent" className="bg-transparent">
+    <Sidebar containerClassName="relative bg-transparent" className="bg-transparent">
       <SidebarHeader className="flex justify-between items-center flex-row p-4">
         <Logo />
       </SidebarHeader>
