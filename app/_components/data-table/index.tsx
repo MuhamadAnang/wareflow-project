@@ -11,7 +11,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
 import { useMemo } from "react";
 import Loading from "../loading";
-import { useIsMobile } from "../../_hooks/use-mobile";
 import { Button } from "../ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Pagination, PaginationContent, PaginationItem } from "../ui/pagination";
@@ -22,7 +21,6 @@ import { TFilterItem } from "./filter-collections/factory";
 import { FilterTable } from "./filter";
 import { DateRange } from "react-day-picker";
 import { TPaginationResponse } from "@/types/meta";
-import type { AxiosResponse } from "axios";
 
 export type TFilterValue =
   | string
@@ -33,14 +31,7 @@ export type TFilterValue =
   | Array<string | number>;
 
 interface IDataTableProps<TData, TValue = unknown> {
-  source?:
-    | TPaginationResponse<TData>
-    | AxiosResponse<TPaginationResponse<TData>>
-    | TData[]
-    | {
-        data?: TData[] | TPaginationResponse<TData>;
-        meta?: TPaginationResponse<TData>["meta"];
-      };
+  source?: TPaginationResponse<TData>;
   columns: ColumnDef<TData, TValue>[];
   isLoading?: boolean;
   placeholderSearch?: string;
@@ -77,41 +68,7 @@ const DataTable = <TData, TValue = unknown>(props: IDataTableProps<TData, TValue
     placeholderSearch,
     selectable,
   } = props;
-  const normalizedSource = useMemo(() => {
-    if (!source) {
-      return {
-        data: [] as TData[],
-        meta: undefined as TPaginationResponse<TData>["meta"] | undefined,
-      };
-    }
-
-    if (Array.isArray(source)) {
-      return { data: source, meta: undefined };
-    }
-
-    const directData = (source as TPaginationResponse<TData>).data;
-    if (Array.isArray(directData)) {
-      return {
-        data: directData,
-        meta: (source as TPaginationResponse<TData>).meta,
-      };
-    }
-
-    const nestedData = (source as AxiosResponse<TPaginationResponse<TData>>).data;
-    if (nestedData && Array.isArray(nestedData.data)) {
-      return {
-        data: nestedData.data,
-        meta: nestedData.meta,
-      };
-    }
-
-    return {
-      data: [] as TData[],
-      meta: undefined as TPaginationResponse<TData>["meta"] | undefined,
-    };
-  }, [source]);
-
-  const { data = [], meta } = normalizedSource;
+  const { data = [], meta } = source || {};
   const { page, pageSize } = pagination;
   const { total } = meta || {};
 
@@ -126,7 +83,7 @@ const DataTable = <TData, TValue = unknown>(props: IDataTableProps<TData, TValue
     columns,
     state: {
       pagination: {
-        pageIndex: page,
+        pageIndex: Math.max(page - 1, 0),
         pageSize: pageSize,
       },
     },
@@ -252,48 +209,46 @@ const TablePagination = <TData,>(props: IPaginationProps<TData>) => {
   const { getState, getPageCount } = table;
   const { pageIndex, pageSize } = getState().pagination;
   const pageCount = getPageCount();
+  const currentPage = pageIndex + 1;
 
-  const isMobile = useIsMobile();
-  const pageRange = isMobile ? 1 : 2;
-  const start = pageIndex * pageSize - pageSize + 1;
+  const start = pageIndex * pageSize + 1;
   const hasData = (totalItems ?? 0) > 0;
 
   const generatePageNumbers = (): (number | string)[] => {
-    const maxVisiblePages = !isMobile ? 3 : 6;
+    const maxVisiblePages = 3;
 
     if (pageCount <= maxVisiblePages) {
       return Array.from({ length: pageCount }, (_, i) => i + 1);
     }
 
-    const pages: (number | string)[] = [];
-    if (pageIndex <= pageRange + 1) {
-      pages.push(...Array.from({ length: pageRange + 2 }, (_, i) => i + 1), "...");
-    } else if (pageIndex >= pageCount - pageRange) {
-      pages.push(
-        "...",
-        ...Array.from({ length: pageRange + 2 }, (_, i) => pageCount - pageRange - 1 + i),
-      );
-    } else {
-      pages.push("...", pageIndex - pageRange, pageIndex, pageIndex + pageRange, "...");
+    if (currentPage <= 2) {
+      return [...Array.from({ length: maxVisiblePages }, (_, i) => i + 1), "..."];
     }
 
-    return pages;
+    if (currentPage >= pageCount - 1) {
+      return [
+        "...",
+        ...Array.from({ length: maxVisiblePages }, (_, i) => pageCount - maxVisiblePages + 1 + i),
+      ];
+    }
+
+    return ["...", currentPage - 1, currentPage, currentPage + 1, "..."];
   };
 
-  const handleEllipsisClick = (index: number) => {
-    const isFirstEllipsis = index === 0;
+  const handleEllipsisClick = (index: number, pages: (number | string)[]) => {
+    const isFirstEllipsis = index < pages.length / 2;
     const jumpAmount = Math.floor(pageCount / 3);
     const newPage = isFirstEllipsis
-      ? Math.max(1, pageIndex - jumpAmount)
-      : Math.min(pageCount, pageIndex + jumpAmount);
+      ? Math.max(1, currentPage - jumpAmount)
+      : Math.min(pageCount, currentPage + jumpAmount);
     onPageChange?.(newPage, pageSize);
   };
 
-  const renderPageButton = (page: number | string, index: number) => {
+  const renderPageButton = (page: number | string, index: number, pages: (number | string)[]) => {
     if (typeof page === "number") {
       return (
         <Button
-          variant={pageIndex === page ? "default" : "outline"}
+          variant={currentPage === page ? "default" : "outline"}
           className="h-8 w-8"
           onClick={() => onPageChange?.(page, pageSize)}
           disabled={!hasData}
@@ -307,7 +262,7 @@ const TablePagination = <TData,>(props: IPaginationProps<TData>) => {
       <Button
         variant="outline"
         className="h-8 w-8"
-        onClick={() => handleEllipsisClick(index)}
+        onClick={() => handleEllipsisClick(index, pages)}
         disabled={!hasData}
       >
         {page}
@@ -315,13 +270,15 @@ const TablePagination = <TData,>(props: IPaginationProps<TData>) => {
     );
   };
 
+  const pages = generatePageNumbers();
+
   return (
     <CardFooter className="flex w-full flex-col items-center justify-center gap-5 lg:flex-row lg:justify-between">
       <div className="flex w-full items-center justify-center gap-3 lg:w-max">
         <div className="w-20">
           <Select
             value={String(pageSize)}
-            onValueChange={(value) => onPageChange?.(pageIndex, Number(value))}
+            onValueChange={(value) => onPageChange?.(currentPage, Number(value))}
           >
             <SelectTrigger>
               <SelectValue placeholder={pageSize || 0} />
@@ -351,7 +308,7 @@ const TablePagination = <TData,>(props: IPaginationProps<TData>) => {
                 variant="outline"
                 className="h-8 w-8"
                 onClick={() => onPageChange(1, pageSize)}
-                disabled={pageIndex === 1 || !hasData}
+                disabled={currentPage === 1 || !hasData}
               >
                 <ChevronsLeft className="h-4 w-4" />
               </Button>
@@ -360,23 +317,23 @@ const TablePagination = <TData,>(props: IPaginationProps<TData>) => {
               <Button
                 variant="outline"
                 className="h-8 w-8"
-                onClick={() => onPageChange(pageIndex - 1, pageSize)}
-                disabled={pageIndex === 1 || !hasData}
+                onClick={() => onPageChange(currentPage - 1, pageSize)}
+                disabled={currentPage === 1 || !hasData}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
             </PaginationItem>
 
-            {generatePageNumbers().map((page, index) => (
-              <PaginationItem key={index}>{renderPageButton(page, index)}</PaginationItem>
+            {pages.map((page, index) => (
+              <PaginationItem key={index}>{renderPageButton(page, index, pages)}</PaginationItem>
             ))}
 
             <PaginationItem>
               <Button
                 variant="outline"
                 className="h-8 w-8"
-                onClick={() => onPageChange(pageIndex + 1, pageSize)}
-                disabled={pageIndex === pageCount || !hasData}
+                onClick={() => onPageChange(currentPage + 1, pageSize)}
+                disabled={currentPage === pageCount || !hasData}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -386,7 +343,7 @@ const TablePagination = <TData,>(props: IPaginationProps<TData>) => {
                 variant="outline"
                 className="h-8 w-8"
                 onClick={() => onPageChange(pageCount, pageSize)}
-                disabled={pageIndex === pageCount || !hasData}
+                disabled={currentPage === pageCount || !hasData}
               >
                 <ChevronsRight className="h-4 w-4" />
               </Button>
